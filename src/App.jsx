@@ -529,15 +529,30 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
 
 
             {/* RAPPORT */}
-            {activeStage === "rapport" && (
+            {activeStage === "open" && (
               <div>
                 <div style={{ marginBottom:28, background:C.emerald, borderRadius:14, padding:26 }}>
                   <div style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,0.6)", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:12 }}>★ Open with this — every time</div>
                   <div style={{ fontSize:22, color:C.white, lineHeight:1.9, marginBottom:14, fontWeight:600 }}>"I'm glad we found the time to meet today."</div>
                   <div style={{ fontSize:15, color:"rgba(255,255,255,0.85)", lineHeight:1.7, borderTop:"1px solid rgba(255,255,255,0.2)", paddingTop:14 }}>Then SHUT UP. See how they respond. Small talk energy → stay with it. Business energy → "Can we talk about the agenda?" Never thank them for their time — positions you lower.</div>
                 </div>
+                <div style={{ marginBottom:20, background:"#fff8e0", border:"1.5px solid #f5c040", borderRadius:12, padding:"16px 20px" }}>
+                  <div style={{ fontSize:11, fontWeight:700, color:"#8b6000", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>🏆 Presidents Club Frame — Larry S.</div>
+                  <div style={{ fontSize:14, color:"#5a3c00", lineHeight:1.8, marginBottom:12 }}>Genuinely understand <strong>what's not working</strong>, <strong>why it's not working</strong>, and <strong>do the math to scope the impact</strong>. Soften with reverse psychology.</div>
+                  {[
+                    { label:"They say it takes 3 hours", q:'"What about that process is taking 3 hours?"' },
+                    { label:"They lost a deal", q:'"What's the average deal size?" → "How many times has this happened in the last month?"' },
+                    { label:"Soften frequency", q:'"Is this something that happens often — or was that a rare one-off?"' },
+                  ].map((f,i)=>(
+                    <div key={i} style={{ background:"#fffef5", borderRadius:8, padding:"10px 14px", border:"1px solid #f0d870", marginBottom:i<2?8:0 }}>
+                      <div style={{ fontSize:11, fontWeight:700, color:"#8b6000", marginBottom:4 }}>{f.label}</div>
+                      <div style={{ fontSize:14, color:"#3a2a00", lineHeight:1.7, fontStyle:"italic" }}>{f.q}</div>
+                    </div>
+                  ))}
+                </div>
+
                 {[{ label:"They want to chat", text:'Stay with it for 60-90 seconds. Ask something real. Then: "Can we talk about the agenda?"' },{ label:"They mean business", text:'"Good, thanks for asking. Look, I know your time is valuable and you reached out for a reason — mind if we dive in?"' }].map((s,i)=>{
-                  const key=`rapport-${i}`, open=expandedScript===key;
+                  const key=`open-${i}`, open=expandedScript===key;
                   return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
@@ -555,14 +570,14 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
             )}
 
             {/* ROE */}
-            {activeStage === "roe" && (
+            {activeStage === "open_roe_removed" && (
               <div>
                 {[
                   { label:"Transition from small talk", text:'"Can we talk about the agenda?"' },
                   { label:"Full ROE — Orlob's exact script", text:'"Here\'s what I\'m thinking in terms of an agenda. Let me know if you had something else in mind.\n\nThe objective of this meeting in my mind is simply to determine if we should have a next step. Obviously I don\'t expect us to do business on this call. So let\'s just learn enough about each other to determine whether the next logical step even makes sense.\n\nFair?\n\nGreat. Now here\'s the agenda I\'m thinking:\n\nFirst, let\'s spend most of our time getting clear on the challenges you\'re facing.\n\nOnce we\'re clear on that, I can share a bit about what PandaDoc does so we can jointly decide whether we schedule a next step.\n\nDoes that agenda feel fair?"' },
                   { label:"End-of-call callback", text:'"So at the beginning of this call, one of the things we agreed on is we\'ll make a decision — does it make sense to schedule a next logical step, or does it make sense not to?\n\nThe sense I\'m getting is it feels like this conversation has legs and we should talk about what a next step looks like. Does that feel fair to you?"' },
                 ].map((s,i)=>{
-                  const key=`roe-${i}`, open=expandedScript===key;
+                  const key=`open2-${i}`, open=expandedScript===key;
                   return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
@@ -592,6 +607,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   {sd.tips.map((t,i)=>(<div key={i} style={{ display:"flex", gap:14, marginBottom:i<sd.tips.length-1?14:0 }}><span style={{ fontSize:15, color:C.textMuted, flexShrink:0 }}>—</span><span style={{ fontSize:16, color:C.textSecondary, lineHeight:1.75 }}>{t}</span></div>))}
                 </Collapsible>
                 <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
+                  { label:"Trial + check-in", text:'"What I\'d recommend is getting you into a trial and checking in in three days once you\'ve had a chance to look around. I\'ll send you a setup link right after this call. Does that work?"' },
+                  { label:"Call back the ROE", text:'"So at the beginning of this call, one of the things we agreed on is we\'d both make a decision — does it make sense to continue in a concrete way, or is this not a priority? Based on what we both learned — should we go our separate ways, or does it make sense to take a next step?"' },
+
                   {sd.watch.map((w,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.watch.length-1?14:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:16, color:"#5a1a00", lineHeight:1.75 }}>{w}</span></div>))}
                 </Collapsible>
               </div>
@@ -602,10 +620,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div>
                 {[
                   { label:"Full What/Who/Why — Orlob's exact script", text:'"Looks like we\'re coming up on time. Should we talk about next steps?\n\nGreat. You know your company better than me. So if you have a different idea, let me know.\n\nBut based on what you told me today, what I recommend we do next is [specific next step].\n\nIt would be helpful if we could include [name/role] in that meeting too — [why they should be there].\n\nDoes that feel fair?"' },
-                  { label:"Multi-stakeholder demo", text:'"Based on what you\'ve shared, I\'d recommend a focused demo with you and [decision maker]. It\'d be helpful to have [name/role] in the room — since what we talked about directly affects [their metric]. You know your company better than I do — does that feel like the right next step?"' },
-                  { label:"Trial + check-in", text:'"What I\'d recommend is getting you into a trial and checking in in three days once you\'ve had a chance to look around. I\'ll send you a setup link right after this call. Does that work?"' },
-                  { label:"Call back the ROE", text:'"So at the beginning of this call, one of the things we agreed on is we\'d both make a decision — does it make sense to continue in a concrete way, or is this not a priority? Based on what we both learned — should we go our separate ways, or does it make sense to take a next step?"' },
-                ].map((s,i)=>{
+                  { label:"Multi-stakeholder demo", text:'"Based on what you\'ve shared, I\'d recommend a focused demo with you and [decision maker]. It\'d be helpful to have [name/role] in the room — since what we talked about directly affects [their metric]. You know your company better than I do — does that feel like the right next step?"' },                ].map((s,i)=>{
                   const key=`next-${i}`, open=expandedScript===key;
                   return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
