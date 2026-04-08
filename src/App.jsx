@@ -607,9 +607,6 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   {sd.tips.map((t,i)=>(<div key={i} style={{ display:"flex", gap:14, marginBottom:i<sd.tips.length-1?14:0 }}><span style={{ fontSize:15, color:C.textMuted, flexShrink:0 }}>—</span><span style={{ fontSize:16, color:C.textSecondary, lineHeight:1.75 }}>{t}</span></div>))}
                 </Collapsible>
                 <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
-                  { label:"Trial + check-in", text:'"What I\'d recommend is getting you into a trial and checking in in three days once you\'ve had a chance to look around. I\'ll send you a setup link right after this call. Does that work?"' },
-                  { label:"Call back the ROE", text:'"So at the beginning of this call, one of the things we agreed on is we\'d both make a decision — does it make sense to continue in a concrete way, or is this not a priority? Based on what we both learned — should we go our separate ways, or does it make sense to take a next step?"' },
-
                   {sd.watch.map((w,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.watch.length-1?14:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:16, color:"#5a1a00", lineHeight:1.75 }}>{w}</span></div>))}
                 </Collapsible>
               </div>
@@ -619,8 +616,11 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
             {activeStage === "next-step" && (
               <div>
                 {[
-                  { label:"Full What/Who/Why — Orlob's exact script", text:'"Looks like we\'re coming up on time. Should we talk about next steps?\n\nGreat. You know your company better than me. So if you have a different idea, let me know.\n\nBut based on what you told me today, what I recommend we do next is [specific next step].\n\nIt would be helpful if we could include [name/role] in that meeting too — [why they should be there].\n\nDoes that feel fair?"' },
-                  { label:"Multi-stakeholder demo", text:'"Based on what you\'ve shared, I\'d recommend a focused demo with you and [decision maker]. It\'d be helpful to have [name/role] in the room — since what we talked about directly affects [their metric]. You know your company better than I do — does that feel like the right next step?"' },                ].map((s,i)=>{
+                  { label:"Call back the ROE — open with this", text:'"So at the beginning of this call, one of the things we agreed on is we\'ll make a decision — does it make sense to continue in a concrete way, or is this not a priority?\n\nBased on what we both learned today — should we go our separate ways, or does it make sense to take a next step?"' },
+                  { label:"Full What/Who/Why — Orlob\'s exact script", text:'"Looks like we\'re coming up on time. Should we talk about next steps?\n\nGreat. You know your company better than me. So if you have a different idea, let me know.\n\nBut based on what you told me today, what I recommend we do next is [specific next step].\n\nIt would be helpful if we could include [name/role] in that meeting too — [why they should be there].\n\nDoes that feel fair?"' },
+                  { label:"Multi-stakeholder demo", text:'"Based on what you\'ve shared, I\'d recommend a focused demo with you and [decision maker]. It\'d be helpful to have [name/role] in the room — since what we talked about directly affects [their metric]. You know your company better than I do — does that feel like the right next step?"' },
+                  { label:"Trial + check-in", text:'"What I\'d recommend is getting you into a trial and checking in in three days once you\'ve had a chance to look around. I\'ll send you a setup link right after this call. Does that work?"' },
+                ].map((s,i)=>{
                   const key=`next-${i}`, open=expandedScript===key;
                   return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
