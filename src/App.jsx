@@ -536,20 +536,6 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   <div style={{ fontSize:22, color:C.white, lineHeight:1.9, marginBottom:14, fontWeight:600 }}>"I'm glad we found the time to meet today."</div>
                   <div style={{ fontSize:15, color:"rgba(255,255,255,0.85)", lineHeight:1.7, borderTop:"1px solid rgba(255,255,255,0.2)", paddingTop:14 }}>Then SHUT UP. See how they respond. Small talk energy → stay with it. Business energy → "Can we talk about the agenda?" Never thank them for their time — positions you lower.</div>
                 </div>
-                <div style={{ marginBottom:20, background:"#fff8e0", border:"1.5px solid #f5c040", borderRadius:12, padding:"16px 20px" }}>
-                  <div style={{ fontSize:11, fontWeight:700, color:"#8b6000", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>🏆 Presidents Club Frame — Larry S.</div>
-                  <div style={{ fontSize:14, color:"#5a3c00", lineHeight:1.8, marginBottom:12 }}>Genuinely understand <strong>what's not working</strong>, <strong>why it's not working</strong>, and <strong>do the math to scope the impact</strong>. Soften with reverse psychology.</div>
-                  {[
-                    { label:"They say it takes 3 hours", q:'"What about that process is taking 3 hours?"' },
-                    { label:"They lost a deal", q:"\"What\u2019s the average deal size?\" \u2192 \"How many times has this happened in the last month?\"" },
-                    { label:"Soften frequency", q:'"Is this something that happens often — or was that a rare one-off?"' },
-                  ].map((f,i)=>(
-                    <div key={i} style={{ background:"#fffef5", borderRadius:8, padding:"10px 14px", border:"1px solid #f0d870", marginBottom:i<2?8:0 }}>
-                      <div style={{ fontSize:11, fontWeight:700, color:"#8b6000", marginBottom:4 }}>{f.label}</div>
-                      <div style={{ fontSize:14, color:"#3a2a00", lineHeight:1.7, fontStyle:"italic" }}>{f.q}</div>
-                    </div>
-                  ))}
-                </div>
 
                 {[{ label:"They want to chat", text:'Stay with it for 60-90 seconds. Ask something real. Then: "Can we talk about the agenda?"' },{ label:"They mean business", text:'"Good, thanks for asking. Look, I know your time is valuable and you reached out for a reason — mind if we dive in?"' }].map((s,i)=>{
                   const key=`open-${i}`, open=expandedScript===key;
