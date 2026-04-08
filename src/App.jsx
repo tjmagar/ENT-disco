@@ -661,13 +661,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   <textarea
                     value={callTranscript}
                     onChange={e => setCallTranscript(e.target.value)}
-                    placeholder={"Paste your Granola transcript here...
-
-0:00 | Tyler
-hey, how's it going...
-
-0:15 | Prospect
-..."}
+                    placeholder="Paste your Granola transcript here... (e.g. 0:00 | Tyler — hey how's it going...)"
                     style={{ width:"100%", minHeight:160, fontSize:14, lineHeight:1.75, padding:"14px 16px", border:`1.5px solid ${C.border}`, borderRadius:10, background:C.sand, color:C.textPrimary, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none", marginBottom:14 }}
                   />
                   <button
