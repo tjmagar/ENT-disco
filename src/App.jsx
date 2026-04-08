@@ -541,7 +541,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   <div style={{ fontSize:14, color:"#5a3c00", lineHeight:1.8, marginBottom:12 }}>Genuinely understand <strong>what's not working</strong>, <strong>why it's not working</strong>, and <strong>do the math to scope the impact</strong>. Soften with reverse psychology.</div>
                   {[
                     { label:"They say it takes 3 hours", q:'"What about that process is taking 3 hours?"' },
-                    { label:"They lost a deal", q:'"What's the average deal size?" → "How many times has this happened in the last month?"' },
+                    { label:"They lost a deal", q:"\"What\u2019s the average deal size?\" \u2192 \"How many times has this happened in the last month?\"" },
                     { label:"Soften frequency", q:'"Is this something that happens often — or was that a rare one-off?"' },
                   ].map((f,i)=>(
                     <div key={i} style={{ background:"#fffef5", borderRadius:8, padding:"10px 14px", border:"1px solid #f0d870", marginBottom:i<2?8:0 }}>
