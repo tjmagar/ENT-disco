@@ -263,9 +263,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
             {r.text && <div style={{ padding:"18px 22px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{r.text}</div>}
             {r.alts && <div style={{ padding:"12px 22px 0" }}>{r.alts.map((a,i)=><div key={i} style={{ fontSize:16, color:"#1a1a1a", lineHeight:2, whiteSpace:"pre-wrap", fontWeight:500, marginBottom:i<r.alts.length-1?16:0, paddingBottom:i<r.alts.length-1?16:0, borderBottom:i<r.alts.length-1?`1px dashed ${C.border}`:"none" }}>{a}</div>)}</div>}
             {r.note && <div style={{ margin:"12px 22px 0", fontSize:14, color:C.textSecondary, lineHeight:1.75, background:C.white, padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
-            <div style={{ padding:"14px 18px", display:"flex", gap:8 }}>
-              {r.text &&}
-            </div>
+
           </div>
         )}
       </div>
