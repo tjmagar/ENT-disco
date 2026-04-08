@@ -103,12 +103,9 @@ export default function App() {
   const [coachInput, setCoachInput] = useState("");
   const [outputs, setOutputs] = useState({ spiced:"", email:"", score:"", whatweheard:"", debrief:"" });
   const [outputLoading, setOutputLoading] = useState("");
-  const [proactiveNudge, setProactiveNudge] = useState("");
-  const [nudgeLoading, setNudgeLoading] = useState(false);
   const [tipsOpen, setTipsOpen] = useState(false);
   const [watchOpen, setWatchOpen] = useState(false);
   const [expandedScript, setExpandedScript] = useState(null);
-  const nudgeTimer = useRef(null);
   const coachRef = useRef(null);
   const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "coach" | "roi"
@@ -116,34 +113,13 @@ export default function App() {
   const [debriefLoading, setDebriefLoading] = useState(false);
 
   const currentIdx = STAGES.findIndex(s => s.id === activeStage);
-  const completedStages = STAGES.slice(0, currentIdx).map(s => s.id);
   const stageNote = notes[activeStage] || "";
-  const showOutputsShortcut = currentIdx >= STAGES.findIndex(s => s.id === "next-step") && activeStage !== "outputs";
+  const showOutputsShortcut = activeStage !== "outputs";
   const B = { fontFamily:"'Inter', system-ui, sans-serif", cursor:"pointer" };
 
-  useEffect(() => { setTipsOpen(false); setWatchOpen(false); setProactiveNudge(""); setExpandedScript(null); }, [activeStage]);
+  useEffect(() => { setTipsOpen(false); setWatchOpen(false); setExpandedScript(null); }, [activeStage]);
 
-  useEffect(() => {
-    if (activeStage === "prep" || activeStage === "outputs") return;
-    if (!stageNote || stageNote.length < 40) return;
-    if (nudgeTimer.current) clearTimeout(nudgeTimer.current);
-    nudgeTimer.current = setTimeout(() => fireNudge(stageNote), 2000);
-    return () => clearTimeout(nudgeTimer.current);
-  }, [stageNote, activeStage]);
 
-  async function fireNudge(noteText) {
-    setNudgeLoading(true); setProactiveNudge("");
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:120, system:PANDADOC_CONTEXT,
-          messages:[{ role:"user", content:`Prep: ${prepBrief||"None"}\nStage: ${activeStage}\nBuyer path: ${buyerPath||"unknown"}\nNote: "${noteText}"\nOne coaching insight, 2 sentences max. Direct. No preamble.` }] }),
-      });
-      const data = await res.json();
-      setProactiveNudge(data.content?.[0]?.text || "");
-    } catch { setProactiveNudge(""); }
-    setNudgeLoading(false);
-  }
 
   function buildContext(q) {
     return `Prep:\n${prepBrief||"None"}\nStage: ${activeStage}\nBuyer path: ${buyerPath||"unknown"}\nNotes: ${Object.entries(notes).map(([k,v])=>v?k+": "+v:"").filter(Boolean).join(" | ")}\nSPICED: ${JSON.stringify(spiced)}\n\n${q}`;
@@ -317,7 +293,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       <div style={{ marginBottom:28 }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
           <div style={{ fontSize:13, fontWeight:700, color:pathColor, letterSpacing:"0.06em", textTransform:"uppercase" }}>{pathLabel}</div>
-          <button onClick={()=>setBuyerPath(null)} style={{ ...B, fontSize:11, color:C.textMuted, background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"3px 10px" }}>change</button>
+          <button onClick={()=>setBuyerPath(null)} style={{ ...B, fontSize:12, color:C.white, background:C.coral, border:"none", borderRadius:6, padding:"5px 14px", fontWeight:600 }}>← Change</button>
         </div>
 
         {buyerPath === "evaluating" && <>
@@ -476,10 +452,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         <div style={{ flex:1, padding:"6px 10px" }}>
           {STAGES.map(s => {
             const isActive = s.id === activeStage;
-            const isDone = completedStages.includes(s.id);
             return (
               <button key={s.id} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 12px", borderRadius:8, background:isActive?C.emerald:"transparent", border:"none", textAlign:"left", marginBottom:2 }}>
-                <span style={{ fontSize:16, color:isActive?C.white:isDone?C.emerald:"#aaa", fontWeight:700, minWidth:20, textAlign:"center" }}>{isDone?"✓":s.icon}</span>
+                <span style={{ fontSize:16, color:isActive?C.white:"#aaa", fontWeight:700, minWidth:20, textAlign:"center" }}>{s.icon}</span>
                 <span style={{ fontSize:15, color:C.white, fontWeight:isActive?700:500 }}>{s.short}</span>
               </button>
             );
@@ -491,7 +466,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
             <div style={{ display:"inline-flex", fontSize:12, fontWeight:600, padding:"4px 12px", borderRadius:99, background:buyerPath==="evaluating"?"#0d2a4a":buyerPath==="active-pain"?"#0a2a1a":"#3a1e00", color:buyerPath==="evaluating"?"#6aaae8":buyerPath==="active-pain"?"#5ad88a":"#e8a84a" }}>
               {buyerPath==="evaluating"?"⚡ Evaluating":buyerPath==="active-pain"?"⚠ Active Pain":"◎ Latent"}
             </div>
-            <button onClick={()=>setBuyerPath(null)} style={{ ...B, display:"block", marginTop:5, fontSize:11, color:"#bbb", background:"none", border:"none", padding:0 }}>change</button>
+            <button onClick={()=>setBuyerPath(null)} style={{ ...B, display:"block", marginTop:6, fontSize:11, color:"#bbb", background:"none", border:"1px solid #666", borderRadius:5, padding:"3px 8px" }}>← change</button>
           </div>
         )}
       </div>
@@ -541,14 +516,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               </div>
             )}
 
-            {/* NUDGE */}
-            {(proactiveNudge||nudgeLoading) && activeStage!=="prep" && activeStage!=="outputs" && (
-              <div style={{ marginBottom:28, background:"#F0EDFF", border:`2px solid #A496FF`, borderRadius:12, padding:"16px 20px", display:"flex", gap:12, alignItems:"flex-start" }}>
-                <span style={{ fontSize:20 }}>⚡</span>
-                {nudgeLoading ? <span style={{ fontSize:14, color:C.textMuted, fontStyle:"italic" }}>Reading your notes...</span>
-                  : <span style={{ fontSize:15, color:"#3a2a7a", lineHeight:1.75, fontWeight:500 }}>{proactiveNudge}</span>}
-              </div>
-            )}
+
 
             {/* RAPPORT */}
             {activeStage === "rapport" && (
