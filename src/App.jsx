@@ -10,8 +10,7 @@ const C = {
 
 const STAGES = [
   { id:"prep",             icon:"◎", short:"Prep Brief" },
-  { id:"rapport",          icon:"①", short:"Rapport" },
-  { id:"roe",              icon:"②", short:"ROE" },
+  { id:"open",             icon:"①", short:"Open" },
   { id:"buyer-type",       icon:"③", short:"Buyer Type" },
   { id:"business-problem", icon:"④", short:"Business Problem" },
   { id:"baseline",         icon:"⑤", short:"Baseline" },
@@ -22,12 +21,85 @@ const STAGES = [
   { id:"outputs",          icon:"✦", short:"Outputs" },
 ];
 
-const SPICED_FIELDS = [
-  { key:"situation",      label:"S — Situation",      hint:"Company, team, tools, context" },
-  { key:"pain",           label:"P — Pain",           hint:"Need behind the need + root cause" },
-  { key:"impact",         label:"I — Impact",         hint:"Metric + current state + cost of inaction" },
-  { key:"critical_event", label:"C — Critical Event", hint:"Timeline driver, trajectory, dissatisfaction" },
-  { key:"decision",       label:"D — Decision",       hint:"Steps, people, criteria, funding" },
+const SPICED_QUESTIONS = [
+  {
+    key:"situation",
+    label:"S — Situation",
+    color:"#1a4878",
+    bg:"#edf5ff",
+    border:"#a8d0f0",
+    questions:[
+      "How many people generate, send, track, or approve documents at your company?",
+      "How many documents do you typically send out on a monthly or annual basis?",
+      "What departments would be using a tool like PandaDoc?",
+      "From the beginning of your process to the end — what documents are sent, how are they completed, and where are they stored?",
+      "What solution are you using currently, if any?",
+      "What CRM do you use?",
+      "Are there any security or compliance requirements we need to account for?",
+    ]
+  },
+  {
+    key:"pain",
+    label:"P — Pain",
+    color:C.emerald,
+    bg:C.emeraldLight,
+    border:C.emeraldMid,
+    questions:[
+      "What is going on in your business that's driving this to be a priority?",
+      "Aside from [what they said] — is there something going on behind the scenes driving you to prioritize fixing this?",
+      "What's your take on why this is happening?",
+      "Could you tell me about the moment when you realized this was actually a problem?",
+      "What have you tried to do about it? Did it work?",
+      "Is a solution like this a nice to have or a need to have?",
+      "Out of everything you could have chosen to solve for — why this?",
+    ]
+  },
+  {
+    key:"impact",
+    label:"I — Impact",
+    color:"#b07020",
+    bg:"#FFF4E6",
+    border:"#F5C070",
+    questions:[
+      "What metric is below expectations as a result of the challenges you've shared with me?",
+      "What are the ripple effects this challenge is having across the business?",
+      "How much time are you spending each day dealing with this problem?",
+      "How much do you think this has cost you?",
+      "What is the potential impact on revenue if this isn't solved?",
+      "Who else in your organization is aware of and affected by this issue?",
+      "Have you lost clients because of these issues?",
+    ]
+  },
+  {
+    key:"critical_event",
+    label:"C — Critical Event",
+    color:"#9a2060",
+    bg:"#FFF0F8",
+    border:"#E090C0",
+    questions:[
+      "When do you need this implemented by? What happens if we can't hit that timeline?",
+      "Why now — not two months ago or two months from now?",
+      "Would anything prevent your team from moving forward this month if you saw everything you needed?",
+      "Is there a renewal, contract expiration, or hiring deadline driving the timing?",
+      "I'm getting the sense this might not be the top priority right now — am I off on that?",
+    ]
+  },
+  {
+    key:"decision",
+    label:"D — Decision",
+    color:"#5a3ab0",
+    bg:"#F0EDFF",
+    border:"#A496FF",
+    questions:[
+      "What steps do you and your company need to take to make a go or no-go decision on this?",
+      "Who would be involved in each of those steps — and who ultimately signs off?",
+      "Who else cares about this besides you?",
+      "How does your company typically purchase software?",
+      "Whose budget would this come from?",
+      "What are the possible hurdles you've had in the past getting a solution like this approved?",
+      "What specific steps do we need to take to get your legal team to sign off?",
+    ]
+  },
 ];
 
 const PANDADOC_CONTEXT = `You are an AI sales coach in a live PandaDoc SMB discovery call companion. Coach using Chris Orlob's framework from pclub.io.
@@ -61,54 +133,22 @@ KEY ORLOB SCRIPTS:
 Anytime you transition topics — summarize first, then transition. Every time.
 Be specific, brief, direct. Word-for-word scripts. Personalize using prep brief and notes.`;
 
-const RECIPES = [
-  { label:"Summarize → transition", prompt:"Give me word-for-word summarize + validate language to transition to the next topic right now, based on my notes." },
-  { label:"Soften the next question", prompt:"The next question I need to ask might feel like an interrogation. Give me the exact softening T-up language to use." },
-  { label:"Aside from template", prompt:"They gave a surface answer. Give me an 'aside from' follow-up to go deeper without repeating myself." },
-  { label:"They want the product", prompt:"The buyer wants to see the product before discovery is done. Give me the exact words to hold them off." },
-  { label:"Get to power", prompt:"I think I'm talking to an evaluator. How do I navigate to the decision maker right now?" },
-  { label:"CFO worthy yet?", prompt:"Based on what I've captured — does this pass the CFO acid test? Symptom or problem? What do I still need to uncover?" },
-  { label:"What to ask next?", prompt:"Based on where I am and what I've captured, what's the single best question I should ask right now?" },
-  { label:"Symptom → problem", prompt:"My buyer is expressing symptoms. Give me the exact questions to develop them into a CFO-worthy problem." },
-];
 
-async function suggestSpicedField(fieldKey, notes, prepBrief) {
-  const fieldMap = {
-    situation:"S — Situation: company context, team size, tools in use",
-    pain:"P — Pain: the need behind the need and root cause",
-    impact:"I — Impact: metric suffering + cost of inaction",
-    critical_event:"C — Critical Event: timeline driver, trajectory, dissatisfaction level",
-    decision:"D — Decision: steps, people, criteria, funding",
-  };
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:150, system:PANDADOC_CONTEXT,
-        messages:[{ role:"user", content:`Extract 1-2 sentence fill for: ${fieldMap[fieldKey]}.\nPrep: ${prepBrief||"None"}\nNotes: ${Object.entries(notes).map(([k,v])=>v?`${k}: ${v}`:"").filter(Boolean).join(" | ")||"None"}\nReturn ONLY the filled text using prospect's exact words. Empty string if not enough info.` }] }),
-    });
-    const data = await res.json();
-    return data.content?.[0]?.text?.trim() || "";
-  } catch { return ""; }
-}
+
 
 export default function App() {
   const [activeStage, setActiveStage] = useState("prep");
   const [buyerPath, setBuyerPath] = useState(null);
   const [notes, setNotes] = useState({});
   const [prepBrief, setPrepBrief] = useState("");
-  const [spiced, setSpiced] = useState({ situation:"", pain:"", impact:"", critical_event:"", decision:"" });
-  const [spicedSuggesting, setSpicedSuggesting] = useState({});
-  const [coaching, setCoaching] = useState("");
-  const [coachingLoading, setCoachingLoading] = useState(false);
-  const [coachInput, setCoachInput] = useState("");
+  const [openSpiced, setOpenSpiced] = useState(null);
   const [outputs, setOutputs] = useState({ spiced:"", email:"", score:"", whatweheard:"", debrief:"" });
   const [outputLoading, setOutputLoading] = useState("");
   const [tipsOpen, setTipsOpen] = useState(false);
   const [watchOpen, setWatchOpen] = useState(false);
   const [expandedScript, setExpandedScript] = useState(null);
-  const coachRef = useRef(null);
   const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
-  const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "coach" | "roi"
+  const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
   const [callTranscript, setCallTranscript] = useState("");
   const [debriefLoading, setDebriefLoading] = useState(false);
 
@@ -118,28 +158,6 @@ export default function App() {
   const B = { fontFamily:"'Inter', system-ui, sans-serif", cursor:"pointer" };
 
   useEffect(() => { setTipsOpen(false); setWatchOpen(false); setExpandedScript(null); }, [activeStage]);
-
-
-
-  function buildContext(q) {
-    return `Prep:\n${prepBrief||"None"}\nStage: ${activeStage}\nBuyer path: ${buyerPath||"unknown"}\nNotes: ${Object.entries(notes).map(([k,v])=>v?k+": "+v:"").filter(Boolean).join(" | ")}\nSPICED: ${JSON.stringify(spiced)}\n\n${q}`;
-  }
-
-  async function askCoach(customPrompt) {
-    const q = customPrompt || coachInput;
-    if (!q.trim()) return;
-    if (!customPrompt) setCoachInput("");
-    setCoachingLoading(true); setCoaching("");
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:800, system:PANDADOC_CONTEXT, messages:[{ role:"user", content:buildContext(q) }] }),
-      });
-      const data = await res.json();
-      setCoaching(data.content?.[0]?.text || "No response.");
-    } catch { setCoaching("Coach unavailable."); }
-    setCoachingLoading(false);
-  }
 
   async function generateDebrief() {
     if (!callTranscript.trim()) return;
@@ -194,7 +212,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       spiced:`Filled SPICED + next step for PandaDoc.\nPrep: ${prepBrief||"None"}\nBuyer path: ${buyerPath||"unknown"}\nNotes:\n${allNotes}\nSPICED so far: ${JSON.stringify(spiced)}\nUse their exact words. S=situation, P=need behind the need+root cause, I=metric+cost of inaction, C=timeline+trajectory+dissatisfaction, D=decision process. Recommend next step with What/Who/Why.`,
       email:`Post-discovery follow-up email for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nGreeting + 4-5 word genuine callback. One sentence in their exact words. Bridge to next steps. Max 4 bullet next steps with dates. Sign off: Excited to tackle this together. No corporate speak.`,
       score:`Score this PandaDoc call out of 100.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nBuyer path: ${buyerPath||"unknown"}\nScore /20 each: 1) ROE set + buyer journey diagnosed 2) Need behind the need uncovered (not just symptoms) 3) Current state baselined with metric+trajectory 4) Future state quantified with value delta 5) Next step secured with What/Who/Why. Top 3 failure modes. 3 coaching actions for next call.`,
-      whatweheard:`Create a 'What We Heard' slide for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nSPICED: ${JSON.stringify(spiced)}\nFormat:\nCURRENT STATE: [problem in their exact words + metric suffering + current measurement]\nNEED BEHIND THE NEED: [underlying business problem + why it matters]\nDESIRED STATE: [what good looks like 365 days from now + target metric]\nVALUE DELTA: [current vs desired metric — calculate financial gap if possible]\nNO LOGO TEST: [could someone identify this company from this description alone? Rate 1-5 and explain]\nThis opens the next meeting.`,
+      whatweheard:`Create a 'What We Heard' slide for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\n\nFormat:\nCURRENT STATE: [problem in their exact words + metric suffering + current measurement]\nNEED BEHIND THE NEED: [underlying business problem + why it matters]\nDESIRED STATE: [what good looks like 365 days from now + target metric]\nVALUE DELTA: [current vs desired metric — calculate financial gap if possible]\nNO LOGO TEST: [could someone identify this company from this description alone? Rate 1-5 and explain]\nThis opens the next meeting.`,
     };
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -207,12 +225,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     setOutputLoading("");
   }
 
-  async function autoFillSpiced(fieldKey) {
-    setSpicedSuggesting(s => ({ ...s, [fieldKey]:true }));
-    const suggestion = await suggestSpicedField(fieldKey, notes, prepBrief);
-    if (suggestion) setSpiced(s => ({ ...s, [fieldKey]:suggestion }));
-    setSpicedSuggesting(s => ({ ...s, [fieldKey]:false }));
-  }
+
 
   function copyText(t) { navigator.clipboard.writeText(t); }
 
@@ -251,8 +264,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
             {r.alts && <div style={{ padding:"12px 22px 0" }}>{r.alts.map((a,i)=><div key={i} style={{ fontSize:16, color:"#1a1a1a", lineHeight:2, whiteSpace:"pre-wrap", fontWeight:500, marginBottom:i<r.alts.length-1?16:0, paddingBottom:i<r.alts.length-1?16:0, borderBottom:i<r.alts.length-1?`1px dashed ${C.border}`:"none" }}>{a}</div>)}</div>}
             {r.note && <div style={{ margin:"12px 22px 0", fontSize:14, color:C.textSecondary, lineHeight:1.75, background:C.white, padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
             <div style={{ padding:"14px 18px", display:"flex", gap:8 }}>
-              {r.text && <button onClick={()=>copyText(r.text)} style={{ ...B, fontSize:12, padding:"5px 16px", border:`1px solid ${C.border}`, borderRadius:6, background:C.white, color:C.textMuted }}>Copy</button>}
-              {r.alts && r.alts.map((a,i)=><button key={i} onClick={()=>copyText(a)} style={{ ...B, fontSize:12, padding:"5px 14px", border:`1px solid ${C.border}`, borderRadius:6, background:C.white, color:C.textMuted }}>Copy {i+1}</button>)}
+              {r.text &&}
             </div>
           </div>
         )}
@@ -264,7 +276,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     if (!buyerPath) return (
       <div style={{ marginBottom:28 }}>
         <div style={{ background:C.emeraldLight, border:`1.5px solid ${C.emeraldMid}`, borderRadius:12, padding:"16px 20px", marginBottom:24 }}>
-          <div style={{ fontSize:12, fontWeight:700, color:C.emerald, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Ask this in the first 2 minutes — before ROE</div>
+          <div style={{ fontSize:12, fontWeight:700, color:C.emerald, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Ask this in the first 2 minutes — right after rapport</div>
           <div style={{ fontSize:17, fontWeight:600, color:C.textPrimary, lineHeight:2, marginBottom:6 }}>Inbound: "What motivated you to reach out and explore this?"</div>
           <div style={{ fontSize:17, fontWeight:600, color:C.textPrimary, lineHeight:2, marginBottom:12 }}>Outbound: "We reached out to you, so this might sound odd — but what made you agree to take this call?"</div>
           <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7 }}>Then listen. Their language tells you which path you're on.</div>
@@ -478,10 +490,10 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         <div style={{ padding:"22px 36px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
           <div>
             <div style={{ fontSize:26, fontWeight:800, color:"#666", letterSpacing:"-0.03em" }}>
-              {{prep:"Pre-Call Prep Brief",rapport:"Build Rapport",roe:"Rules of Engagement","buyer-type":"Meet Buyer Where They Are","business-problem":"Business Problem",baseline:"Baseline Current State","root-cause":"Root Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Buying Process","next-step":"Secure the Next Step",outputs:"Outputs"}[activeStage]}
+              {{prep:"Pre-Call Prep Brief",open:"Rapport + ROE","buyer-type":"Meet Buyer Where They Are","business-problem":"Business Problem",baseline:"Baseline Current State","root-cause":"Root Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Buying Process","next-step":"Secure the Next Step",outputs:"Outputs"}[activeStage]}
             </div>
             <div style={{ fontSize:14, color:C.textMuted, marginTop:4 }}>
-              {{prep:"Paste your prep brief. Everything downstream personalizes from this.",rapport:"Read the energy. Their response tells you everything.",roe:"What you do in the first 5 minutes influences the next 25.","buyer-type":"Diagnose first. Then match your approach to where they are.","business-problem":"Peel back the onion. Find business pain that money follows.",baseline:"Measure it. Metric + trajectory + dissatisfaction.","root-cause":"The cause dictates the solution that gets purchased.","negative-impact":"Build urgency without being salesy.","future-state":"Value comes from contrast — painful present, compelling future.","next-step":"What. Who. Why. Book it before you hang up.",outputs:"Generate your end-of-call outputs."}[activeStage]}
+              {{prep:"Paste your prep brief. Everything downstream personalizes from this.",open:"Open strong. Set the agenda. Diagnose your buyer.","buyer-type":"Diagnose first. Then match your approach to where they are.","business-problem":"Peel back the onion. Find business pain that money follows.",baseline:"Measure it. Metric + trajectory + dissatisfaction.","root-cause":"The cause dictates the solution that gets purchased.","negative-impact":"Build urgency without being salesy.","future-state":"Value comes from contrast — painful present, compelling future.","next-step":"What. Who. Why. Book it before you hang up.",outputs:"Generate your end-of-call outputs."}[activeStage]}
             </div>
           </div>
           <div style={{ display:"flex", gap:10 }}>
@@ -525,7 +537,6 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   <div style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,0.6)", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:12 }}>★ Open with this — every time</div>
                   <div style={{ fontSize:22, color:C.white, lineHeight:1.9, marginBottom:14, fontWeight:600 }}>"I'm glad we found the time to meet today."</div>
                   <div style={{ fontSize:15, color:"rgba(255,255,255,0.85)", lineHeight:1.7, borderTop:"1px solid rgba(255,255,255,0.2)", paddingTop:14 }}>Then SHUT UP. See how they respond. Small talk energy → stay with it. Business energy → "Can we talk about the agenda?" Never thank them for their time — positions you lower.</div>
-                  <button onClick={()=>copyText('"I\'m glad we found the time to meet today."')} style={{ ...B, marginTop:14, fontSize:13, padding:"7px 18px", border:"1.5px solid rgba(255,255,255,0.4)", borderRadius:7, background:"transparent", color:C.white, fontWeight:600 }}>Copy</button>
                 </div>
                 {[{ label:"They want to chat", text:'Stay with it for 60-90 seconds. Ask something real. Then: "Can we talk about the agenda?"' },{ label:"They mean business", text:'"Good, thanks for asking. Look, I know your time is valuable and you reached out for a reason — mind if we dive in?"' }].map((s,i)=>{
                   const key=`rapport-${i}`, open=expandedScript===key;
@@ -534,7 +545,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
                       <span style={{ fontSize:14, color:open?C.white:C.textMuted, fontWeight:700 }}>{open?"▲":"▼"}</span>
                     </button>
-                    {open && <div><div style={{ padding:"22px 26px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{s.text}</div><div style={{ padding:"0 22px 16px" }}><button onClick={()=>copyText(s.text)} style={{ ...B, fontSize:12, padding:"5px 16px", border:`1px solid ${C.border}`, borderRadius:6, background:C.sand, color:C.textMuted }}>Copy</button></div></div>}
+                    {open && <div><div style={{ padding:"22px 26px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{s.text}</div></div>}
                   </div>);
                 })}
                 <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
@@ -559,7 +570,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
                       <span style={{ fontSize:14, color:open?C.white:C.textMuted, fontWeight:700 }}>{open?"▲":"▼"}</span>
                     </button>
-                    {open && <div><div style={{ padding:"22px 26px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{s.text}</div><div style={{ padding:"0 22px 16px" }}><button onClick={()=>copyText(s.text)} style={{ ...B, fontSize:12, padding:"5px 16px", border:`1px solid ${C.border}`, borderRadius:6, background:C.sand, color:C.textMuted }}>Copy</button></div></div>}
+                    {open && <div><div style={{ padding:"22px 26px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{s.text}</div></div>}
                   </div>);
                 })}
                 <Collapsible label="Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textMuted}>
@@ -603,7 +614,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
                       <span style={{ fontSize:14, color:open?C.white:C.textMuted, fontWeight:700 }}>{open?"▲":"▼"}</span>
                     </button>
-                    {open && <div><div style={{ padding:"22px 26px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{s.text}</div><div style={{ padding:"0 22px 16px" }}><button onClick={()=>copyText(s.text)} style={{ ...B, fontSize:12, padding:"5px 16px", border:`1px solid ${C.border}`, borderRadius:6, background:C.sand, color:C.textMuted }}>Copy</button></div></div>}
+                    {open && <div><div style={{ padding:"22px 26px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{s.text}</div></div>}
                   </div>);
                 })}
                 <Collapsible label="Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textMuted}>
@@ -641,7 +652,6 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   {outputs.debrief && (
                     <div style={{ marginTop:20 }}>
                       <div style={{ fontSize:15, color:C.textSecondary, lineHeight:1.9, whiteSpace:"pre-wrap", borderTop:`1px solid ${C.border}`, paddingTop:16 }}>{outputs.debrief}</div>
-                      <button onClick={()=>copyText(outputs.debrief)} style={{ ...B, marginTop:12, fontSize:13, padding:"7px 18px", border:`1px solid ${C.border}`, borderRadius:7, background:C.sand, color:C.textMuted }}>Copy</button>
                     </div>
                   )}
                 </div>
@@ -662,7 +672,6 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                     {outputs[o.key] && (
                       <div>
                         <div style={{ fontSize:15, color:C.textSecondary, lineHeight:1.85, whiteSpace:"pre-wrap", borderTop:`1px solid ${C.border}`, paddingTop:16, marginTop:4 }}>{outputs[o.key]}</div>
-                        <button onClick={()=>copyText(outputs[o.key])} style={{ ...B, marginTop:12, fontSize:13, padding:"7px 18px", border:`1px solid ${C.border}`, borderRadius:7, background:C.sand, color:C.textMuted }}>Copy</button>
                       </div>
                     )}
                   </div>
@@ -670,13 +679,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               </div>
             )}
 
-            {/* NOTES */}
-            {activeStage !== "outputs" && (
-              <div style={{ marginTop:28 }}>
-                <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:12, paddingBottom:10, borderBottom:`2px solid ${C.black}` }}>Call Notes — capture their exact words</div>
-                <textarea value={stageNote} onChange={e=>setNotes(n=>({...n,[activeStage]:e.target.value}))} placeholder="Type what they're saying — their exact words, not a paraphrase. The coach and outputs use this." style={{ width:"100%", minHeight:100, fontSize:15, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.border}`, borderRadius:10, background:C.white, color:C.textPrimary, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
-              </div>
-            )}
+
           </div>
 
           {/* RIGHT — SPICED + COACH */}
@@ -685,52 +688,131 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
             {/* RIGHT PANEL TABS */}
             <div style={{ display:"flex", borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
               {[
-                { id:"spiced", label:"SPICED" },
-                { id:"coach",  label:"Coach" },
-                { id:"roi",    label:"ROI" },
+                { id:"spiced",     label:"Questions" },
+                { id:"enterprise", label:"Enterprise" },
+                { id:"roi",        label:"ROI" },
               ].map(t => (
-                <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"13px 0", fontSize:12, fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase", border:"none", borderBottom: rightTab===t.id ? `2px solid ${C.emerald}` : "2px solid transparent", background:"transparent", color: rightTab===t.id ? C.emerald : C.textMuted, marginBottom:-1 }}>
+                <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"16px 4px", fontSize:14, fontWeight:800, letterSpacing:"0.03em", textTransform:"uppercase", border:"none", borderBottom: rightTab===t.id ? `3px solid ${C.emerald}` : "3px solid transparent", background: rightTab===t.id ? C.emeraldLight : "transparent", color: rightTab===t.id ? C.emerald : C.textMuted, marginBottom:-1 }}>
                   {t.label}
                 </button>
               ))}
             </div>
 
-            {/* SPICED TAB */}
+            {/* QUESTION BANK TAB */}
             {rightTab === "spiced" && (
-              <div style={{ padding:24, overflowY:"auto", flex:1 }}>
-                <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:20 }}>SPICED Tracker</div>
-                {SPICED_FIELDS.map(f=>(
-                  <div key={f.key} style={{ marginBottom:18 }}>
-                    <div style={{ fontSize:13, fontWeight:600, color:spiced[f.key]?C.emerald:C.textMuted, marginBottom:7, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                      <span>{spiced[f.key]?"✓ ":""}{f.label}</span>
-                      <button onClick={()=>autoFillSpiced(f.key)} disabled={spicedSuggesting[f.key]} style={{ ...B, fontSize:11, padding:"3px 10px", border:`1.5px solid ${C.emerald}`, borderRadius:6, background:"transparent", color:C.emerald, fontWeight:600, flexShrink:0, opacity:spicedSuggesting[f.key]?0.5:1 }}>
-                        {spicedSuggesting[f.key]?"...":"✦ fill"}
+              <div style={{ overflowY:"auto", flex:1 }}>
+                <div style={{ padding:"18px 20px 10px", fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase" }}>Question Bank</div>
+                <div style={{ padding:"0 20px 8px", fontSize:12, color:C.textMuted, lineHeight:1.6 }}>If you're stuck uncovering any SPICED element — open it for questions to ask.</div>
+                {SPICED_QUESTIONS.map(s=>{
+                  const isOpen = openSpiced === s.key;
+                  return (
+                    <div key={s.key} style={{ borderTop:`1px solid ${C.border}` }}>
+                      <button onClick={()=>setOpenSpiced(isOpen?null:s.key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?s.bg:"transparent", border:"none", textAlign:"left" }}>
+                        <span style={{ fontSize:13, fontWeight:700, color:isOpen?s.color:C.textPrimary }}>{s.label}</span>
+                        <span style={{ fontSize:14, color:isOpen?s.color:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
                       </button>
+                      {isOpen && (
+                        <div style={{ padding:"4px 20px 16px", background:s.bg, borderTop:`1px solid ${s.border}` }}>
+                          {s.questions.map((q,i)=>(
+                            <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:i<s.questions.length-1?12:0 }}>
+                              <span style={{ fontSize:11, fontWeight:700, color:s.color, marginTop:3, flexShrink:0 }}>→</span>
+                              <div style={{ flex:1 }}>
+                                <div style={{ fontSize:13, color:"#1a1a1a", lineHeight:1.7 }}>{q}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <textarea value={spiced[f.key]} onChange={e=>setSpiced(s=>({...s,[f.key]:e.target.value}))} placeholder={f.hint} style={{ width:"100%", fontSize:13, lineHeight:1.65, padding:"10px 12px", border:`1.5px solid ${spiced[f.key]?C.emeraldMid:C.border}`, borderRadius:9, background:spiced[f.key]?C.emeraldLight:C.sand, color:C.textPrimary, resize:"none", minHeight:56, boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
-
-            {/* COACH TAB */}
-            {rightTab === "coach" && (
-              <div style={{ padding:24, flex:1, display:"flex", flexDirection:"column", overflowY:"auto" }}>
-                <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:18 }}>Live Coach</div>
-                {coaching && <div style={{ fontSize:14, color:C.textSecondary, lineHeight:1.85, background:C.emeraldLight, border:`1.5px solid ${C.emeraldMid}`, borderRadius:12, padding:16, marginBottom:16, whiteSpace:"pre-wrap" }}>{coaching}</div>}
-                {coachingLoading && <div style={{ fontSize:14, color:C.textMuted, marginBottom:16, fontStyle:"italic" }}>Thinking...</div>}
-                <div style={{ marginBottom:16 }}>
-                  <div style={{ fontSize:11, fontWeight:600, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Quick Recipes</div>
-                  <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
-                    {RECIPES.map(r=>(
-                      <button key={r.label} onClick={()=>askCoach(r.prompt)} style={{ ...B, fontSize:12, padding:"6px 12px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:99, background:C.emeraldLight, color:C.emerald, fontWeight:600, lineHeight:1.4 }}>{r.label}</button>
-                    ))}
-                  </div>
-                </div>
-                <div style={{ display:"flex", gap:8, marginTop:"auto" }}>
-                  <textarea ref={coachRef} value={coachInput} onChange={e=>setCoachInput(e.target.value)} onKeyDown={e=>{ if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askCoach();}}} placeholder="Ask anything mid-call..." style={{ flex:1, fontSize:14, padding:"12px 14px", border:`1.5px solid ${C.border}`, borderRadius:10, background:C.sand, color:C.textPrimary, resize:"none", minHeight:62, fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
-                  <button onClick={()=>askCoach()} disabled={coachingLoading} style={{ ...B, alignSelf:"flex-end", padding:"12px 18px", border:"none", borderRadius:10, background:C.emerald, fontSize:16, color:C.white, fontWeight:700 }}>↗</button>
-                </div>
+            {/* ENTERPRISE TAB */}
+            {rightTab === "enterprise" && (
+              <div style={{ overflowY:"auto", flex:1 }}>
+                <div style={{ padding:"18px 20px 6px", fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase" }}>Enterprise Features</div>
+                <div style={{ padding:"0 20px 12px", fontSize:12, color:C.textMuted, lineHeight:1.6 }}>Ask these mid-discovery. A yes to any red question = Enterprise is a no-brainer.</div>
+                {[
+                  { feature:"Workspaces", color:"#1a4878", bg:"#edf5ff", border:"#a8d0f0", questions:[
+                    { q:"Which teams would realistically be using PandaDoc day-to-day?", hot:false },
+                    { q:"Do different teams need their own templates, branding, or approval flows?", hot:false },
+                    { q:"Would it ever be a problem if HR could see sales contracts — or vice versa?", hot:true },
+                  ]},
+                  { feature:"Smart Content", color:"#1a4230", bg:C.emeraldLight, border:C.emeraldMid, questions:[
+                    { q:"How much of your proposals stays the same vs. customized each time?", hot:false },
+                    { q:"Do you have content that depends on industry, product, or region?", hot:false },
+                    { q:"Do reps ever copy-paste sections from old docs to save time?", hot:true },
+                    { q:"How do you make sure reps are using the right version of messaging?", hot:true },
+                  ]},
+                  { feature:"Approval Workflows", color:"#7a4200", bg:"#fffbee", border:"#f0c878", questions:[
+                    { q:"At what point does a deal need internal approval today?", hot:false },
+                    { q:"What usually triggers that — pricing, discounting, legal terms?", hot:false },
+                    { q:"How do you handle approvals now — Slack, email, something else?", hot:false },
+                    { q:"Ever had a deal go out that shouldn't have without approval?", hot:true },
+                  ]},
+                  { feature:"Renewal Notifications", color:"#5a3ab0", bg:"#F0EDFF", border:"#A496FF", questions:[
+                    { q:"Do you manage contracts with renewal dates today?", hot:false },
+                    { q:"How do you usually keep track of upcoming renewals?", hot:false },
+                    { q:"Ever had something auto-renew or expire without your team noticing?", hot:true },
+                  ]},
+                  { feature:"Content Locking", color:"#8b1a1a", bg:"#fff3f3", border:"#f5a0a0", questions:[
+                    { q:"How much flexibility do reps have when editing templates?", hot:false },
+                    { q:"Are there parts of the doc that should never be changed?", hot:false },
+                    { q:"Have you ever had issues with reps tweaking pricing, terms, or content?", hot:true },
+                  ]},
+                  { feature:"Redlining", color:"#1a4878", bg:"#edf5ff", border:"#a8d0f0", questions:[
+                    { q:"How do contract negotiations usually happen today?", hot:false },
+                    { q:"Do you go back and forth in Word or PDF — or directly in the doc?", hot:false },
+                    { q:"Who's typically involved in reviewing changes — legal, finance, client?", hot:false },
+                  ]},
+                  { feature:"Salesforce / HubSpot 2-way Sync", color:"#1a4230", bg:C.emeraldLight, border:C.emeraldMid, questions:[
+                    { q:"How important is it that data flows both ways automatically?", hot:false },
+                    { q:"Do reps update your CRM manually after sending docs?", hot:false },
+                    { q:"Any errors or mismatches happening after that?", hot:true },
+                    { q:"Do you need signed PDFs attached to records so legal or billing can see them?", hot:true },
+                  ]},
+                  { feature:"Custom Roles", color:"#7a4200", bg:"#fffbee", border:"#f0c878", questions:[
+                    { q:"Do different people on your team need different levels of access?", hot:false },
+                    { q:"Do you need to limit who can see certain templates, pricing, or actions?", hot:false },
+                    { q:"Has someone ever accidentally changed or sent something they shouldn't have?", hot:true },
+                  ]},
+                  { feature:"SSO", color:"#5a3ab0", bg:"#F0EDFF", border:"#A496FF", questions:[
+                    { q:"How does your team usually log into tools — individual logins or centralized?", hot:false },
+                    { q:"Does your IT team require or enforce SSO for new tools?", hot:true },
+                  ]},
+                  { feature:"Whitelabeling", color:"#8b1a1a", bg:"#fff3f3", border:"#f5a0a0", questions:[
+                    { q:"Do you want clients to feel like everything is coming directly from your domain?", hot:false },
+                    { q:"Have you ever had issues with emails landing in spam or looking external?", hot:true },
+                  ]},
+                  { feature:"HIPAA Compliance", color:"#1a4878", bg:"#edf5ff", border:"#a8d0f0", questions:[
+                    { q:"Does your company handle any personal health information (PHI)?", hot:false },
+                    { q:"Is HIPAA compliance a requirement for any of the software you use?", hot:true },
+                  ]},
+                ].map((f, fi) => {
+                  const isOpen = openSpiced === `ent-${fi}`;
+                  return (
+                    <div key={fi} style={{ borderTop:`1px solid ${C.border}` }}>
+                      <button onClick={()=>setOpenSpiced(isOpen?null:`ent-${fi}`)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?f.bg:"transparent", border:"none", textAlign:"left" }}>
+                        <span style={{ fontSize:13, fontWeight:700, color:isOpen?f.color:C.textPrimary }}>{f.feature}</span>
+                        <span style={{ fontSize:14, color:isOpen?f.color:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
+                      </button>
+                      {isOpen && (
+                        <div style={{ padding:"4px 20px 16px", background:f.bg, borderTop:`1px solid ${f.border}` }}>
+                          {f.questions.map((q,qi)=>(
+                            <div key={qi} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:qi<f.questions.length-1?12:0 }}>
+                              <span style={{ fontSize:12, fontWeight:800, color:q.hot?C.coral:f.color, marginTop:2, flexShrink:0 }}>{q.hot?"🔴":"→"}</span>
+                              <div style={{ fontSize:13, color:q.hot?"#8b1a00":"#1a1a1a", lineHeight:1.7, fontWeight:q.hot?600:400 }}>{q.q}</div>
+                            </div>
+                          ))}
+                          {f.questions.some(q=>q.hot) && (
+                            <div style={{ marginTop:12, fontSize:11, color:C.coral, fontWeight:600 }}>🔴 = yes to this → Enterprise is the right plan</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -787,7 +869,6 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                       <div style={{ background:C.sand, border:`1.5px solid ${C.border}`, borderRadius:10, padding:"14px 16px", marginTop:4 }}>
                         <div style={{ fontSize:12, fontWeight:700, color:C.textPrimary, marginBottom:8 }}>CFO-worthy framing</div>
                         <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.75, marginBottom:10 }}>"{cfoCopy}"</div>
-                        <button onClick={()=>copyText(cfoCopy)} style={{ ...B, fontSize:12, padding:"5px 14px", border:`1px solid ${C.border}`, borderRadius:6, background:C.white, color:C.textMuted }}>Copy</button>
                       </div>
                     </div>
                   );
