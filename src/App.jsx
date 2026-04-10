@@ -260,9 +260,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         </button>
         {open && (
           <div style={{ background:tc.bg, borderTop:`1px solid ${C.border}` }}>
-            {r.text && <div style={{ padding:"18px 22px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{r.text}</div>}
-            {r.alts && <div style={{ padding:"12px 22px 0" }}>{r.alts.map((a,i)=><div key={i} style={{ fontSize:16, color:"#1a1a1a", lineHeight:2, whiteSpace:"pre-wrap", fontWeight:500, marginBottom:i<r.alts.length-1?16:0, paddingBottom:i<r.alts.length-1?16:0, borderBottom:i<r.alts.length-1?`1px dashed ${C.border}`:"none" }}>{a}</div>)}</div>}
-            {r.note && <div style={{ margin:"12px 22px 0", fontSize:14, color:C.textSecondary, lineHeight:1.75, background:C.white, padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
+            {r.text && <div style={{ padding:"18px 22px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{r.text}</div>}
+            {r.alts && <div style={{ padding:"12px 22px 0" }}>{r.alts.map((a,i)=><div key={i} style={{ fontSize:15, color:"#e6edf3", lineHeight:2, whiteSpace:"pre-wrap", fontWeight:500, marginBottom:i<r.alts.length-1?16:0, paddingBottom:i<r.alts.length-1?16:0, borderBottom:i<r.alts.length-1?`1px dashed ${C.border}`:"none" }}>{a}</div>)}</div>}
+            {r.note && <div style={{ margin:"12px 22px 0", fontSize:14, color:"#8b949e", lineHeight:1.75, background:"#0d1117", padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
 
           </div>
         )}
@@ -577,8 +577,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                 </div>
 
                 {[
-                  { label:"Call out the script — Hughes", text:"Most calls like this start with someone running a pitch and someone else waiting for it to be over. I don\\'t want to do that. What I\\'d rather do is spend most of our time understanding what\\'s actually going on in your world — and then we can both decide if it even makes sense to keep talking. Does that sound fair?", note:"Hughes: openly name the script running in their head. Any script you surface loses its power. They were bracing for a pitch — you just told them there isn\\'t one. Now they relax. This is also Orlob\\'s ROE reframed through the PCP model." },
-                  { label:"Negative contrast frame — Hughes", text:"There are a lot of vendors who jump straight to a demo before they understand anything about your situation. I\\'d rather not do that — it wastes both our time. So if it\\'s okay with you, I\\'d love to spend the first part of this call just understanding where you are today.", note:"Hughes: negative dissociation — you\\'re defining who you\\'re NOT before saying who you are. They\\'re now mentally distancing themselves from bad vendor experiences and placing you in a different category. Perception shifted before discovery even starts." },
+                  { label:"Call out the script — Hughes", text:"Most calls like this start with someone running a pitch and someone else waiting for it to be over. I don\'t want to do that. What I\'d rather do is spend most of our time understanding what\'s actually going on in your world — and then we can both decide if it even makes sense to keep talking. Does that sound fair?", note:"Hughes: openly name the script running in their head. Any script you surface loses its power. They were bracing for a pitch — you just told them there isn\'t one. Now they relax. This is also Orlob\'s ROE reframed through the PCP model." },
+                  { label:"Negative contrast frame — Hughes", text:"There are a lot of vendors who jump straight to a demo before they understand anything about your situation. I\'d rather not do that — it wastes both our time. So if it\'s okay with you, I\'d love to spend the first part of this call just understanding where you are today.", note:"Hughes: negative dissociation — you\'re defining who you\'re NOT before saying who you are. They\'re now mentally distancing themselves from bad vendor experiences and placing you in a different category. Perception shifted before discovery even starts." },
                   { label:"They want to chat", text:"Stay with it for 60-90 seconds. Ask something real. Then: Can we talk about the agenda?" },
                   { label:"They mean business", text:"Good, thanks for asking. Look, I know your time is valuable and you reached out for a reason — mind if we dive in?" },
                 ].map((s,i)=>{
@@ -588,7 +588,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
                       <span style={{ fontSize:14, color:open?"#e6edf3":"#484f58", fontWeight:700 }}>{open?"▲":"▼"}</span>
                     </button>
-                    {open && <div><div style={{ padding:"22px 26px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{s.text}</div></div>}
+                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
                   </div>);
                 })}
                 <div style={{ marginBottom:16, background:"#edf5ff", border:"1.5px solid #a8d0f0", borderRadius:12, padding:"16px 18px" }}>
@@ -627,7 +627,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
                       <span style={{ fontSize:14, color:open?"#e6edf3":"#484f58", fontWeight:700 }}>{open?"▲":"▼"}</span>
                     </button>
-                    {open && <div><div style={{ padding:"22px 26px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{s.text}</div></div>}
+                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
                   </div>);
                 })}
                 <Collapsible label="Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textMuted}>
@@ -671,7 +671,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
                       <span style={{ fontSize:14, color:open?"#e6edf3":"#484f58", fontWeight:700 }}>{open?"▲":"▼"}</span>
                     </button>
-                    {open && <div><div style={{ padding:"22px 26px", fontSize:18, color:"#1a1a1a", lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{s.text}</div></div>}
+                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
                   </div>);
                 })}
                 <Collapsible label="Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textMuted}>
