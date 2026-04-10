@@ -151,6 +151,8 @@ export default function App() {
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
   const [callTranscript, setCallTranscript] = useState("");
   const [debriefLoading, setDebriefLoading] = useState(false);
+  const [scriptEdits, setScriptEdits] = useState({}); // key -> edited text
+  const [editingKey, setEditingKey] = useState(null);  // which card is in edit mode
 
   const currentIdx = STAGES.findIndex(s => s.id === activeStage);
   const stageNote = notes[activeStage] || "";
@@ -251,6 +253,10 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     const tc = tagColors[r.type] || tagColors.ask;
     const key = `${prefix}-${idx}`;
     const open = expandedScript === key;
+    const isEditing = editingKey === key;
+    const editKey = `rc-${key}`;
+    const originalText = r.text || (r.alts ? r.alts.join("\n\n") : "");
+    const displayText = scriptEdits[editKey] !== undefined ? scriptEdits[editKey] : originalText;
     return (
       <div style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:open?tc.border:`1.5px solid #21262d`, background:"#161b22" }}>
         <button onClick={() => setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:"#161b22", border:"none", textAlign:"left" }}>
@@ -260,10 +266,28 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         </button>
         {open && (
           <div style={{ background:tc.bg, borderTop:`1px solid ${C.border}` }}>
-            {r.text && <div style={{ padding:"18px 22px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{r.text}</div>}
-            {r.alts && <div style={{ padding:"12px 22px 0" }}>{r.alts.map((a,i)=><div key={i} style={{ fontSize:15, color:"#e6edf3", lineHeight:2, whiteSpace:"pre-wrap", fontWeight:500, marginBottom:i<r.alts.length-1?16:0, paddingBottom:i<r.alts.length-1?16:0, borderBottom:i<r.alts.length-1?`1px dashed ${C.border}`:"none" }}>{a}</div>)}</div>}
-            {r.note && <div style={{ margin:"12px 22px 0", fontSize:14, color:"#8b949e", lineHeight:1.75, background:"#0d1117", padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
-
+            {isEditing ? (
+              <div style={{ padding:"16px 20px" }}>
+                <textarea
+                  value={displayText}
+                  onChange={e => setScriptEdits(s=>({...s,[editKey]:e.target.value}))}
+                  style={{ width:"100%", minHeight:120, fontSize:15, lineHeight:1.8, padding:"12px 14px", background:"#0d1117", color:"#e6edf3", border:"1.5px solid "+tc.badge, borderRadius:8, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
+                  autoFocus
+                />
+                <div style={{ display:"flex", gap:8, marginTop:10 }}>
+                  <button onClick={()=>setEditingKey(null)} style={{ ...B, fontSize:12, padding:"6px 16px", background:tc.badge, color:tc.badgeText, border:"none", borderRadius:6, fontWeight:700 }}>Save</button>
+                  <button onClick={()=>{ setScriptEdits(s=>({...s,[editKey]:originalText})); setEditingKey(null); }} style={{ ...B, fontSize:12, padding:"6px 16px", background:"transparent", color:"#8b949e", border:"1px solid #21262d", borderRadius:6 }}>Reset</button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ padding:"18px 22px 8px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{displayText}</div>
+                <div style={{ padding:"0 22px 14px" }}>
+                  <button onClick={e=>{ e.stopPropagation(); setEditingKey(key); }} style={{ ...B, fontSize:11, padding:"4px 12px", background:"transparent", color:"#484f58", border:"1px solid #21262d", borderRadius:5, fontWeight:600 }}>✎ Edit</button>
+                </div>
+                {r.note && <div style={{ margin:"0 22px 16px", fontSize:14, color:"#8b949e", lineHeight:1.75, background:"#0d1117", padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
+              </div>
+            )}
           </div>
         )}
       </div>
