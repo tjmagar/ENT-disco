@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 
 const C = {
-  pageBg: "#0d1117", panelBg: "#161b22", border: "#21262d",
-  textPrimary: "#e6edf3", textSecondary: "#8b949e", textMuted: "#484f58",
-  black: "#010409", white: "#161b22", sidebar: "#010409",
-  emerald: "#10b981", emeraldLight: "#0d2a1e", emeraldMid: "#1a4a35",
-  coral: "#f87171", sand: "#1c2128",
+  pageBg: "#f4f4f5", panelBg: "#ffffff", border: "#e4e4e7",
+  textPrimary: "#18181b", textSecondary: "#52525b", textMuted: "#a1a1aa",
+  black: "#18181b", white: "#ffffff", sidebar: "#1c1917",
+  emerald: "#f97316", emeraldLight: "#fff7ed", emeraldMid: "#fed7aa",
+  coral: "#ef4444", sand: "#f9fafb",
 };
 
 const STAGES = [
@@ -25,7 +25,7 @@ const SPICED_QUESTIONS = [
   {
     key:"situation",
     label:"S — Situation",
-    color:"#1a4878",
+    color:"#1e40af",
     bg:"#edf5ff",
     border:"#a8d0f0",
     questions:[
@@ -243,12 +243,12 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
 
   function RhythmCard({ r, idx, prefix }) {
     const tagColors = {
-      ask:{ bg:"#0d2a1e", border:"1.5px solid #1a4a35", badge:"#10b981", badgeText:"#fff", tag:"Ask" },
-      wallow:{ bg:"#0d1a2e", border:"1.5px solid #1a3050", badge:"#3b82f6", badgeText:"#fff", tag:"Wallow" },
-      segue:{ bg:"#1e1500", border:"1.5px solid #3a2a00", badge:"#f59e0b", badgeText:"#000", tag:"Segue" },
-      summarize:{ bg:"#1a1500", border:"1.5px solid #2a2000", badge:"#eab308", badgeText:"#000", tag:"Summarize" },
-      validate:{ bg:"#1e0a1e", border:"1.5px solid #3a1a3a", badge:"#a855f7", badgeText:"#fff", tag:"Validate" },
-      transition:{ bg:"#0f0f1e", border:"1.5px solid #1e1e3a", badge:"#6366f1", badgeText:"#fff", tag:"Transition" },
+      ask:{ bg:"#fff7ed", border:"1.5px solid #1a4a35", badge:"#f97316", badgeText:"#fff", tag:"Ask" },
+      wallow:{ bg:"#eff6ff", border:"1.5px solid #bfdbfe", badge:"#3b82f6", badgeText:"#fff", tag:"Wallow" },
+      segue:{ bg:"#fffbeb", border:"1.5px solid #fde68a", badge:"#f59e0b", badgeText:"#fff", tag:"Segue" },
+      summarize:{ bg:"#fefce8", border:"1.5px solid #fef08a", badge:"#ca8a04", badgeText:"#fff", tag:"Summarize" },
+      validate:{ bg:"#faf5ff", border:"1.5px solid #e9d5ff", badge:"#a855f7", badgeText:"#fff", tag:"Validate" },
+      transition:{ bg:"#eef2ff", border:"1.5px solid #c7d2fe", badge:"#6366f1", badgeText:"#fff", tag:"Transition" },
     };
     const tc = tagColors[r.type] || tagColors.ask;
     const key = `${prefix}-${idx}`;
@@ -258,8 +258,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     const originalText = r.text || (r.alts ? r.alts.join("\n\n") : "");
     const displayText = scriptEdits[editKey] !== undefined ? scriptEdits[editKey] : originalText;
     return (
-      <div style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:open?tc.border:`1.5px solid #21262d`, background:"#161b22" }}>
-        <button onClick={() => setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:"#161b22", border:"none", textAlign:"left" }}>
+      <div style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:open?tc.border:`1.5px solid #21262d`, background:"#ffffff" }}>
+        <button onClick={() => setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:"#ffffff", border:"none", textAlign:"left" }}>
           <span style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:99, background:tc.badge, color:tc.badgeText, flexShrink:0, letterSpacing:"0.06em", textTransform:"uppercase" }}>{tc.tag}</span>
           <span style={{ fontSize:17, fontWeight:700, color:C.textPrimary, flex:1, letterSpacing:"-0.01em" }}>{r.label}</span>
           <span style={{ fontSize:14, color:C.textMuted, fontWeight:700 }}>{open?"▲":"▼"}</span>
@@ -271,21 +271,21 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                 <textarea
                   value={displayText}
                   onChange={e => setScriptEdits(s=>({...s,[editKey]:e.target.value}))}
-                  style={{ width:"100%", minHeight:120, fontSize:15, lineHeight:1.8, padding:"12px 14px", background:"#0d1117", color:"#e6edf3", border:"1.5px solid "+tc.badge, borderRadius:8, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
+                  style={{ width:"100%", minHeight:120, fontSize:15, lineHeight:1.8, padding:"12px 14px", background:"#f9fafb", color:"#18181b", border:"1.5px solid "+tc.badge, borderRadius:8, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
                   autoFocus
                 />
                 <div style={{ display:"flex", gap:8, marginTop:10 }}>
                   <button onClick={()=>setEditingKey(null)} style={{ ...B, fontSize:12, padding:"6px 16px", background:tc.badge, color:tc.badgeText, border:"none", borderRadius:6, fontWeight:700 }}>Save</button>
-                  <button onClick={()=>{ setScriptEdits(s=>({...s,[editKey]:originalText})); setEditingKey(null); }} style={{ ...B, fontSize:12, padding:"6px 16px", background:"transparent", color:"#8b949e", border:"1px solid #21262d", borderRadius:6 }}>Reset</button>
+                  <button onClick={()=>{ setScriptEdits(s=>({...s,[editKey]:originalText})); setEditingKey(null); }} style={{ ...B, fontSize:12, padding:"6px 16px", background:"transparent", color:"#52525b", border:"1px solid #21262d", borderRadius:6 }}>Reset</button>
                 </div>
               </div>
             ) : (
               <div>
-                <div style={{ padding:"18px 22px 8px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{displayText}</div>
+                <div style={{ padding:"18px 22px 8px", fontSize:16, color:"#18181b", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{displayText}</div>
                 <div style={{ padding:"0 22px 14px" }}>
-                  <button onClick={e=>{ e.stopPropagation(); setEditingKey(key); }} style={{ ...B, fontSize:11, padding:"4px 12px", background:"transparent", color:"#484f58", border:"1px solid #21262d", borderRadius:5, fontWeight:600 }}>✎ Edit</button>
+                  <button onClick={e=>{ e.stopPropagation(); setEditingKey(key); }} style={{ ...B, fontSize:11, padding:"4px 12px", background:"transparent", color:"#a1a1aa", border:"1px solid #21262d", borderRadius:5, fontWeight:600 }}>✎ Edit</button>
                 </div>
-                {r.note && <div style={{ margin:"0 22px 16px", fontSize:14, color:"#8b949e", lineHeight:1.75, background:"#0d1117", padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
+                {r.note && <div style={{ margin:"0 22px 16px", fontSize:14, color:"#52525b", lineHeight:1.75, background:"#f9fafb", padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
               </div>
             )}
           </div>
@@ -306,8 +306,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:14 }}>What did their response sound like?</div>
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {[
-            { path:"evaluating", border:"#a8d0f0", bg:"#edf5ff", titleColor:"#1a4878", bodyColor:"#3a6898", badge:"#d4eaff", badgeText:"#1a4878", icon:"⚡", title:"Solution language", sub:'"We\'re looking for a product that can do X..." — They\'re actively evaluating. Past pain. Comparing solutions.', technique:"→ Go Back In Time" },
-            { path:"active-pain", border:C.emeraldMid, bg:C.emeraldLight, titleColor:"#1a4230", bodyColor:"#3a6248", badge:"#c8e8d8", badgeText:C.emerald, icon:"⚠", title:"Problem language", sub:'"We have a challenge with Y... Z is not where we want it..." — Active pain. They feel it but haven\'t defined a solution.', technique:"→ Symptoms → Problems" },
+            { path:"evaluating", border:"#a8d0f0", bg:"#edf5ff", titleColor:"#1e40af", bodyColor:"#3a6898", badge:"#d4eaff", badgeText:"#1e40af", icon:"⚡", title:"Solution language", sub:'"We\'re looking for a product that can do X..." — They\'re actively evaluating. Past pain. Comparing solutions.', technique:"→ Go Back In Time" },
+            { path:"active-pain", border:C.emeraldMid, bg:C.emeraldLight, titleColor:"#fff7ed", bodyColor:"#fed7aa", badge:"#fed7aa", badgeText:C.emerald, icon:"⚠", title:"Problem language", sub:'"We have a challenge with Y... Z is not where we want it..." — Active pain. They feel it but haven\'t defined a solution.', technique:"→ Symptoms → Problems" },
             { path:"latent", border:"#f0c878", bg:"#fffbee", titleColor:"#7a4200", bodyColor:"#9a6220", badge:"#fde8b0", badgeText:"#7a4200", icon:"◎", title:"Vague or can't remember", sub:'"You said something that caught my attention but..." — Latent pain. Dormant. Not top of mind.', technique:"→ Discovery Prompter" },
           ].map(opt=>(
             <button key={opt.path} onClick={()=>setBuyerPath(opt.path)} style={{ ...B, padding:"18px 22px", border:`2px solid ${opt.border}`, borderRadius:12, background:opt.bg, textAlign:"left" }}>
@@ -321,7 +321,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     );
 
     const pathLabel = buyerPath==="evaluating"?"⚡ Actively Evaluating":buyerPath==="active-pain"?"⚠ Active Pain":"◎ Latent Pain";
-    const pathColor = buyerPath==="evaluating"?"#1a4878":buyerPath==="active-pain"?C.emerald:"#7a4200";
+    const pathColor = buyerPath==="evaluating"?"#1e40af":buyerPath==="active-pain"?C.emerald:"#7a4200";
 
     return (
       <div style={{ marginBottom:28 }}>
@@ -334,7 +334,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
           <div style={{ fontSize:14, color:C.textSecondary, lineHeight:1.75, marginBottom:16, padding:"12px 16px", background:"#edf5ff", borderRadius:10, border:"1.5px solid #a8d0f0" }}>They're on the second half of the buyer's journey. Predisposed to talk about solutions. Meet them there first — then earn the right to go back to pain. 4 steps: Align → Wallow → Segue → Go Back.</div>
           <div style={{ background:"#fff8e8", border:"1.5px solid #f5c842", borderRadius:10, padding:"12px 16px", marginBottom:16 }}>
             <div style={{ fontSize:12, fontWeight:700, color:"#c89500", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:6 }}>Skip it rule</div>
-            <div style={{ fontSize:14, color:"#5a3c00", lineHeight:1.7 }}>If they pour their heart out about pain on Step 1 — go with it. The technique served its purpose. Don't keep asking Steps 2-3. Just follow the pain.</div>
+            <div style={{ fontSize:14, color:"#78350f", lineHeight:1.7 }}>If they pour their heart out about pain on Step 1 — go with it. The technique served its purpose. Don't keep asking Steps 2-3. Just follow the pain.</div>
           </div>
           {[
             { type:"ask", label:"Step 1 — Align: meet them where they are", text:'"Can you help me understand what you\'re looking for in a product or service like this?"', note:"You will almost never get friction from this question at this stage. They want to talk solutions — so start there." },
@@ -353,16 +353,16 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
 
         {buyerPath === "active-pain" && <>
           <div style={{ fontSize:14, color:C.textSecondary, lineHeight:1.75, marginBottom:16, padding:"12px 16px", background:C.emeraldLight, borderRadius:10, border:`1.5px solid ${C.emeraldMid}` }}>Active pain — they feel it but are expressing symptoms, not the underlying problem. Symptoms get ghosted. Problems get funded. Discipline yourself to slow down and develop what they're sharing into something CFO-worthy.</div>
-          <div style={{ background:"#fff8e0", border:"1.5px solid #f0c040", borderRadius:10, padding:"14px 18px", marginBottom:16 }}>
-            <div style={{ fontSize:12, fontWeight:700, color:"#8b6000", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:10 }}>Symptom vs. Problem</div>
+          <div style={{ background:"#fffbeb", border:"1.5px solid #f0c040", borderRadius:10, padding:"14px 18px", marginBottom:16 }}>
+            <div style={{ fontSize:12, fontWeight:700, color:"#92400e", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:10 }}>Symptom vs. Problem</div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
               <div style={{ background:"#fff3f3", borderRadius:8, padding:"10px 12px" }}>
                 <div style={{ fontSize:12, fontWeight:700, color:"#8b1a1a", marginBottom:6 }}>SYMPTOM — keep peeling</div>
                 <div style={{ fontSize:13, color:"#5a1a00", lineHeight:1.6 }}>Can't be expressed as a business outcome. CFO rejects it. "Reps struggling with discovery." Gets ghosted.</div>
               </div>
               <div style={{ background:"#f0fbf4", borderRadius:8, padding:"10px 12px" }}>
-                <div style={{ fontSize:12, fontWeight:700, color:"#1a5c28", marginBottom:6 }}>PROBLEM — you're here</div>
-                <div style={{ fontSize:13, color:"#1a3c1e", lineHeight:1.6 }}>Measurable business outcome. CFO listens. "Win rates dropped from 27% to 19%." Gets funded.</div>
+                <div style={{ fontSize:12, fontWeight:700, color:"#92400e", marginBottom:6 }}>PROBLEM — you're here</div>
+                <div style={{ fontSize:13, color:"#fff7ed", lineHeight:1.6 }}>Measurable business outcome. CFO listens. "Win rates dropped from 27% to 19%." Gets funded.</div>
               </div>
             </div>
           </div>
@@ -488,16 +488,16 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       {/* SIDEBAR */}
       <div style={{ width:220, background:C.sidebar, display:"flex", flexDirection:"column", flexShrink:0, overflowY:"auto" }}>
         <div style={{ padding:"28px 22px 18px" }}>
-          <div style={{ fontSize:10, fontWeight:700, color:"#484f58", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:4 }}>PandaDoc</div>
-          <div style={{ fontSize:18, fontWeight:700, color:"#e6edf3", letterSpacing:"0.01em" }}>Discovery</div>
+          <div style={{ fontSize:10, fontWeight:700, color:"#a1a1aa", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:4 }}>PandaDoc</div>
+          <div style={{ fontSize:18, fontWeight:700, color:"#18181b", letterSpacing:"0.01em" }}>Discovery</div>
         </div>
         <div style={{ flex:1, padding:"6px 10px" }}>
           {STAGES.map(s => {
             const isActive = s.id === activeStage;
             return (
-              <button key={s.id} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 12px", borderRadius:6, background:isActive?"#10b98122":"transparent", border:"none", borderLeft:isActive?"2px solid #10b981":"2px solid transparent", textAlign:"left", marginBottom:2 }}>
-                <span style={{ fontSize:16, color:isActive?"#10b981":"#484f58", fontWeight:700, minWidth:20, textAlign:"center" }}>{s.icon}</span>
-                <span style={{ fontSize:15, color:isActive?"#e6edf3":"#8b949e", fontWeight:isActive?600:400 }}>{s.short}</span>
+              <button key={s.id} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 12px", borderRadius:6, background:isActive?"#fff7ed":"transparent", border:"none", borderLeft:isActive?"2px solid #10b981":"2px solid transparent", textAlign:"left", marginBottom:2 }}>
+                <span style={{ fontSize:16, color:isActive?"#f97316":"#a1a1aa", fontWeight:700, minWidth:20, textAlign:"center" }}>{s.icon}</span>
+                <span style={{ fontSize:15, color:isActive?"#18181b":"#52525b", fontWeight:isActive?600:400 }}>{s.short}</span>
               </button>
             );
           })}
@@ -505,7 +505,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         {buyerPath && (
           <div style={{ padding:"16px 22px", borderTop:"1px solid #666" }}>
             <div style={{ fontSize:10, color:"#aaa", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.1em" }}>Buyer Path</div>
-            <div style={{ display:"inline-flex", fontSize:12, fontWeight:600, padding:"4px 12px", borderRadius:99, background:buyerPath==="evaluating"?"#0d2a4a":buyerPath==="active-pain"?"#0a2a1a":"#3a1e00", color:buyerPath==="evaluating"?"#6aaae8":buyerPath==="active-pain"?"#5ad88a":"#e8a84a" }}>
+            <div style={{ display:"inline-flex", fontSize:12, fontWeight:600, padding:"4px 12px", borderRadius:99, background:buyerPath==="evaluating"?"#1e3a5f":buyerPath==="active-pain"?"#7c2d12":"#713f12", color:buyerPath==="evaluating"?"#6aaae8":buyerPath==="active-pain"?"#fb923c":"#e8a84a" }}>
               {buyerPath==="evaluating"?"⚡ Evaluating":buyerPath==="active-pain"?"⚠ Active Pain":"◎ Latent"}
             </div>
             <button onClick={()=>setBuyerPath(null)} style={{ ...B, display:"block", marginTop:6, fontSize:11, color:"#bbb", background:"none", border:"1px solid #666", borderRadius:5, padding:"3px 8px" }}>← change</button>
@@ -519,7 +519,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         {/* TOP BAR */}
         <div style={{ padding:"22px 36px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
           <div>
-            <div style={{ fontSize:22, fontWeight:700, color:"#e6edf3", letterSpacing:"-0.02em" }}>
+            <div style={{ fontSize:22, fontWeight:700, color:"#18181b", letterSpacing:"-0.02em" }}>
               {{prep:"Pre-Call Prep Brief",open:"Rapport + ROE","buyer-type":"Meet Buyer Where They Are","business-problem":"Business Problem",baseline:"Baseline Current State","root-cause":"Root Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Buying Process","next-step":"Secure the Next Step",outputs:"Outputs"}[activeStage]}
             </div>
             <div style={{ fontSize:14, color:C.textMuted, marginTop:4 }}>
@@ -543,36 +543,36 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                 <div style={{ background:C.emeraldLight, border:`2px solid ${C.emeraldMid}`, borderRadius:14, padding:26, marginBottom:20 }}>
                   <div style={{ fontSize:13, fontWeight:700, color:C.emerald, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>★ Paste your discovery prep brief</div>
                   <div style={{ fontSize:15, color:C.textSecondary, marginBottom:16, lineHeight:1.7 }}>Paste the output from your pre-call research. The coach and all outputs will use this to personalize every response.</div>
-                  <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Company] — [Date]\n\nContact: [Name], [Title] | Tenure: X years\nCall Source: Inbound/Outbound\n\nMoney Signals: ...\nTech Stack: ...\nCompelling Trigger: ...\nOpen Gaps: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#0d1117", color:"#e6edf3", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
+                  <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Company] — [Date]\n\nContact: [Name], [Title] | Tenure: X years\nCall Source: Inbound/Outbound\n\nMoney Signals: ...\nTech Stack: ...\nCompelling Trigger: ...\nOpen Gaps: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#f9fafb", color:"#18181b", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
                   {prepBrief && <div style={{ marginTop:12, fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>}
                 </div>
-                <div style={{ background:"#edf5ff", border:"1.5px solid #a8d0f0", borderRadius:12, padding:20, marginBottom:16 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#1a4878", marginBottom:14 }}>Pre-call behavioral read — Hughes Six-Minute X-Ray</div>
-                  <div style={{ fontSize:13, color:"#1a2a4a", lineHeight:1.7, marginBottom:12 }}>Based on their email, LinkedIn, or context — profile before you dial. You're looking for three things:</div>
+                <div style={{ background:"#eff6ff", border:"1.5px solid #bfdbfe", borderRadius:12, padding:20, marginBottom:16 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#1e40af", marginBottom:14 }}>Pre-call behavioral read — Hughes Six-Minute X-Ray</div>
+                  <div style={{ fontSize:13, color:"#1e3a5f", lineHeight:1.7, marginBottom:12 }}>Based on their email, LinkedIn, or context — profile before you dial. You're looking for three things:</div>
                   {[
                     { label:"Primary Social Need", detail:"What makes them feel significant? Approval (they want validation), Power (they want control), Intelligence (they want to be seen as sharp), Acceptance (they want to belong). Tailor your opener to meet that need." },
                     { label:"Decision Style", detail:"Novelty seeker (show them something new), Social conformist (show them who else uses it), Necessity driven (show them the cost of not acting), Investment driven (show them the ROI math)." },
                     { label:"Sensory preference", detail:"Scan their writing. Visual = 'I see,' 'looks like,' 'picture this.' Auditory = 'sounds right,' 'rings true.' Kinesthetic = 'feels like,' 'get a sense.' Mirror their language in the call." },
                   ].map((s,i)=>(
                     <div key={i} style={{ marginBottom:i<2?12:0, paddingBottom:i<2?12:0, borderBottom:i<2?`1px solid #c8e0f8`:"none" }}>
-                      <div style={{ fontSize:12, fontWeight:700, color:"#1a4878", marginBottom:4 }}>{s.label}</div>
-                      <div style={{ fontSize:13, color:"#1a2a4a", lineHeight:1.65 }}>{s.detail}</div>
+                      <div style={{ fontSize:12, fontWeight:700, color:"#1e40af", marginBottom:4 }}>{s.label}</div>
+                      <div style={{ fontSize:13, color:"#1e3a5f", lineHeight:1.65 }}>{s.detail}</div>
                     </div>
                   ))}
                 </div>
-                <div style={{ background:"#fff8e0", border:"1.5px solid #f5c040", borderRadius:12, padding:20, marginBottom:16 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#8b6000", marginBottom:14 }}>PCP Model — Hughes. Set this before every call.</div>
-                  <div style={{ fontSize:13, color:"#5a3c00", lineHeight:1.7, marginBottom:14 }}>Every human decision flows through 3 steps. Control the frame, control the outcome.</div>
+                <div style={{ background:"#fffbeb", border:"1.5px solid #f5c040", borderRadius:12, padding:20, marginBottom:16 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#92400e", marginBottom:14 }}>PCP Model — Hughes. Set this before every call.</div>
+                  <div style={{ fontSize:13, color:"#78350f", lineHeight:1.7, marginBottom:14 }}>Every human decision flows through 3 steps. Control the frame, control the outcome.</div>
                   {[
                     { letter:"P", label:"Perception", desc:"Change how they see the situation before discovery starts. Your opener sets what this meeting means. 'A lot of vendors jump to a demo before understanding anything about you. That's not how I want to spend our time.'" },
                     { letter:"C", label:"Context", desc:"Context dictates what behavior is permissible. The ROE sets the context — mutual discovery, not a pitch. Once the context is set, the prospect knows what's expected of them." },
                     { letter:"P", label:"Permission", desc:"Context gives permission. When you say 'does that feel fair?' — you're granting them permission to engage as a peer. When you summarize and ask 'did I get that right?' — you're giving them permission to correct and go deeper." },
                   ].map((s,i)=>(
                     <div key={i} style={{ display:"flex", gap:12, marginBottom:i<2?12:0, paddingBottom:i<2?12:0, borderBottom:i<2?"1px solid #f0d870":"none" }}>
-                      <span style={{ fontSize:18, fontWeight:800, color:"#8b6000", flexShrink:0, minWidth:22 }}>{s.letter}</span>
+                      <span style={{ fontSize:18, fontWeight:800, color:"#92400e", flexShrink:0, minWidth:22 }}>{s.letter}</span>
                       <div>
-                        <div style={{ fontSize:12, fontWeight:700, color:"#8b6000", marginBottom:3 }}>{s.label}</div>
-                        <div style={{ fontSize:13, color:"#5a3c00", lineHeight:1.65 }}>{s.desc}</div>
+                        <div style={{ fontSize:12, fontWeight:700, color:"#92400e", marginBottom:3 }}>{s.label}</div>
+                        <div style={{ fontSize:13, color:"#78350f", lineHeight:1.65 }}>{s.desc}</div>
                       </div>
                     </div>
                   ))}
@@ -610,13 +610,13 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
-                      <span style={{ fontSize:14, color:open?"#e6edf3":"#484f58", fontWeight:700 }}>{open?"▲":"▼"}</span>
+                      <span style={{ fontSize:14, color:open?"#18181b":"#a1a1aa", fontWeight:700 }}>{open?"▲":"▼"}</span>
                     </button>
-                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
+                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#18181b", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
                   </div>);
                 })}
-                <div style={{ marginBottom:16, background:"#edf5ff", border:"1.5px solid #a8d0f0", borderRadius:12, padding:"16px 18px" }}>
-                  <div style={{ fontSize:11, fontWeight:700, color:"#1a4878", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Read them in the first 60 seconds — Hughes</div>
+                <div style={{ marginBottom:16, background:"#eff6ff", border:"1.5px solid #bfdbfe", borderRadius:12, padding:"16px 18px" }}>
+                  <div style={{ fontSize:11, fontWeight:700, color:"#1e40af", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Read them in the first 60 seconds — Hughes</div>
                   {[
                     { signal:"Pronouns", read:"I/me/my → individual focus, personal stakes matter most. We/us/our → team focus, consensus matters. Adapt accordingly." },
                     { signal:"Sensory words", read:"'I see what you mean' → visual. 'Sounds right' → auditory. 'Feels like a fit' → kinesthetic. Mirror their language back in your questions." },
@@ -624,8 +624,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                     { signal:"Unprompted complaint", read:"If they volunteer a frustration before you ask — that's the center. Note it. Everything else is surface." },
                   ].map((s,i)=>(
                     <div key={i} style={{ marginBottom:i<3?10:0, display:"flex", gap:10 }}>
-                      <span style={{ fontSize:11, fontWeight:700, color:"#1a4878", flexShrink:0, minWidth:100 }}>{s.signal}</span>
-                      <span style={{ fontSize:13, color:"#1a2a4a", lineHeight:1.65 }}>{s.read}</span>
+                      <span style={{ fontSize:11, fontWeight:700, color:"#1e40af", flexShrink:0, minWidth:100 }}>{s.signal}</span>
+                      <span style={{ fontSize:13, color:"#1e3a5f", lineHeight:1.65 }}>{s.read}</span>
                     </div>
                   ))}
                 </div>
@@ -649,9 +649,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
-                      <span style={{ fontSize:14, color:open?"#e6edf3":"#484f58", fontWeight:700 }}>{open?"▲":"▼"}</span>
+                      <span style={{ fontSize:14, color:open?"#18181b":"#a1a1aa", fontWeight:700 }}>{open?"▲":"▼"}</span>
                     </button>
-                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
+                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#18181b", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
                   </div>);
                 })}
                 <Collapsible label="Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textMuted}>
@@ -693,9 +693,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
-                      <span style={{ fontSize:14, color:open?"#e6edf3":"#484f58", fontWeight:700 }}>{open?"▲":"▼"}</span>
+                      <span style={{ fontSize:14, color:open?"#18181b":"#a1a1aa", fontWeight:700 }}>{open?"▲":"▼"}</span>
                     </button>
-                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#e6edf3", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
+                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#18181b", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
                   </div>);
                 })}
                 <Collapsible label="Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textMuted}>
@@ -710,9 +710,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
             {/* OUTPUTS */}
             {activeStage === "outputs" && (
               <div>
-                <div style={{ background:"#fff8e0", border:"1.5px solid #f5c040", borderRadius:12, padding:"16px 20px", marginBottom:24 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#8b6000", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>No Logo Challenge — before you generate</div>
-                  <div style={{ fontSize:14, color:"#5a3c00", lineHeight:1.75 }}>Could someone read your description of this customer's problem and identify the company — without seeing the logo? If it describes every company on the planet, you haven't gone deep enough. That specificity is the acid test of good discovery.</div>
+                <div style={{ background:"#fffbeb", border:"1.5px solid #f5c040", borderRadius:12, padding:"16px 20px", marginBottom:24 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#92400e", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>No Logo Challenge — before you generate</div>
+                  <div style={{ fontSize:14, color:"#78350f", lineHeight:1.75 }}>Could someone read your description of this customer's problem and identify the company — without seeing the logo? If it describes every company on the planet, you haven't gone deep enough. That specificity is the acid test of good discovery.</div>
                 </div>
                 {/* CALL DEBRIEF */}
                 <div style={{ background:C.white, border:`2px solid ${C.emerald}`, borderRadius:14, padding:26, marginBottom:18 }}>
@@ -722,7 +722,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                     value={callTranscript}
                     onChange={e => setCallTranscript(e.target.value)}
                     placeholder="Paste your Granola transcript here... (e.g. 0:00 | Tyler — hey how's it going...)"
-                    style={{ width:"100%", minHeight:160, fontSize:14, lineHeight:1.75, padding:"14px 16px", border:`1.5px solid ${C.border}`, borderRadius:10, background:"#0d1117", color:"#e6edf3", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none", marginBottom:14 }}
+                    style={{ width:"100%", minHeight:160, fontSize:14, lineHeight:1.75, padding:"14px 16px", border:`1.5px solid ${C.border}`, borderRadius:10, background:"#f9fafb", color:"#18181b", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none", marginBottom:14 }}
                   />
                   <button
                     onClick={generateDebrief}
@@ -773,7 +773,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                 { id:"enterprise", label:"Enterprise" },
                 { id:"roi",        label:"ROI" },
               ].map(t => (
-                <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"16px 4px", fontSize:14, fontWeight:800, letterSpacing:"0.03em", textTransform:"uppercase", border:"none", borderBottom: rightTab===t.id ? `2px solid #10b981` : "2px solid transparent", background: "transparent", color: rightTab===t.id ? "#10b981" : "#484f58", marginBottom:-1 }}>
+                <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"16px 4px", fontSize:14, fontWeight:800, letterSpacing:"0.03em", textTransform:"uppercase", border:"none", borderBottom: rightTab===t.id ? `2px solid #10b981` : "2px solid transparent", background: "transparent", color: rightTab===t.id ? "#f97316" : "#a1a1aa", marginBottom:-1 }}>
                   {t.label}
                 </button>
               ))}
@@ -815,12 +815,12 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                 <div style={{ padding:"18px 20px 6px", fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase" }}>Enterprise Features</div>
                 <div style={{ padding:"0 20px 12px", fontSize:12, color:C.textMuted, lineHeight:1.6 }}>Ask these mid-discovery. A yes to any red question = Enterprise is a no-brainer.</div>
                 {[
-                  { feature:"Workspaces", color:"#1a4878", bg:"#edf5ff", border:"#a8d0f0", questions:[
+                  { feature:"Workspaces", color:"#1e40af", bg:"#edf5ff", border:"#a8d0f0", questions:[
                     { q:"Which teams would realistically be using PandaDoc day-to-day?", hot:false },
                     { q:"Do different teams need their own templates, branding, or approval flows?", hot:false },
                     { q:"Would it ever be a problem if HR could see sales contracts — or vice versa?", hot:true },
                   ]},
-                  { feature:"Smart Content", color:"#1a4230", bg:C.emeraldLight, border:C.emeraldMid, questions:[
+                  { feature:"Smart Content", color:"#fff7ed", bg:C.emeraldLight, border:C.emeraldMid, questions:[
                     { q:"How much of your proposals stays the same vs. customized each time?", hot:false },
                     { q:"Do you have content that depends on industry, product, or region?", hot:false },
                     { q:"Do reps ever copy-paste sections from old docs to save time?", hot:true },
@@ -842,12 +842,12 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                     { q:"Are there parts of the doc that should never be changed?", hot:false },
                     { q:"Have you ever had issues with reps tweaking pricing, terms, or content?", hot:true },
                   ]},
-                  { feature:"Redlining", color:"#1a4878", bg:"#edf5ff", border:"#a8d0f0", questions:[
+                  { feature:"Redlining", color:"#1e40af", bg:"#edf5ff", border:"#a8d0f0", questions:[
                     { q:"How do contract negotiations usually happen today?", hot:false },
                     { q:"Do you go back and forth in Word or PDF — or directly in the doc?", hot:false },
                     { q:"Who's typically involved in reviewing changes — legal, finance, client?", hot:false },
                   ]},
-                  { feature:"Salesforce / HubSpot 2-way Sync", color:"#1a4230", bg:C.emeraldLight, border:C.emeraldMid, questions:[
+                  { feature:"Salesforce / HubSpot 2-way Sync", color:"#fff7ed", bg:C.emeraldLight, border:C.emeraldMid, questions:[
                     { q:"How important is it that data flows both ways automatically?", hot:false },
                     { q:"Do reps update your CRM manually after sending docs?", hot:false },
                     { q:"Any errors or mismatches happening after that?", hot:true },
@@ -866,7 +866,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                     { q:"Do you want clients to feel like everything is coming directly from your domain?", hot:false },
                     { q:"Have you ever had issues with emails landing in spam or looking external?", hot:true },
                   ]},
-                  { feature:"HIPAA Compliance", color:"#1a4878", bg:"#edf5ff", border:"#a8d0f0", questions:[
+                  { feature:"HIPAA Compliance", color:"#1e40af", bg:"#edf5ff", border:"#a8d0f0", questions:[
                     { q:"Does your company handle any personal health information (PHI)?", hot:false },
                     { q:"Is HIPAA compliance a requirement for any of the software you use?", hot:true },
                   ]},
@@ -911,7 +911,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   ].map(f => (
                     <div key={f.key}>
                       <div style={{ fontSize:12, fontWeight:600, color:C.textSecondary, marginBottom:6 }}>{f.label}</div>
-                      <input type="number" value={roi[f.key]} onChange={e=>setRoi(r=>({...r,[f.key]:e.target.value}))} placeholder={f.placeholder} style={{ width:"100%", fontSize:15, fontWeight:600, padding:"10px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, background:"#0d1117", color:"#e6edf3", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
+                      <input type="number" value={roi[f.key]} onChange={e=>setRoi(r=>({...r,[f.key]:e.target.value}))} placeholder={f.placeholder} style={{ width:"100%", fontSize:15, fontWeight:600, padding:"10px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, background:"#f9fafb", color:"#18181b", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
                     </div>
                   ))}
                 </div>
@@ -939,7 +939,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                       {[
                         { label:"Current cost / yr",    value:fmt(costNowYear),   sub:`${fmtH(hoursNowYear)} building docs`,        color:C.coral,    bg:"#fff3f3",    border:`${C.coral}50` },
                         { label:"With PandaDoc / yr",   value:fmt(costPDYear),    sub:`${fmtH(hoursPDYear)} at 15 min/proposal`,    color:C.emerald,  bg:C.emeraldLight, border:C.emeraldMid },
-                        { label:"Annual value delta",   value:fmt(savedDollars),  sub:`${fmtH(savedHours)} reclaimed — ${savePct}% saved`, color:"#1a4878", bg:"#edf5ff", border:"#a8d0f0" },
+                        { label:"Annual value delta",   value:fmt(savedDollars),  sub:`${fmtH(savedHours)} reclaimed — ${savePct}% saved`, color:"#1e40af", bg:"#edf5ff", border:"#a8d0f0" },
                       ].map((m,i)=>(
                         <div key={i} style={{ background:m.bg, border:`1.5px solid ${m.border}`, borderRadius:10, padding:"14px 16px", marginBottom:10 }}>
                           <div style={{ fontSize:11, fontWeight:700, color:m.color, letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:4 }}>{m.label}</div>
