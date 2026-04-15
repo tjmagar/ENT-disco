@@ -138,6 +138,7 @@ Be specific, brief, direct. Word-for-word scripts. Personalize using prep brief 
 export default function App() {
   const [activeStage, setActiveStage] = useState("prep");
   const [buyerPath, setBuyerPath] = useState(null);
+  const [callSource, setCallSource] = useState(null);
   const [notes, setNotes] = useState({});
   const [prepBrief, setPrepBrief] = useState("");
   const [openSpiced, setOpenSpiced] = useState(null);
@@ -150,6 +151,7 @@ export default function App() {
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [coachingVisible, setCoachingVisible] = useState(false);
   const [callTranscript, setCallTranscript] = useState("");
   const [debriefLoading, setDebriefLoading] = useState(false);
   const [scriptEdits, setScriptEdits] = useState({}); // key -> edited text
@@ -286,7 +288,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                 <div style={{ padding:"0 22px 14px" }}>
                   <button onClick={e=>{ e.stopPropagation(); setEditingKey(key); }} style={{ ...B, fontSize:11, padding:"4px 12px", background:"transparent", color:"#a1a1aa", border:"1px solid #21262d", borderRadius:5, fontWeight:600 }}>✎ Edit</button>
                 </div>
-                {r.note && <div style={{ margin:"0 22px 16px", fontSize:14, color:"#52525b", lineHeight:1.75, background:"#f9fafb", padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
+                {r.note && coachingVisible && <div style={{ margin:"0 22px 16px", fontSize:14, color:"#52525b", lineHeight:1.75, background:"#f9fafb", padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
               </div>
             )}
           </div>
@@ -299,10 +301,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     if (!buyerPath) return (
       <div style={{ marginBottom:28 }}>
         <div style={{ background:C.emeraldLight, border:`1.5px solid ${C.emeraldMid}`, borderRadius:12, padding:"16px 20px", marginBottom:24 }}>
-          <div style={{ fontSize:12, fontWeight:700, color:C.emerald, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Ask this in the first 2 minutes — right after rapport</div>
-          <div style={{ fontSize:17, fontWeight:600, color:C.textPrimary, lineHeight:2, marginBottom:6 }}>Inbound: "What motivated you to reach out and explore this?"</div>
-          <div style={{ fontSize:17, fontWeight:600, color:C.textPrimary, lineHeight:2, marginBottom:12 }}>Outbound: "We reached out to you, so this might sound odd — but what made you agree to take this call?"</div>
-          <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7 }}>Then listen. Their language tells you which path you're on.</div>
+          <div style={{ fontSize:17, fontWeight:600, color:C.textPrimary, lineHeight:2, marginBottom:6 }}><span style={{ color:C.emerald, fontWeight:700 }}>Inbound:</span> "What motivated you to reach out and explore this?"</div>
+          <div style={{ fontSize:17, fontWeight:600, color:C.textPrimary, lineHeight:2 }}><span style={{ color:"#3b82f6", fontWeight:700 }}>Outbound:</span> "I know we reached out to you, so this might sound odd — but what made you agree to take this call?"</div>
         </div>
         <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:14 }}>What did their response sound like?</div>
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
@@ -328,7 +328,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       <div style={{ marginBottom:28 }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
           <div style={{ fontSize:13, fontWeight:700, color:pathColor, letterSpacing:"0.06em", textTransform:"uppercase" }}>{pathLabel}</div>
-          <button onClick={()=>setBuyerPath(null)} style={{ ...B, fontSize:12, color:C.white, background:C.coral, border:"none", borderRadius:6, padding:"5px 14px", fontWeight:600 }}>← Change</button>
+          <button onClick={()=>{setBuyerPath(null);setCallSource(null);}} style={{ ...B, fontSize:12, color:C.white, background:C.coral, border:"none", borderRadius:6, padding:"5px 14px", fontWeight:600 }}>← Change</button>
         </div>
 
         {buyerPath === "evaluating" && <>
@@ -413,22 +413,18 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
 
   const STAGE_DATA = {
     "business-problem": {
-      rule:"Map their process first. Then peel. You can't find the pain until you know the workflow.",
+      rule:"Summarize what you heard. Prioritize. Validate it is a raging fire. Summarize before moving on.",
       rhythm:[
-        { type:"ask", label:"Map their process — open neutral, let them describe it", alts:["Before we get into the challenges — walk me through what your document workflow actually looks like today. From the moment someone decides a document needs to go out, all the way to when it lands signed and stored.","Help me understand your current process end to end. What does it actually look like day to day?"], note:"Voss: calibrated and open. Hughes: neutral frame — you are not naming what you expect to find. Whatever they describe is the truth you work with. Get them talking, then stop." },
-        { type:"ask", label:"Mirror to pull the thread — last 3 words + silence", alts:["They say we kind of stitch it together → you say stitch it together? [silence 4+ seconds]","They say it goes to a few different people → few different people? [silence]","They say it takes longer than it should → longer than it should? [silence]"], note:"Voss: mirroring is the most underrated technique in sales. Repeat their last 3 words, let silence do the work. People are compelled to fill silence — and what they say next is almost always more honest and specific than what they said first." },
-        { type:"ask", label:"Complaint bait — invite the frustration without naming it", alts:['"Every process has at least one part that\'s more painful than the rest. Where does yours tend to break down?"','"When that process goes sideways — what usually causes it?"','"What part of that takes longer than it probably should?"'], note:"Hughes: complaint baiting invites the complaint without interrogating. They identify the pain point themselves — which means they own it. You didn\'t put it in their mouth. That\'s what makes it stick." },
-        { type:"ask", label:"Negative dissociation — distance them from the status quo", alts:['"A lot of teams I talk to have just kind of accepted the manual parts as the cost of doing business. They\'ve stopped expecting it to be different."','"Most people I meet with have tried to fix parts of this at some point and just sort of gave up on it."'], note:"Hughes: you\'re making an observation about OTHER people — not them. They\'ll covertly distance themselves from that identity. \'That\'s not us\' fires in their head without you asking. Now they\'re more motivated to describe the problem as something they want to fix — not live with. Never say this about them directly." },
-        { type:"ask", label:"Lego technique — lay pieces, let them connect", alts:['"It sounds like a lot of the friction is on the front end — getting the thing built and out the door." [pause] "And then separately, once it\'s out there\'s not a lot of visibility." [pause — let them connect it]','"So there\'s the creation side, and then there\'s what happens after. Which one would you say causes more pain day to day?"'], note:"Hughes: the most dangerous persuasion skill. Put information A on the table. Put information B on the table. Never connect them yourself. Their brain connects them — and any conclusion that feels like it came from their own mind cannot be resisted. This is how they articulate their own pain without you naming it first." },
-        { type:"ask", label:"Label what you\'re hearing — Voss", alts:['"It sounds like there\'s a lot of manual work involved in getting something out the door."','"It seems like that process has a few more steps than anyone would want."','"It sounds like visibility is pretty limited once something leaves your hands."'], note:"Voss: labeling is It sounds like or It seems like — never I feel like. Name their emotion or situation and let them confirm or correct. When they say that\'s right — you\'ve landed. That\'s alignment, not just agreement." },
-        { type:"ask", label:"The killer question — lead with this", text:'"What is going on in your business that\'s driving this to be a priority?"', note:"Orlob: buyers often chuckle at this question — because it gets them thinking about the underlying trainwreck in their business. That chuckle is the signal you\'re getting closer to the center of the onion." },
-        { type:"ask", label:"Aside from template — ask the same thing twice naturally", alts:['"Aside from [what they just said], is there something going on behind the scenes driving you to prioritize fixing this?"','"Aside from the obvious benefits of solving [X], is there anything else going on behind the scenes that has you focused on this above the other challenges?"'], note:"This is how you ask the same question multiple times without it feeling repetitive. Acknowledge what they said. Invite the deeper answer. Same spirit — zero repetition." },
-        { type:"ask", label:"Softening T-up — when the next question feels heavy", alts:["This is going to sound a little redundant. You could be focusing on any number of challenges in your world, but I sense energy behind this one specifically. What\'s going on behind the scenes that has you focused on this above the others?","If the question I\'m about to ask comes across as overbearing, feel free to kick me in the teeth. With that said — what\'s going on in the business that\'s driving this to make its way to your priority list?"], note:"Use this any time you need to ask a hard follow-up or you have already asked something similar. The T-up changes the entire feel of the question." },
-        { type:"ask", label:"Validate — raging fire or brush fire?", text:"Before we go too much further — I just want to make sure we\'re anchoring our conversation to the right thing. Is this the challenge we should be focused on together, or are there other things that are going to overpower this? Is this something that\'ll be top of mind a week from now, or more of a nice-to-have?", note:"CFO acid test: would a CFO fund this problem statement? If no → symptom, keep peeling. If yes → you\'re at a problem. Symptoms get ghosted. Problems get funded." },
-        { type:"summarize", label:"Summarize + Validate → Transition to Baseline", alts:["Let me see if I\'ve understood you so far. [Their exact words back — not a paraphrase, not your words.] Did I get that right?","Before we move on — I want to make sure I\'m aligned to the things you care about most. Is this the challenge we should anchor our conversations to, or did I lead you down a path to something you only mildly care about?"], note:"Option 1 = summarize (do every 3-5 questions). Option 2 = validate priority (do once per call). Two different jobs. The validate question might save you weeks on a deal that would have gone dark." },
+        { type:"summarize", label:"1 — Early summary + prioritize", text:"I heard a few things — [X, Y, Z]. Which one of those feels most top of mind? We will touch on all of them but in your opinion — what is the biggest headache right now?", note:"Do this immediately after their opening answer. Summarize what you heard, give it back organized, make them prioritize. The one they pick is where the real pain lives." },
+        { type:"ask", label:"2 — Validate: raging fire or brush fire", text:"Before we go too much further — I just want to make sure we are anchoring our conversation to the right thing. Is this the challenge we should be focused on together, or are there other things that are going to overpower this? Is this something that will be top of mind a week from now, or more of a nice-to-have?", note:"CFO acid test: would a CFO fund this problem statement? If no — keep peeling. Symptoms get ghosted. Problems get funded." },
+        { type:"summarize", label:"3 — Summarize before transition (Orlob Script #7)", text:"Let me see if I have this right so far. [Their exact words — not yours.] Did I get that right? ... Ok great. Thanks for confirming that. Now that we have your challenge established — what are the ripple effects this is having across the business?", note:"Summarize in their exact words — never paraphrase. When they say that is right you have true alignment. Then springboard to the next topic." },
+        { fallback:true, type:"ask", label:"4 — Domino effect", alts:["A — Orlob: There is a domino effect attached to that — what else does it affect when that breaks down?","D — TJ: There is a domino effect attached to that — why is it important to fix that one specifically?"], note:"Peels past the first answer to find what the operational problem is actually costing the business." },
+        { fallback:true, type:"ask", label:"5 — Aside from", alts:["A — Orlob: Aside from [what they just said] — is there something going on behind the scenes driving you to prioritize fixing this?","D — TJ: Aside from the obvious benefit of maybe a rep not giving your product away for free — what else would you stand to gain?"], note:"Ask the same question multiple times without it feeling repetitive." },
+        { fallback:true, type:"ask", label:"6 — Personal stake", alts:["A — Orlob: Beyond what this means for the business — what does solving this mean for you personally?","D — TJ: We have discussed how this looks for the business. But you are here today — how does this affect your role? Your day?"], note:"The most powerful question on the call. Ask it after business pain is established." },
+        { fallback:true, type:"ask", label:"7 — Cost of inaction", alts:["A — Orlob: What happens if other priorities take over and you simply do not make this decision?","D — TJ: If I could ask an uncomfortable question — what happens if other priorities take over and you simply do not make that decision?"], note:"Makes the invisible cost visible. Soften it first." },
       ],
-      tips:["Hughes: micro compliance — every small agreement ('did I get that right?', 'fair?', 'does that make sense?') builds toward the big one. Never skip the small confirms. The pattern of yeses is what makes the final yes feel inevitable.","Map first, peel second. You can't find the most painful step until you know all the steps.","The first answer your buyer gives is almost always too surface level. Human nature. Guide them deeper.","Voss: silence after a mirror is doing work. Don't break it. 4 seconds feels long — let it run.","Hughes: whoever describes the problem owns the problem. Get them talking, not you.","Don't move on until you can pass the No Logo Challenge: could someone identify this company from your description of their problem alone?"],
-      watch:["Naming what you expect to find before they've said it — that's anchoring, not eliciting","Stopping at the first answer — 'we need better proposals' is a solution, not a problem","Breaking silence too soon after a mirror — the best answer often comes 5 seconds in","Happy ears — getting excited about pain before validating it's actually a raging fire"],
+      tips:["Little problems get little dollars. BIG problems get BIG dollars.","Summarize in their exact words — never paraphrase. Buyers resonate with their words not yours.","No Logo Challenge: could someone identify this company from your description alone?"],
+      watch:["Stopping at the first answer — it is almost always a symptom","Moving on before validating priority","Happy ears — getting excited before validating it is a raging fire"],
     },
     "current-process": {
       rule:"Map where they are today. The metric will surface naturally. Don't hunt for it.",
@@ -571,7 +567,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               {{prep:"Paste your prep brief. Everything downstream personalizes from this.",open:"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","current-process":"Map where they are today before you peel.","business-problem":"Find the need behind the need. Peel until a CFO would fund it.","negative-impact":"What is this actually costing the business?","future-state":"Contrast painful present with compelling future. Then decision process.","next-step":"Call back the ROE. Make the recommendation.",outputs:"Generate your end-of-call outputs."}[activeStage]}
             </div>
           </div>
-          <div style={{ display:"flex", gap:10 }}>
+          <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+            <button onClick={()=>setCoachingVisible(v=>!v)} style={{ ...B, fontSize:12, padding:"8px 14px", border:`1px solid ${C.border}`, borderRadius:8, background:coachingVisible?C.emeraldLight:C.white, color:coachingVisible?C.emerald:C.textMuted, fontWeight:600 }}>{coachingVisible?"Hide coaching":"Show coaching"}</button>
             {showOutputsShortcut && <button onClick={()=>setActiveStage("outputs")} style={{ ...B, fontSize:13, padding:"10px 20px", border:`2px solid ${C.emerald}`, borderRadius:8, background:"transparent", color:C.emerald, fontWeight:700 }}>✦ Outputs</button>}
             {currentIdx > 0 && <button onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} style={{ ...B, fontSize:14, padding:"10px 22px", border:`1px solid ${C.border}`, borderRadius:8, background:C.white, color:C.textMuted, fontWeight:500 }}>← Back</button>}
             {currentIdx < STAGES.length-1 && <button onClick={()=>setActiveStage(STAGES[currentIdx+1].id)} style={{ ...B, fontSize:14, padding:"10px 24px", border:"none", borderRadius:8, background:C.emerald, color:C.white, fontWeight:700 }}>Next →</button>}
@@ -641,15 +638,19 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div>
                 {/* OPENER — always */}
                 <div style={{ marginBottom:20, background:C.emerald, borderRadius:14, padding:26 }}>
-                  <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,0.7)", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>★ Always — every call</div>
-                  <div style={{ fontSize:20, color:"#fff", lineHeight:1.85, fontWeight:600, marginBottom:10 }}>"I'm glad we found the time to meet today. How's your week going?"</div>
-                  <div style={{ fontSize:14, color:"rgba(255,255,255,0.85)", lineHeight:1.7, borderTop:"1px solid rgba(255,255,255,0.2)", paddingTop:12 }}>
-                    Read their energy. Talkative → hang with it naturally, find the landing spot → <strong style={{color:"#fff"}}>"Look, I know your time is valuable and you reached out for a reason — mind if we talk about the agenda?"</strong> Business → pivot immediately with the same line.
+                  <div style={{ fontSize:22, color:"#fff", lineHeight:1.85, fontWeight:600, marginBottom:16 }}>"Hey [Name] — I'm glad we could find the time to meet today. How's your week going?"</div>
+                  <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                    <div style={{ background:"rgba(255,255,255,0.15)", borderRadius:8, padding:"12px 16px", fontSize:14, color:"#fff", lineHeight:1.7 }}>
+                      <strong>Rapport →</strong> hang with it, find the natural end → "Mind if we hop into the agenda?"
+                    </div>
+                    <div style={{ background:"rgba(255,255,255,0.15)", borderRadius:8, padding:"12px 16px", fontSize:14, color:"#fff", lineHeight:1.7 }}>
+                      <strong>Business →</strong> "Week's going good, thanks. Look, I know your time is valuable and you reached out for a reason — mind if we talk about the agenda?"
+                    </div>
                   </div>
                 </div>
 
                 {/* HUGHES SIGNALS */}
-                <div style={{ marginBottom:16, background:"#eff6ff", border:"1.5px solid #bfdbfe", borderRadius:10, padding:"14px 18px" }}>
+                {coachingVisible && <div style={{ marginBottom:16, background:"#eff6ff", border:"1.5px solid #bfdbfe", borderRadius:10, padding:"14px 18px" }}>
                   <div style={{ fontSize:11, fontWeight:700, color:"#1e40af", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Read them in the first 60 seconds — Hughes</div>
                   {[
                     { signal:"Pronouns", read:"I/me/my → individual, personal stakes matter. We/us/our → team focus, consensus matters." },
@@ -661,7 +662,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                       <span style={{ fontSize:13, color:"#1e3a5f", lineHeight:1.6 }}>{s.read}</span>
                     </div>
                   ))}
-                </div>
+                </div>}
 
                 {/* ROE CARDS */}
                 <div style={{ fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>ROE — pick one</div>
@@ -680,27 +681,12 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   </div>);
                 })}
 
-                {/* DIAGNOSTIC */}
-                <div style={{ fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", margin:"20px 0 10px" }}>Diagnostic — after they agree to the agenda</div>
-                {[
-                  { label:"Inbound", text:"What motivated you to reach out and explore this?" },
-                  { label:"Outbound", text:"I know we reached out to you, so this might sound odd — but what made you agree to take this call?" },
-                ].map((s,i)=>{
-                  const key=`diag-${i}`, isOpen=expandedScript===key;
-                  return (<div key={i} style={{ marginBottom:8, borderRadius:10, overflow:"hidden", border:`1.5px solid ${isOpen?C.emerald:C.border}`, background:C.white }}>
-                    <button onClick={()=>setExpandedScript(isOpen?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?C.emeraldLight:C.white, border:"none", textAlign:"left" }}>
-                      <span style={{ fontSize:15, fontWeight:700, color:isOpen?C.emerald:C.textPrimary }}>{s.label}</span>
-                      <span style={{ fontSize:13, color:isOpen?C.emerald:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
-                    </button>
-                    {isOpen && <div style={{ padding:"18px 22px", fontSize:15, color:C.textPrimary, lineHeight:1.9, fontWeight:400, background:C.emeraldLight }}>{s.text}</div>}
-                  </div>);
-                })}
 
-                <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
-                  {["Thanking the prospect for their time — immediately positions you lower","Running both ROE versions back to back — pick one and commit","Skipping the diagnostic — buyer type diagnosis is the most important click in the app"].map((w,i)=>(
-                    <div key={i} style={{ display:"flex", gap:12, marginBottom:i<2?12:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#5a1a00", lineHeight:1.7 }}>{w}</span></div>
+                {coachingVisible && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
+                  {["Thanking the prospect for their time — immediately positions you lower","Running both ROE versions back to back — pick one and commit"].map((w,i)=>(
+                    <div key={i} style={{ display:"flex", gap:12, marginBottom:i<1?12:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#5a1a00", lineHeight:1.7 }}>{w}</span></div>
                   ))}
-                </Collapsible>
+                </Collapsible>}
               </div>
             )}
 
@@ -712,14 +698,14 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div>
                 <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.06em", marginBottom:16, paddingBottom:12, borderBottom:`1px solid ${C.border}` }}>{sd.rule}</div>
                 {sd.rhythm.filter(r=>!r.fallback).map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix={activeStage} />)}
-                {sd.rhythm.some(r=>r.fallback) && (
+                {sd.rhythm.some(r=>r.fallback) && coachingVisible && (
                   <Collapsible label="+ More techniques" isOpen={moreOpen} onToggle={()=>setMoreOpen(v=>!v)} accent={C.textMuted}>
                     {sd.rhythm.filter(r=>r.fallback).map((r,i)=><RhythmCard key={i} r={r} idx={i+100} prefix={activeStage+"-more"} />)}
                   </Collapsible>
                 )}
-                <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
+                {coachingVisible && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
                   {sd.watch.map((w,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.watch.length-1?14:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#5a1a00", lineHeight:1.7 }}>{w}</span></div>))}
-                </Collapsible>
+                </Collapsible>}
               </div>
             )}
 
@@ -744,9 +730,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                 <Collapsible label="Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textMuted}>
                   {["Every rep who overperformed took a leadership posture on next steps. Always have a clear point of view on what to do next.","Any deal without a scheduled next step on the calendar is at risk. 85%+ go dark.","Always lead with a recommendation. Never 'what do you think we should do next?'","Rank by deal health: multi-stakeholder demo > technical call > trial > champion prep."].map((t,i)=>(<div key={i} style={{ display:"flex", gap:14, marginBottom:i<3?14:0 }}><span style={{ fontSize:15, color:C.textMuted, flexShrink:0 }}>—</span><span style={{ fontSize:16, color:C.textSecondary, lineHeight:1.75 }}>{t}</span></div>))}
                 </Collapsible>
-                <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
+                {coachingVisible && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
                   {["Hughes: pre-commitment — every 'fair?', 'did I get that right?', 'is this the challenge we should anchor to?' built toward this moment. If you skipped those — the next step ask lands cold.","'I'll follow up next week' — not a next step. Must be booked before you hang up.","Not recommending who else should be in the room — this is how you stay stuck with one contact.","Forgetting to call back the ROE decision you set at the start of the call."].map((w,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<3?14:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:16, color:"#5a1a00", lineHeight:1.75 }}>{w}</span></div>))}
-                </Collapsible>
+                </Collapsible>}
               </div>
             )}
 
