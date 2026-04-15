@@ -146,7 +146,7 @@ export default function App() {
   const [outputLoading, setOutputLoading] = useState("");
   const [tipsOpen, setTipsOpen] = useState(false);
   const [watchOpen, setWatchOpen] = useState(false);
-  const [collapsedCards, setCollapsedCards] = useState(new Set()); // cards that are collapsed (default = all open)
+  const [collapsedCards, setCollapsedCards] = useState({});
   const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
@@ -256,14 +256,14 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     const tc = tagColors[r.type] || tagColors.ask;
     const key = `${prefix}-${idx}`;
     const defaultOpen = idx === 0;
-    const open = collapsedCards.has(key) ? !defaultOpen : defaultOpen;
+    const open = collapsedCards[key] !== undefined ? !collapsedCards[key] : defaultOpen;
     const isEditing = editingKey === key;
     const editKey = `rc-${key}`;
     const originalText = r.text || (r.alts ? r.alts.join("\n\n") : "");
     const displayText = scriptEdits[editKey] !== undefined ? scriptEdits[editKey] : originalText;
     return (
       <div style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:open?tc.border:`1.5px solid ${C.border}`, background:C.white }}>
-        <button onClick={() => setCollapsedCards(s=>{ const n=new Set(s); n.has(key)?n.delete(key):n.add(key); return n; })} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:C.white, border:"none", textAlign:"left" }}>
+        <button onClick={() => setCollapsedCards(s=>({...s,[key]:!s[key]}))} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:C.white, border:"none", textAlign:"left" }}>
           <span style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:99, background:tc.badge, color:tc.badgeText, flexShrink:0, letterSpacing:"0.06em", textTransform:"uppercase" }}>{tc.tag}</span>
           <span style={{ fontSize:17, fontWeight:700, color:C.textPrimary, flex:1, letterSpacing:"-0.01em" }}>{r.label}</span>
           <span style={{ fontSize:14, color:C.textMuted, fontWeight:700 }}>{open?"▲":"▼"}</span>
@@ -683,7 +683,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   { label:"B — Hughes", text:"Here's what I'm thinking for today, feel free to let me know if you had something else in mind.\n\nMost calls like this start with feature dumping, jumping into the product prematurely, and taking you on a grand tour of which 90% of it is irrelevant.\n\nWhat I'd rather do is spend most of our time understanding what's actually going on in your world — why you're here, why today. And then I'll share how PandaDoc might help. At the end, I'd like to put us in a position to decide if a next step even makes sense. That next step would be a demo built specifically around our conversation.\n\nDoes that sound fair?" },
                   { label:"C — TJ", text:"Here's what I'm thinking for today — feel free to let me know if you had something else in mind.\n\nI know you want to see the product, and there are a lot of vendors out there who jump straight to a demo before they understand anything about your situation. I'd rather not do that — it wastes both our time and honestly doesn't serve you well.\n\nSo if it's okay with you, I'd love to spend the first part of this call just understanding where you are today — what's going on, why you're here, why now. From there I'll share a bit about how PandaDoc helps teams like yours, and by the end I'd like to put us in a position where we can both make a decision on whether a next step makes sense or not. The next call would be a tight demo built around what I heard today. Sometimes it's 20 minutes, sometimes 45. But specific to you.\n\nDoes that sound fair?" },
                 ].map((s,i)=>{
-                  const key=`open-${i}`, isOpen=!collapsedCards.has(key);
+                  const key=`open-${i}`, isOpen=collapsedCards[key]!==undefined ? !collapsedCards[key] : false;
                   return (<div key={i} style={{ marginBottom:8, borderRadius:10, overflow:"hidden", border:`1.5px solid ${isOpen?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setCollapsedCards(s=>{ const n=new Set(s); n.has(key)?n.delete(key):n.add(key); return n; })} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?C.emeraldLight:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:15, fontWeight:700, color:isOpen?C.emerald:C.textPrimary }}>{s.label}</span>
