@@ -263,7 +263,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     const displayText = scriptEdits[editKey] !== undefined ? scriptEdits[editKey] : originalText;
     return (
       <div style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:open?tc.border:`1.5px solid ${C.border}`, background:C.white }}>
-        <button onClick={() => setCollapsedCards(s=>({...s,[key]:!s[key]}))} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:C.white, border:"none", textAlign:"left" }}>
+        <button onClick={() => setCollapsedCards(s=>({...s,[key]:open}))} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:C.white, border:"none", textAlign:"left" }}>
           <span style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:99, background:tc.badge, color:tc.badgeText, flexShrink:0, letterSpacing:"0.06em", textTransform:"uppercase" }}>{tc.tag}</span>
           <span style={{ fontSize:17, fontWeight:700, color:C.textPrimary, flex:1, letterSpacing:"-0.01em" }}>{r.label}</span>
           <span style={{ fontSize:14, color:C.textMuted, fontWeight:700 }}>{open?"▲":"▼"}</span>
@@ -685,7 +685,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                 ].map((s,i)=>{
                   const key=`open-${i}`, isOpen=collapsedCards[key]!==undefined ? !collapsedCards[key] : false;
                   return (<div key={i} style={{ marginBottom:8, borderRadius:10, overflow:"hidden", border:`1.5px solid ${isOpen?C.emerald:C.border}`, background:C.white }}>
-                    <button onClick={()=>setCollapsedCards(s=>{ const n=new Set(s); n.has(key)?n.delete(key):n.add(key); return n; })} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?C.emeraldLight:C.white, border:"none", textAlign:"left" }}>
+                    <button onClick={()=>setCollapsedCards(s=>({...s,[key]:s[key]===undefined?true:!s[key]}))} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?C.emeraldLight:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:15, fontWeight:700, color:isOpen?C.emerald:C.textPrimary }}>{s.label}</span>
                       <span style={{ fontSize:13, color:isOpen?C.emerald:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
                     </button>
@@ -730,7 +730,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   { label:"Multi-stakeholder demo", text:'"Based on what you\'ve shared, I\'d recommend a focused demo with you and [decision maker]. It\'d be helpful to have [name/role] in the room — since what we talked about directly affects [their metric]. You know your company better than I do — does that feel like the right next step?"' },
                   { label:"Trial + check-in", text:'"What I\'d recommend is getting you into a trial and checking in in three days once you\'ve had a chance to look around. I\'ll send you a setup link right after this call. Does that work?"' },
                 ].map((s,i)=>{
-                  const key=`next-${i}`, open=!collapsedCards.has(key);
+                  const key=`next-${i}`, open=collapsedCards[key]!==undefined?!collapsedCards[key]:false;
                   return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
