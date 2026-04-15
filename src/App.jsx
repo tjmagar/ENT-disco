@@ -109,7 +109,7 @@ PANDADOC: All-in-one document workflow. 50% reduction in doc creation time, 87% 
 
 BUYER JOURNEY: Latent pain (dormant, back of mind) → Active pain (problem-language, not shopping) → Actively evaluating (solution-language, comparing vendors).
 
-DIAGNOSTIC (first 2 min before ROE): Inbound: "What motivated you to reach out and explore this?" Outbound: "We reached out to you, so this might sound odd — what made you agree to take this call?" Listen: latent=vague | active pain=problem language | evaluating=solution language.
+DIAGNOSTIC (first 2 min before ROE): Inbound: "So what brought you to the table today — what made this worth exploring?" Outbound: "We reached out to you, so this might sound odd — what made you agree to take this call?" Listen: latent=vague | active pain=problem language | evaluating=solution language.
 
 KEY ORLOB SCRIPTS:
 - Rapport: "I'm glad we found the time to meet today." Shut up. Read their response.
@@ -146,7 +146,7 @@ export default function App() {
   const [outputLoading, setOutputLoading] = useState("");
   const [tipsOpen, setTipsOpen] = useState(false);
   const [watchOpen, setWatchOpen] = useState(false);
-  const [expandedScript, setExpandedScript] = useState(null);
+  const [collapsedCards, setCollapsedCards] = useState(new Set()); // cards that are collapsed (default = all open)
   const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
@@ -255,14 +255,15 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     };
     const tc = tagColors[r.type] || tagColors.ask;
     const key = `${prefix}-${idx}`;
-    const open = expandedScript === key;
+    const defaultOpen = idx === 0;
+    const open = collapsedCards.has(key) ? !defaultOpen : defaultOpen;
     const isEditing = editingKey === key;
     const editKey = `rc-${key}`;
     const originalText = r.text || (r.alts ? r.alts.join("\n\n") : "");
     const displayText = scriptEdits[editKey] !== undefined ? scriptEdits[editKey] : originalText;
     return (
-      <div style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:open?tc.border:`1.5px solid #21262d`, background:"#ffffff" }}>
-        <button onClick={() => setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:"#ffffff", border:"none", textAlign:"left" }}>
+      <div style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:open?tc.border:`1.5px solid ${C.border}`, background:C.white }}>
+        <button onClick={() => setCollapsedCards(s=>{ const n=new Set(s); n.has(key)?n.delete(key):n.add(key); return n; })} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:C.white, border:"none", textAlign:"left" }}>
           <span style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:99, background:tc.badge, color:tc.badgeText, flexShrink:0, letterSpacing:"0.06em", textTransform:"uppercase" }}>{tc.tag}</span>
           <span style={{ fontSize:17, fontWeight:700, color:C.textPrimary, flex:1, letterSpacing:"-0.01em" }}>{r.label}</span>
           <span style={{ fontSize:14, color:C.textMuted, fontWeight:700 }}>{open?"▲":"▼"}</span>
@@ -298,26 +299,51 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
   }
 
   function renderBuyerType() {
+    const allPaths = [
+      { path:"evaluating", border:"#a8d0f0", bg:"#edf5ff", titleColor:"#1e40af", bodyColor:"#3a6898", badge:"#d4eaff", badgeText:"#1e40af", icon:"⚡", title:"Solution language", sub:'"We\'re looking for a product that can do X..." — Actively evaluating. Comparing solutions.', technique:"→ Go Back In Time" },
+      { path:"active-pain", border:"#f97316", bg:"#fff7ed", titleColor:"#7c2d12", bodyColor:"#92400e", badge:"#f97316", badgeText:"#fff", icon:"⚠", title:"Problem language", sub:'"We have a challenge with Y... Z is not where we want it..." — Active pain. Not yet solution-focused.', technique:"→ Symptoms → Problems" },
+      { path:"latent", border:"#f0c878", bg:"#fffbee", titleColor:"#7a4200", bodyColor:"#9a6220", badge:"#fde8b0", badgeText:"#7a4200", icon:"◎", title:"Vague or can\'t remember", sub:'"You said something that caught my attention..." — Latent pain. Dormant. Not top of mind.', technique:"→ Discovery Prompter" },
+    ];
+    const visiblePaths = callSource === "inbound" ? allPaths.filter(p=>p.path!=="latent") : allPaths;
+
     if (!buyerPath) return (
       <div style={{ marginBottom:28 }}>
-        <div style={{ background:C.emeraldLight, border:`1.5px solid ${C.emeraldMid}`, borderRadius:12, padding:"16px 20px", marginBottom:24 }}>
-          <div style={{ fontSize:17, fontWeight:600, color:C.textPrimary, lineHeight:2, marginBottom:6 }}><span style={{ color:C.emerald, fontWeight:700 }}>Inbound:</span> "What motivated you to reach out and explore this?"</div>
-          <div style={{ fontSize:17, fontWeight:600, color:C.textPrimary, lineHeight:2 }}><span style={{ color:"#3b82f6", fontWeight:700 }}>Outbound:</span> "I know we reached out to you, so this might sound odd — but what made you agree to take this call?"</div>
-        </div>
-        <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:14 }}>What did their response sound like?</div>
-        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-          {[
-            { path:"evaluating", border:"#a8d0f0", bg:"#edf5ff", titleColor:"#1e40af", bodyColor:"#3a6898", badge:"#d4eaff", badgeText:"#1e40af", icon:"⚡", title:"Solution language", sub:'"We\'re looking for a product that can do X..." — They\'re actively evaluating. Past pain. Comparing solutions.', technique:"→ Go Back In Time" },
-            { path:"active-pain", border:"#f97316", bg:"#fff7ed", titleColor:"#7c2d12", bodyColor:"#92400e", badge:"#f97316", badgeText:"#fff", icon:"⚠", title:"Problem language", sub:'"We have a challenge with Y... Z is not where we want it..." — Active pain. They feel it but haven\'t defined a solution.', technique:"→ Symptoms → Problems" },
-            { path:"latent", border:"#f0c878", bg:"#fffbee", titleColor:"#7a4200", bodyColor:"#9a6220", badge:"#fde8b0", badgeText:"#7a4200", icon:"◎", title:"Vague or can't remember", sub:'"You said something that caught my attention but..." — Latent pain. Dormant. Not top of mind.', technique:"→ Discovery Prompter" },
-          ].map(opt=>(
-            <button key={opt.path} onClick={()=>setBuyerPath(opt.path)} style={{ ...B, padding:"18px 22px", border:`2px solid ${opt.border}`, borderRadius:12, background:opt.bg, textAlign:"left" }}>
-              <div style={{ fontSize:15, fontWeight:700, color:opt.titleColor, marginBottom:6 }}>{opt.icon} {opt.title}</div>
-              <div style={{ fontSize:13, color:opt.bodyColor, lineHeight:1.65, marginBottom:8 }}>{opt.sub}</div>
-              <div style={{ fontSize:12, fontWeight:600, color:opt.titleColor, background:opt.badge, padding:"3px 10px", borderRadius:6, display:"inline-block" }}>{opt.technique}</div>
-            </button>
-          ))}
-        </div>
+        {!callSource ? (
+          <div style={{ marginBottom:24 }}>
+            <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:12 }}>How did this call originate?</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+              <button onClick={()=>setCallSource("inbound")} style={{ ...B, width:"100%", padding:"24px 28px", border:"2px solid #f97316", borderRadius:14, background:"#fff7ed", textAlign:"left" }}>
+                <div style={{ fontSize:22, fontWeight:800, color:"#f97316", marginBottom:10 }}>Inbound</div>
+                <div style={{ fontSize:17, color:"#7c2d12", lineHeight:1.7, fontWeight:500 }}>"So what brought you to the table today — what made this worth exploring?"</div>
+              </button>
+              <button onClick={()=>setCallSource("outbound")} style={{ ...B, width:"100%", padding:"24px 28px", border:"2px solid #3b82f6", borderRadius:14, background:"#eff6ff", textAlign:"left" }}>
+                <div style={{ fontSize:22, fontWeight:800, color:"#3b82f6", marginBottom:10 }}>Outbound</div>
+                <div style={{ fontSize:17, color:"#1e40af", lineHeight:1.7, fontWeight:500 }}>"I know we reached out to you first, so this might sound like a funny question — but I'm curious, what made you agree to take the call?"</div>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div style={{ marginBottom:20, padding:"12px 16px", borderRadius:10, background:callSource==="inbound"?"#fff7ed":"#eff6ff", border:`1.5px solid ${callSource==="inbound"?"#f97316":"#3b82f6"}`, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ fontSize:14, fontWeight:600, color:callSource==="inbound"?"#7c2d12":"#1e40af" }}>
+              {callSource==="inbound" ? "Inbound — What motivated you to reach out?" : "Outbound — What made you agree to take this call?"}
+            </div>
+            <button onClick={()=>setCallSource(null)} style={{ ...B, fontSize:11, color:C.textMuted, background:"transparent", border:`1px solid ${C.border}`, borderRadius:5, padding:"3px 10px" }}>change</button>
+          </div>
+        )}
+        {callSource && (
+          <div>
+            <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:12 }}>What did their response sound like?</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+              {visiblePaths.map(opt=>(
+                <button key={opt.path} onClick={()=>setBuyerPath(opt.path)} style={{ ...B, padding:"18px 22px", border:`2px solid ${opt.border}`, borderRadius:12, background:opt.bg, textAlign:"left" }}>
+                  <div style={{ fontSize:15, fontWeight:700, color:opt.titleColor, marginBottom:6 }}>{opt.icon} {opt.title}</div>
+                  <div style={{ fontSize:13, color:opt.bodyColor, lineHeight:1.65, marginBottom:8 }}>{opt.sub}</div>
+                  <div style={{ fontSize:12, fontWeight:600, color:opt.titleColor, background:opt.badge, padding:"3px 10px", borderRadius:6, display:"inline-block" }}>{opt.technique}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
 
@@ -332,52 +358,38 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         </div>
 
         {buyerPath === "evaluating" && <>
-          <div style={{ fontSize:14, color:C.textSecondary, lineHeight:1.75, marginBottom:16, padding:"12px 16px", background:"#edf5ff", borderRadius:10, border:"1.5px solid #a8d0f0" }}>They're on the second half of the buyer's journey. Predisposed to talk about solutions. Meet them there first — then earn the right to go back to pain. 4 steps: Align → Wallow → Segue → Go Back.</div>
-          <div style={{ background:"#fff8e8", border:"1.5px solid #f5c842", borderRadius:10, padding:"12px 16px", marginBottom:16 }}>
-            <div style={{ fontSize:12, fontWeight:700, color:"#c89500", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:6 }}>Skip it rule</div>
-            <div style={{ fontSize:14, color:"#78350f", lineHeight:1.7 }}>If they pour their heart out about pain on Step 1 — go with it. The technique served its purpose. Don't keep asking Steps 2-3. Just follow the pain.</div>
-          </div>
           {[
-            { type:"ask", label:"Step 1 — Align: meet them where they are", text:'"Can you help me understand what you\'re looking for in a product or service like this?"', note:"You will almost never get friction from this question at this stage. They want to talk solutions — so start there." },
-            { type:"wallow", label:"Step 2 — Wallow: stay here. Don't check the box.", alts:['"What are you looking to accomplish with a product like this?"','"What else are you looking for it to do?"','"What\'s most important to you in whatever you end up going with?"'], note:"This is where most reps fail — they ask Step 1, get an answer, and rush to Step 3. Don't. Spend real time here. Ask 2-3 genuine follow-ups. Wallowing is what makes Step 3 feel earned instead of jarring." },
-            { type:"segue", label:"Step 3 — Segue: bridge from solution to current reality", text:'"How are you handling things today without those capabilities?"', note:"Piggyback off what they described. They've been telling you what they want — now you're asking what it looks like without it. This is the natural bridge back to their current state." },
-            { type:"ask", label:"Step 4 — Go back in time (permission first — always)", alts:['"Can I go back in time with you for a second? What was the original trigger event or problem that made you prioritize looking into this?"','"Can I go back in time with you for a second on something? It\'s clear you know what you want more than most people I talk to. I\'m curious — what did that meeting look like, and how did you all define the problem that set this initiative in motion?"'], note:"Option 2 is the killer question. It triggers a concrete mental image — they go back to the room where they defined this with their colleagues. Much richer answer. 'Can I go back in time' is a permission point. Ask it every single time." },
-            { type:"summarize", label:"Summarize before moving on", text:'"Ok. Let me see if I have this right so far.\n\n[Their exact words — what they\'re looking for, what they want to accomplish, and the original challenge]\n\nDid I get that right?"', note:"Their words, not yours. Buyers resonate with their own language. When you parrot it back exactly, they exhale. Now springboard into the business problem." },
+            { type:"ask", label:"1 — Reflect + wallow on requirements", text:"So it sounds like you're actively looking at solutions and you want to get a sense of whether we can help. Seems like a great place to start. Can you help me understand what else you're looking for in a product like ours?", note:"Reflect their solution language back. Then wallow. Get everything on the table before you go anywhere." },
+            { type:"wallow", label:"2 — Keep wallowing", text:"What else? I want to make sure I focus on the right things. The good and bad thing about PandaDoc is it can do a lot — and if anything is irrelevant to you I'd rather not spend energy there.", note:"Don't rush. Stay here 2-3 follow-ups minimum. Wallowing is what makes everything else feel earned." },
+            { type:"summarize", label:"3 — Summarize requirements", text:"Okay so you're looking for [X, Y, Z]. Did I miss anything?", note:"Prove you listened. Give it back organized. If they add something — that's what mattered most." },
+            { type:"ask", label:"4 — Accomplish question", text:"This might be a question you're tired of answering — but what are you looking to accomplish with capabilities like the ones you just listed?", note:"Bridges from solution requirements to business outcomes." },
+            { type:"segue", label:"5 — Current state bridge", text:"Mind if I ask how you're getting along without those capabilities today? Everyone I talk to is getting by, maybe there's room for improvement — but you're still cruising I'm sure. What does that look like right now?", note:"Orlob segue — bridge from solution land to current reality." },
+            { type:"ask", label:"6 — Go back in time", text:"Can I go back in time with you for a second? It's clear you know what you want more than most people I talk to — which usually means something specific set this in motion. What was that moment for you?", note:"Always ask permission first. Short, no examples, no anchoring. Let them fill it." },
+            { type:"summarize", label:"7 — Summarize before Current Process", text:"Let me see if I have this right so far. [Their exact words — what they're looking for, what they want to accomplish, and the original challenge.] Did I get that right?", note:"Their words — not yours. When they say that's right you have alignment." },
           ].map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix="eval" />)}
-          <div style={{ marginTop:16, background:"#fff3f3", border:"1.5px solid #f5a0a0", borderRadius:10, padding:"14px 18px" }}>
+          {coachingVisible && <div style={{ marginTop:16, background:"#fff3f3", border:"1.5px solid #f5a0a0", borderRadius:10, padding:"14px 18px" }}>
             <div style={{ fontSize:11, fontWeight:700, color:"#8b1a1a", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>⚠ Watch For</div>
-            {["Asking 'tell me about your key challenges' before aligning — they're past that stage, you'll get friction or 'just show me the product'","Checking the box on Step 1 and rushing to Step 3 — spend real time in Step 2, it's non-negotiable","Skipping the permission phrase on Step 4 — 'can I go back in time' must be said every time"].map((w,i)=>(
+            {["Asking about challenges before wallowing — they're in solution mode, don't fight it","Checking the box on wallow and rushing forward — stay there, 2-3 follow-ups minimum","Skipping 'can I go back in time' — that permission phrase must be said every time"].map((w,i)=>(
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#5a1a00", lineHeight:1.65 }}>{w}</span></div>
             ))}
-          </div>
+          </div>}
         </>}
 
         {buyerPath === "active-pain" && <>
-          <div style={{ fontSize:14, color:C.textSecondary, lineHeight:1.75, marginBottom:16, padding:"12px 16px", background:C.emeraldLight, borderRadius:10, border:`1.5px solid ${C.emeraldMid}` }}>Active pain — they feel it but are expressing symptoms, not the underlying problem. Symptoms get ghosted. Problems get funded. Discipline yourself to slow down and develop what they're sharing into something CFO-worthy.</div>
-          <div style={{ background:"#fffbeb", border:"1.5px solid #f0c040", borderRadius:10, padding:"14px 18px", marginBottom:16 }}>
-            <div style={{ fontSize:12, fontWeight:700, color:"#92400e", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:10 }}>Symptom vs. Problem</div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-              <div style={{ background:"#fff3f3", borderRadius:8, padding:"10px 12px" }}>
-                <div style={{ fontSize:12, fontWeight:700, color:"#8b1a1a", marginBottom:6 }}>SYMPTOM — keep peeling</div>
-                <div style={{ fontSize:13, color:"#5a1a00", lineHeight:1.6 }}>Can't be expressed as a business outcome. CFO rejects it. "Reps struggling with discovery." Gets ghosted.</div>
-              </div>
-              <div style={{ background:"#f0fbf4", borderRadius:8, padding:"10px 12px" }}>
-                <div style={{ fontSize:12, fontWeight:700, color:"#92400e", marginBottom:6 }}>PROBLEM — you're here</div>
-                <div style={{ fontSize:13, color:"#fff7ed", lineHeight:1.6 }}>Measurable business outcome. CFO listens. "Win rates dropped from 27% to 19%." Gets funded.</div>
-              </div>
-            </div>
-          </div>
           {[
-            { type:"ask", label:"When you hear a symptom — slow down and ask these", alts:['"How is this affecting the business in a way that makes it a priority?"','"What underlying issue is this causing that the business would regret not solving six months from now?"','"What\'s going on behind the scenes that makes this a priority?"','"When you think about your priorities, how highly does this rank compared to the others — and why?"'], note:"These are all follow-up questions after a buyer expresses a symptom. Each one asks 'why does this matter enough to fund?' Pick one. Use softening language if you've asked something similar already." },
-            { type:"ask", label:"Softening T-up — use before hard follow-up questions", alts:['"This is going to sound a little redundant. You could be focusing on any number of challenges, but I sense energy behind this one specifically. What\'s going on behind the scenes that has you focused on this above the others?"','"If the question I\'m about to ask comes across as overbearing, feel free to kick me in the teeth. With that said — what\'s going on in the business that\'s driving this to make its way to your priority list?"'], note:"The T-up before the question changes everything. Same question — completely different reception. Use this any time you've already asked something similar or the next question feels heavy." },
-            { type:"summarize", label:"Summarize + Validate — two distinct jobs", alts:['"Let me see if I\'ve understood you so far... [their exact words back] ...Did I get that right?"','"Before we move on — I want to make sure I\'m aligned to the things you care about most. Is this the challenge we should anchor our conversations to, or did I lead you down a path to something you only mildly care about?"'], note:"Summarize every 3-5 questions (Option 1). Validate once per call before going deeper (Option 2). These are different jobs — don't conflate them. Better to hear 'actually this isn't that important' now than after three weeks of work on a deal that goes dark." },
+            { type:"ask", label:"1 — Soft intro", text:"It sounds like there are some challenges going on in the business and you want to get a sense of whether our product might help. I'd love to have that conversation. Can you tell me a little more about what's going on?", note:"Warm, inviting, no pressure. Let them lead." },
+            { type:"ask", label:"2 — Natural peeling", alts:["Ouch — what's that leading to?","And how long has that been going on?","What does that look like day to day?"], note:"No script needed. Just listen and follow. React genuinely." },
+            { type:"ask", label:"3 — Need behind the need", alts:["🔵 Cold read — if they surfaced the driver:\n\"So it sounds like [what they said] is really what's driving this. Is that fair to say?\"","— OR —\n🟠 T-up 1 — if they haven't surfaced it:\n\"If the question I'm about to ask comes across as overbearing, feel free to kick me in the teeth. With that said — what's going on in the business that's driving this to make its way to your priority list?\"","— OR —\n🟡 T-up 2 — if you've already asked something similar:\n\"This is going to sound a little redundant. You could be focusing on any number of challenges, but I sense energy behind this one specifically. What's going on behind the scenes that has you focused on this above the others?\""], note:"Pick one. Never use more than one on the same call." },
+            { type:"ask", label:"4 — Priority rank", text:"And look — you could be solving any number of things right now, I get it. But I do sense a lot of energy behind this one specifically. Where would you say it ranks on your priority list today?", note:"Gets them to commit to the priority without feeling interrogated." },
+            { type:"ask", label:"5 — Cost of inaction", text:"And I don't want to be doom and gloom here — but I'm curious, what happens if other priorities pop up and this doesn't get fixed? I ask because it happens a lot — fires come up. What does that look like for you?", note:"Makes the invisible cost visible. Soften it first." },
+            { type:"summarize", label:"6 — Summarize before Current Process", text:"Let me see if I have this right so far. [Their exact words — problem + business driver + what's at stake.] Did I get that right?", note:"Their words — not yours. When they say that's right you have alignment." },
           ].map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix="active" />)}
-          <div style={{ marginTop:16, background:"#fff3f3", border:"1.5px solid #f5a0a0", borderRadius:10, padding:"14px 18px" }}>
+          {coachingVisible && <div style={{ marginTop:16, background:"#fff3f3", border:"1.5px solid #f5a0a0", borderRadius:10, padding:"14px 18px" }}>
             <div style={{ fontSize:11, fontWeight:700, color:"#8b1a1a", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>⚠ Watch For</div>
-            {["Hearing a symptom and immediately pitching — this is the hammer and nail syndrome and it puts a ceiling on your income","Stopping at the first answer — it's almost always too surface level. The first answer is a symptom 90% of the time.","Not validating priority before going deep — you might spend weeks on a nice-to-solve that goes dark"].map((w,i)=>(
+            {["Jumping to process mapping before you have the business driver","Using both T-up versions back to back — pick one","Stopping at the symptom — the first answer is almost never the real problem"].map((w,i)=>(
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#5a1a00", lineHeight:1.65 }}>{w}</span></div>
             ))}
-          </div>
+          </div>}
         </>}
 
         {buyerPath === "latent" && <>
@@ -671,9 +683,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   { label:"B — Hughes", text:"Here's what I'm thinking for today, feel free to let me know if you had something else in mind.\n\nMost calls like this start with feature dumping, jumping into the product prematurely, and taking you on a grand tour of which 90% of it is irrelevant.\n\nWhat I'd rather do is spend most of our time understanding what's actually going on in your world — why you're here, why today. And then I'll share how PandaDoc might help. At the end, I'd like to put us in a position to decide if a next step even makes sense. That next step would be a demo built specifically around our conversation.\n\nDoes that sound fair?" },
                   { label:"C — TJ", text:"Here's what I'm thinking for today — feel free to let me know if you had something else in mind.\n\nI know you want to see the product, and there are a lot of vendors out there who jump straight to a demo before they understand anything about your situation. I'd rather not do that — it wastes both our time and honestly doesn't serve you well.\n\nSo if it's okay with you, I'd love to spend the first part of this call just understanding where you are today — what's going on, why you're here, why now. From there I'll share a bit about how PandaDoc helps teams like yours, and by the end I'd like to put us in a position where we can both make a decision on whether a next step makes sense or not. The next call would be a tight demo built around what I heard today. Sometimes it's 20 minutes, sometimes 45. But specific to you.\n\nDoes that sound fair?" },
                 ].map((s,i)=>{
-                  const key=`open-${i}`, isOpen=expandedScript===key;
+                  const key=`open-${i}`, isOpen=!collapsedCards.has(key);
                   return (<div key={i} style={{ marginBottom:8, borderRadius:10, overflow:"hidden", border:`1.5px solid ${isOpen?C.emerald:C.border}`, background:C.white }}>
-                    <button onClick={()=>setExpandedScript(isOpen?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?C.emeraldLight:C.white, border:"none", textAlign:"left" }}>
+                    <button onClick={()=>setCollapsedCards(s=>{ const n=new Set(s); n.has(key)?n.delete(key):n.add(key); return n; })} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?C.emeraldLight:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:15, fontWeight:700, color:isOpen?C.emerald:C.textPrimary }}>{s.label}</span>
                       <span style={{ fontSize:13, color:isOpen?C.emerald:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
                     </button>
@@ -718,7 +730,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                   { label:"Multi-stakeholder demo", text:'"Based on what you\'ve shared, I\'d recommend a focused demo with you and [decision maker]. It\'d be helpful to have [name/role] in the room — since what we talked about directly affects [their metric]. You know your company better than I do — does that feel like the right next step?"' },
                   { label:"Trial + check-in", text:'"What I\'d recommend is getting you into a trial and checking in in three days once you\'ve had a chance to look around. I\'ll send you a setup link right after this call. Does that work?"' },
                 ].map((s,i)=>{
-                  const key=`next-${i}`, open=expandedScript===key;
+                  const key=`next-${i}`, open=!collapsedCards.has(key);
                   return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
                     <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
                       <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
