@@ -179,10 +179,23 @@ export default function App() {
       if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
       if (e.key === 'ArrowRight' && currentIdx < STAGES.length - 1) setActiveStage(STAGES[currentIdx + 1].id);
       if (e.key === 'ArrowLeft' && currentIdx > 0) setActiveStage(STAGES[currentIdx - 1].id);
+      // Number keys 1-9: toggle that card open/closed
+      const n = parseInt(e.key);
+      if (n >= 1 && n <= 9) {
+        const cardIdx = n - 1;
+        const prefix = activeStage === "buyer-type"
+          ? (buyerPath === "evaluating" ? "eval" : buyerPath === "active-pain" ? "active" : "latent")
+          : activeStage;
+        const key = `${prefix}-${cardIdx}`;
+        setCollapsedCards(s => {
+          const currentOpen = s[key] !== undefined ? !s[key] : cardIdx === 0;
+          return { ...s, [key]: currentOpen };
+        });
+      }
     }
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [currentIdx]);
+  }, [currentIdx, activeStage, buyerPath]);
 
   async function generateDebrief() {
     if (!callTranscript.trim()) return;
@@ -281,12 +294,16 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     const editKey = `rc-${key}`;
     const originalText = r.text || (r.alts ? r.alts.join("\n\n") : "");
     const displayText = scriptEdits[editKey] !== undefined ? scriptEdits[editKey] : originalText;
+    const previewText = displayText ? displayText.replace(/\n/g,' ').slice(0, 90) + (displayText.length > 90 ? '…' : '') : '';
     return (
       <div style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:open?tc.border:`1.5px solid ${C.border}`, background:C.white }}>
-        <button onClick={() => setCollapsedCards(s=>({...s,[key]:open}))} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 18px", background:open?tc.bg:C.white, border:"none", textAlign:"left" }}>
-          <span style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:99, background:tc.badge, color:tc.badgeText, flexShrink:0, letterSpacing:"0.06em", textTransform:"uppercase" }}>{tc.tag}</span>
-          <span style={{ fontSize:17, fontWeight:700, color:C.textPrimary, flex:1, letterSpacing:"-0.01em" }}>{r.label}</span>
-          <span style={{ fontSize:14, color:C.textMuted, fontWeight:700 }}>{open?"▲":"▼"}</span>
+        <button onClick={() => setCollapsedCards(s=>({...s,[key]:open}))} style={{ ...B, width:"100%", display:"flex", alignItems:"flex-start", gap:12, padding:"13px 18px", background:open?tc.bg:C.white, border:"none", textAlign:"left" }}>
+          <span style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:99, background:tc.badge, color:tc.badgeText, flexShrink:0, letterSpacing:"0.06em", textTransform:"uppercase", marginTop:2 }}>{tc.tag}</span>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, letterSpacing:"-0.01em" }}>{r.label}</div>
+            {!open && previewText && <div style={{ fontSize:12, color:C.textMuted, marginTop:3, lineHeight:1.4, overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis" }}>{previewText}</div>}
+          </div>
+          <span style={{ fontSize:12, color:C.textMuted, fontWeight:700, flexShrink:0, marginTop:2 }}>{open?"▲":"▼"}</span>
         </button>
         {open && (
           <div style={{ background:tc.bg, borderTop:`1px solid ${C.border}` }}>
@@ -393,6 +410,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
+          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
+          </button>
         </>}
 
         {buyerPath === "active-pain" && <>
@@ -410,6 +430,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
+          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
+          </button>
         </>}
 
         {buyerPath === "latent" && <>
@@ -438,6 +461,9 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>
+          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
+          </button>
         </>}
       </div>
     );
@@ -445,6 +471,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
 
   const STAGE_DATA = {
     "business-problem": {
+      bridgeBanner: true,
       rule:"Summarize what you heard. Prioritize. Validate it is a raging fire. Summarize before moving on.",
       rhythm:[
         { type:"summarize", label:"1 — Early summary + prioritize", text:"I heard a few things — [X, Y, Z]. Which one of those feels most top of mind? We will touch on all of them but in your opinion — what is the biggest headache right now?", note:"Do this immediately after their opening answer. Summarize what you heard, give it back organized, make them prioritize. The one they pick is where the real pain lives." },
@@ -800,6 +827,17 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                         {/* RHYTHM STAGES */}
             {sd && (
               <div>
+                {sd.bridgeBanner && buyerPath && (
+                  <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, padding:"10px 16px", borderRadius:10, background: buyerPath==="evaluating"?"#111d30":buyerPath==="active-pain"?"#0f2b1e":"#1c1a0e", border:`1.5px solid ${buyerPath==="evaluating"?"#1e3a5f":buyerPath==="active-pain"?"#2d4a1e":"#4a3800"}` }}>
+                    <span style={{ fontSize:16 }}>{buyerPath==="evaluating"?"⚡":buyerPath==="active-pain"?"⚠":"◎"}</span>
+                    <div style={{ flex:1 }}>
+                      <span style={{ fontSize:12, fontWeight:700, color: buyerPath==="evaluating"?"#5b8fd4":buyerPath==="active-pain"?C.emerald:"#c08a20" }}>
+                        {buyerPath==="evaluating"?"Evaluating buyer — they came in solution-mode. You went back in time. Now anchor to the business problem.":buyerPath==="active-pain"?"Active pain buyer — they surfaced a challenge. Now prioritize it and validate it's a raging fire.":"Latent buyer — you ran the Discovery Prompter. Now find what resonated and anchor to it."}
+                      </span>
+                    </div>
+                    <button onClick={()=>setActiveStage("buyer-type")} style={{ ...B, fontSize:10, color:C.textMuted, background:"transparent", border:`1px solid ${C.border}`, borderRadius:5, padding:"3px 8px", flexShrink:0 }}>← back</button>
+                  </div>
+                )}
                 <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.06em", marginBottom:16, paddingBottom:12, borderBottom:`1px solid ${C.border}` }}>{sd.rule}</div>
                 {sd.rhythm.filter(r=>!r.fallback).map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix={activeStage} />)}
                 {sd.rhythm.some(r=>r.fallback) && coachingVisible && (
