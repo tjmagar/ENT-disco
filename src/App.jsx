@@ -167,14 +167,12 @@ export default function App() {
   const [debriefLoading, setDebriefLoading] = useState(false);
   const [scriptEdits, setScriptEdits] = useState({}); // key -> edited text
   const [editingKey, setEditingKey] = useState(null);  // which card is in edit mode
-  const [expandedScript, setExpandedScript] = useState(null);
-
   const currentIdx = STAGES.findIndex(s => s.id === activeStage);
   const stageNote = notes[activeStage] || "";
   const showOutputsShortcut = activeStage !== "outputs";
   const B = { fontFamily:"'Inter', system-ui, sans-serif", cursor:"pointer" };
 
-  useEffect(() => { setTipsOpen(false); setWatchOpen(false); setExpandedScript(null); }, [activeStage]);
+  useEffect(() => { setTipsOpen(false); setWatchOpen(false); }, [activeStage]);
 
   useEffect(() => {
     function handleKey(e) {
@@ -236,7 +234,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     setOutputLoading(type);
     const allNotes = Object.entries(notes).filter(([,v])=>v).map(([k,v])=>k+": "+v).join("\n");
     const prompts = {
-      spiced:`Filled SPICED + next step for PandaDoc.\nPrep: ${prepBrief||"None"}\nBuyer path: ${buyerPath||"unknown"}\nNotes:\n${allNotes}\nSPICED so far: ${JSON.stringify(spiced)}\nUse their exact words. S=situation, P=need behind the need+root cause, I=metric+cost of inaction, C=timeline+trajectory+dissatisfaction, D=decision process. Recommend next step with What/Who/Why.`,
+      spiced:`Filled SPICED + next step for PandaDoc.\nPrep: ${prepBrief||"None"}\nBuyer path: ${buyerPath||"unknown"}\nNotes:\n${allNotes}\nUse their exact words. S=situation, P=need behind the need+root cause, I=metric+cost of inaction, C=timeline+trajectory+dissatisfaction, D=decision process. Recommend next step with What/Who/Why.`,
       email:`Post-discovery follow-up email for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nGreeting + 4-5 word genuine callback. One sentence in their exact words. Bridge to next steps. Max 4 bullet next steps with dates. Sign off: Excited to tackle this together. No corporate speak.`,
       score:`Score this PandaDoc call out of 100.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nBuyer path: ${buyerPath||"unknown"}\nScore /20 each: 1) ROE set + buyer journey diagnosed 2) Need behind the need uncovered (not just symptoms) 3) Current state baselined with metric+trajectory 4) Future state quantified with value delta 5) Next step secured with What/Who/Why. Top 3 failure modes. 3 coaching actions for next call.`,
       whatweheard:`Create a 'What We Heard' slide for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\n\nFormat:\nCURRENT STATE: [problem in their exact words + metric suffering + current measurement]\nNEED BEHIND THE NEED: [underlying business problem + why it matters]\nDESIRED STATE: [what good looks like 365 days from now + target metric]\nVALUE DELTA: [current vs desired metric — calculate financial gap if possible]\nNO LOGO TEST: [could someone identify this company from this description alone? Rate 1-5 and explain]\nThis opens the next meeting.`,
@@ -454,8 +452,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         { type:"summarize", label:"3 — Summarize before transition (Orlob Script #7)", text:"Let me see if I have this right so far. [Their exact words — not yours.] Did I get that right? ... Ok great. Thanks for confirming that. Now that we have your challenge established — what are the ripple effects this is having across the business?", note:"Summarize in their exact words — never paraphrase. When they say that is right you have true alignment. Then springboard to the next topic." },
         { fallback:true, type:"ask", label:"4 — Domino effect", alts:["A — Orlob: There is a domino effect attached to that — what else does it affect when that breaks down?","D — TJ: There is a domino effect attached to that — why is it important to fix that one specifically?"], note:"Peels past the first answer to find what the operational problem is actually costing the business." },
         { fallback:true, type:"ask", label:"5 — Aside from", alts:["A — Orlob: Aside from [what they just said] — is there something going on behind the scenes driving you to prioritize fixing this?","D — TJ: Aside from the obvious benefit of maybe a rep not giving your product away for free — what else would you stand to gain?"], note:"Ask the same question multiple times without it feeling repetitive." },
-        { fallback:true, type:"ask", label:"6 — Personal stake", alts:["A — Orlob: Beyond what this means for the business — what does solving this mean for you personally?","D — TJ: We have discussed how this looks for the business. But you are here today — how does this affect your role? Your day?"], note:"The most powerful question on the call. Ask it after business pain is established." },
-        { fallback:true, type:"ask", label:"7 — Cost of inaction", alts:["A — Orlob: What happens if other priorities take over and you simply do not make this decision?","D — TJ: If I could ask an uncomfortable question — what happens if other priorities take over and you simply do not make that decision?"], note:"Makes the invisible cost visible. Soften it first." },
+        { fallback:true, type:"ask", label:"6 — Cost of inaction", alts:["A — Orlob: What happens if other priorities take over and you simply do not make this decision?","D — TJ: If I could ask an uncomfortable question — what happens if other priorities take over and you simply do not make that decision?"], note:"Makes the invisible cost visible. Soften it first." },
       ],
       tips:["Little problems get little dollars. BIG problems get BIG dollars.","Summarize in their exact words — never paraphrase. Buyers resonate with their words not yours.","No Logo Challenge: could someone identify this company from your description alone?"],
       watch:["Stopping at the first answer — it is almost always a symptom","Moving on before validating priority","Happy ears — getting excited before validating it is a raging fire"],
@@ -535,18 +532,21 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         { type:"ask", label:"2 — Quantify if they didn't", text:"Where would [the metric they shared] have to be for you and everyone involved to feel good about the progress you've made?", note:"Only ask this if they didn't naturally quantify it. Current state number + desired state number = the value delta. That delta is all a business case is." },
         { type:"ask", label:"3 — Personal stake", text:"I want to ask you something a little different. Beyond what this means for the business — what does solving this mean for you personally?", note:"The most powerful question on the call. Ask it after future state is established — it feels earned here. The personal motivation is what keeps deals from going dark when things get complicated internally." },
         { type:"ask", label:"4 — Pressure test alignment", text:"How aligned would everybody else involved be if that was the explicit goal — is that the goal everyone else cares about too?", note:"Prevents them from voicing a random aspiration. Makes sure the future state has organizational alignment. If others don't care about this goal — it won't get funded." },
-        { type:"summarize", label:"5 — Final summary before decision process", text:"Before we talk about what a next step looks like — let me make sure I've captured everything correctly. [Current state in their words + the metric + where it is today + where they want it + the business consequence + what it means personally + timeline.] Did I get that right? Anything you'd add?", note:"This summary becomes the What We Heard slide that opens your next meeting. Do it in their exact words — never paraphrase." },
-        { type:"transition", label:"6 — Transition to decision process", text:"This has been really helpful. Before we talk about what a next step looks like, I'd love to understand how decisions like this typically get made on your end — just so I'm not making assumptions. Mind if I ask a few questions around that?", note:"Natural bridge from future state to decision process. Positions the decision questions as practical, not pushy." },
-        { fallback:true, type:"ask", label:"7 — Decision process", alts:["Walk me through what the decision process typically looks like for something like this — what steps would you and your team need to go through?","Who else would be involved in those steps — and what does their role look like?","What would drive the timeline for moving through those steps?","What would each person involved need to see or hear to feel good about moving forward?","And if we got to the point of doing business — how do you think something like this would get funded, based on how you've handled similar decisions?"], note:"Ask at least the first two. You need to know who else is involved before you can recommend the right next step. The funding question is last — it feels natural after you've established what the decision looks like." },
+        { type:"ask", label:"5 — Buying criteria (Script #9)", text:"What do you think you need in a solution to solve these challenges?", note:"Ask this before you show them anything. It surfaces their buying criteria in their own words — and can reveal misalignment between what they think they need and what would actually solve the problem. Never assume your product maps to what they have in mind. This is what separates reps who tailor demos from reps who just pitch." },
+        { type:"summarize", label:"6 — Final summary before decision process", text:"Before we talk about what a next step looks like — let me make sure I've captured everything correctly. [Current state in their words + the metric + where it is today + where they want it + the business consequence + what it means personally + timeline.] Did I get that right? Anything you'd add?", note:"This summary becomes the What We Heard slide that opens your next meeting. Do it in their exact words — never paraphrase." },
+        { type:"transition", label:"7 — Transition to decision process", text:"This has been really helpful. Before we talk about what a next step looks like, I'd love to understand how decisions like this typically get made on your end — just so I'm not making assumptions. Mind if I ask a few questions around that?", note:"Natural bridge from future state to decision process. Positions the decision questions as practical, not pushy." },
+        { fallback:true, type:"ask", label:"8 — Decision process", alts:["Walk me through what the decision process typically looks like for something like this — what steps would you and your team need to go through?","Who else would be involved in those steps — and what does their role look like?","What would drive the timeline for moving through those steps?","What would each person involved need to see or hear to feel good about moving forward?","And if we got to the point of doing business — how do you think something like this would get funded, based on how you've handled similar decisions?"], note:"Ask at least the first two. You need to know who else is involved before you can recommend the right next step. The funding question is last — it feels natural after you've established what the decision looks like." },
       ],
       tips:[
         "The contrast between painful present and compelling future is where the feeling of value lives — don't skip the summary before this.",
         "The personal stake question is the most powerful thing you'll ask all call. Earn it by establishing business pain and future state first.",
+        "Ask buying criteria (card 5) before you show them anything — it tells you what to demo and can surface misalignment before it kills the deal.",
         "The decision process questions tell you whether to recommend a solo demo or a multi-threaded one.",
         "The final summary becomes the What We Heard slide — it opens every subsequent meeting.",
       ],
       watch:[
         "Skipping the personal stake question — it's the emotional fuel for urgency",
+        "Assuming you know what they need before asking — card 5 prevents this",
         "Not asking who else is involved before recommending a next step — you'll recommend the wrong one",
         "Leaving without a clear picture of how they make decisions and who holds the veto",
       ],
@@ -807,38 +807,15 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                     {sd.rhythm.filter(r=>r.fallback).map((r,i)=><RhythmCard key={i} r={r} idx={i+100} prefix={activeStage+"-more"} />)}
                   </Collapsible>
                 )}
+                {coachingVisible && sd.tips && <Collapsible label="★ Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textSecondary}>
+                  {sd.tips.map((t,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.tips.length-1?12:0 }}><span style={{ color:C.textMuted, fontSize:14, flexShrink:0 }}>—</span><span style={{ fontSize:14, color:C.textSecondary, lineHeight:1.7 }}>{t}</span></div>))}
+                </Collapsible>}
                 {coachingVisible && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
                   {sd.watch.map((w,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.watch.length-1?14:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#e07070", lineHeight:1.7 }}>{w}</span></div>))}
                 </Collapsible>}
               </div>
             )}
 
-            {/* NEXT STEP */}
-            {activeStage === "next-step" && (
-              <div>
-                {[
-                  { label:"Call back the ROE — open with this", text:'"So at the beginning of this call, one of the things we agreed on is we\'ll make a decision — does it make sense to continue in a concrete way, or is this not a priority?\n\nBased on what we both learned today — should we go our separate ways, or does it make sense to take a next step?"' },
-                  { label:"Full What/Who/Why — Orlob\'s exact script", text:'"Looks like we\'re coming up on time. Should we talk about next steps?\n\nGreat. You know your company better than me. So if you have a different idea, let me know.\n\nBut based on what you told me today, what I recommend we do next is [specific next step].\n\nIt would be helpful if we could include [name/role] in that meeting too — [why they should be there].\n\nDoes that feel fair?"' },
-                  { label:"Multi-stakeholder demo", text:'"Based on what you\'ve shared, I\'d recommend a focused demo with you and [decision maker]. It\'d be helpful to have [name/role] in the room — since what we talked about directly affects [their metric]. You know your company better than I do — does that feel like the right next step?"' },
-                  { label:"Trial + check-in", text:'"What I\'d recommend is getting you into a trial and checking in in three days once you\'ve had a chance to look around. I\'ll send you a setup link right after this call. Does that work?"' },
-                ].map((s,i)=>{
-                  const key=`next-${i}`, open=collapsedCards[key]!==undefined?!collapsedCards[key]:false;
-                  return (<div key={i} style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:`1.5px solid ${open?C.emerald:C.border}`, background:C.white }}>
-                    <button onClick={()=>setExpandedScript(open?null:key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 22px", background:open?C.emerald:C.white, border:"none", textAlign:"left" }}>
-                      <span style={{ fontSize:18, fontWeight:700, color:open?C.white:C.textPrimary }}>{s.label}</span>
-                      <span style={{ fontSize:14, color:open?"#eef2f7":"#a1a1aa", fontWeight:700 }}>{open?"▲":"▼"}</span>
-                    </button>
-                    {open && <div style={{ padding:"22px 26px", fontSize:16, color:"#eef2f7", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{s.text}</div>}
-                  </div>);
-                })}
-                <Collapsible label="Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textMuted}>
-                  {["Every rep who overperformed took a leadership posture on next steps. Always have a clear point of view on what to do next.","Any deal without a scheduled next step on the calendar is at risk. 85%+ go dark.","Always lead with a recommendation. Never 'what do you think we should do next?'","Rank by deal health: multi-stakeholder demo > technical call > trial > champion prep."].map((t,i)=>(<div key={i} style={{ display:"flex", gap:14, marginBottom:i<3?14:0 }}><span style={{ fontSize:15, color:C.textMuted, flexShrink:0 }}>—</span><span style={{ fontSize:16, color:C.textSecondary, lineHeight:1.75 }}>{t}</span></div>))}
-                </Collapsible>
-                {coachingVisible && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
-                  {["Hughes: pre-commitment — every 'fair?', 'did I get that right?', 'is this the challenge we should anchor to?' built toward this moment. If you skipped those — the next step ask lands cold.","'I'll follow up next week' — not a next step. Must be booked before you hang up.","Not recommending who else should be in the room — this is how you stay stuck with one contact.","Forgetting to call back the ROE decision you set at the start of the call."].map((w,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<3?14:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:16, color:"#e07070", lineHeight:1.75 }}>{w}</span></div>))}
-                </Collapsible>}
-              </div>
-            )}
 
             {/* OUTPUTS */}
             {activeStage === "outputs" && (
