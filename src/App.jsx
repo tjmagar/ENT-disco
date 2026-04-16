@@ -9,15 +9,16 @@ const C = {
 };
 
 const STAGES = [
-  { id:"prep",             icon:"◎", short:"Prep Brief" },
-  { id:"open",             icon:"①", short:"Open" },
-  { id:"buyer-type",       icon:"②", short:"Buyer Type" },
-  { id:"current-process",  icon:"③", short:"Current Process" },
-  { id:"business-problem", icon:"④", short:"Business Problem" },
-  { id:"negative-impact",  icon:"⑤", short:"Negative Impact" },
-  { id:"future-state",     icon:"⑥", short:"Future State" },
-  { id:"next-step",        icon:"⑦", short:"Next Step" },
-  { id:"outputs",          icon:"✦", short:"Outputs" },
+  { id:"prep",             icon:"◎",  short:"Prep Brief",       group:"setup" },
+  { id:"open",             icon:"①",  short:"Open",             group:"setup" },
+  { id:"buyer-type",       icon:"②",  short:"Buyer Type",       group:"setup" },
+  { id:"business-problem", icon:"1",  short:"Business Problem", group:"framework" },
+  { id:"current-process",  icon:"2",  short:"Current State",    group:"framework" },
+  { id:"cause-analysis",   icon:"3",  short:"Cause Analysis",   group:"framework" },
+  { id:"negative-impact",  icon:"4",  short:"Negative Impact",  group:"framework" },
+  { id:"future-state",     icon:"5",  short:"Future State",     group:"framework" },
+  { id:"next-step",        icon:"⑦",  short:"Next Step",        group:"close" },
+  { id:"outputs",          icon:"✦",  short:"Outputs",          group:"close" },
 ];
 
 const SPICED_QUESTIONS = [
@@ -157,6 +158,7 @@ export default function App() {
   const [debriefLoading, setDebriefLoading] = useState(false);
   const [scriptEdits, setScriptEdits] = useState({}); // key -> edited text
   const [editingKey, setEditingKey] = useState(null);  // which card is in edit mode
+  const [expandedScript, setExpandedScript] = useState(null);
 
   const currentIdx = STAGES.findIndex(s => s.id === activeStage);
   const stageNote = notes[activeStage] || "";
@@ -164,6 +166,16 @@ export default function App() {
   const B = { fontFamily:"'Inter', system-ui, sans-serif", cursor:"pointer" };
 
   useEffect(() => { setTipsOpen(false); setWatchOpen(false); setExpandedScript(null); }, [activeStage]);
+
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowRight' && currentIdx < STAGES.length - 1) setActiveStage(STAGES[currentIdx + 1].id);
+      if (e.key === 'ArrowLeft' && currentIdx > 0) setActiveStage(STAGES[currentIdx - 1].id);
+    }
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [currentIdx]);
 
   async function generateDebrief() {
     if (!callTranscript.trim()) return;
@@ -468,6 +480,25 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         "Moving to Negative Impact without validating priority — you might be anchoring to the wrong problem",
       ],
     },
+    "cause-analysis": {
+      rule: "Mutually identify and challenge the true root cause. Don't accept the first answer.",
+      rhythm: [
+        { type:"ask", label:"1 — Root cause question", text: "What's your take on why this is happening? In your opinion — what's the actual cause of this?", note: "Orlob: 'What's your opinion on why this is happening?' — three things happen: you signal you value their opinion, you get the real cause, and you find out whether they've thought about this deeply." },
+        { type:"ask", label:"2 — Challenge it", text: "That's interesting. Is that a new development, or has it always been that way?", note: "Challenge gently. Has it always been this way = is this structural or situational? Structural has less urgency. Situational (something changed) has more." },
+        { type:"ask", label:"3 — Validate it's the real cause", text: "So if we solved [root cause they named] — would that actually fix the problem you described? Or do you think there's something else underneath it?", note: "CFO test for root cause. If yes → you have the real cause. If they hesitate → keep digging." },
+        { type:"summarize", label:"4 — Summarize + transition to impact", text: "So the real cause here is [their words] — not just a symptom. Did I get that right? ... Perfect. Based on that — I want to make sure I understand what this is actually costing the business.", note: "Transition into Negative Impact. Root cause summary sets up the impact questions perfectly." },
+      ],
+      tips: [
+        "First answer is almost always a symptom. The real cause is usually 1-2 layers deeper.",
+        "Mutual means they discovered it too — not just confirmed your hypothesis.",
+        "'Is that a new development?' challenges without confronting.",
+      ],
+      watch: [
+        "Accepting the first answer as the root cause",
+        "Moving to impact before you've confirmed the cause",
+        "Leading them to your conclusion instead of letting them arrive at it",
+      ],
+    },
     "negative-impact": {
       rule:"Time savings alone rarely justifies a rollout. Find what it is actually costing the business.",
       rhythm:[
@@ -540,29 +571,46 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     <div style={{ display:"flex", height:"100vh", fontFamily:"'Inter', system-ui, sans-serif", background:C.pageBg, overflow:"hidden" }}>
 
       {/* SIDEBAR */}
-      <div style={{ width:220, background:C.sidebar, display:"flex", flexDirection:"column", flexShrink:0, overflowY:"auto" }}>
-        <div style={{ padding:"28px 22px 18px" }}>
-          <div style={{ fontSize:10, fontWeight:700, color:"#a1a1aa", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:4 }}>PandaDoc</div>
-          <div style={{ fontSize:18, fontWeight:700, color:"#18181b", letterSpacing:"0.01em" }}>Discovery</div>
+      <div style={{ width:200, background:C.sidebar, display:"flex", flexDirection:"column", flexShrink:0, overflowY:"auto" }}>
+        <div style={{ padding:"22px 18px 14px" }}>
+          <div style={{ fontSize:9, fontWeight:700, color:"#71717a", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:3 }}>PandaDoc</div>
+          <div style={{ fontSize:16, fontWeight:700, color:"#fafafa", letterSpacing:"0.01em" }}>Discovery</div>
         </div>
-        <div style={{ flex:1, padding:"6px 10px" }}>
-          {STAGES.map(s => {
-            const isActive = s.id === activeStage;
+
+        <div style={{ flex:1, padding:"4px 8px" }}>
+          {/* Setup group */}
+          {["setup","framework","close"].map(group => {
+            const groupStages = STAGES.filter(s => s.group === group);
+            const groupLabel = group === "setup" ? "Setup" : group === "framework" ? "5-Step Framework" : "Close";
             return (
-              <button key={s.id} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:12, padding:"13px 12px", borderRadius:6, background:isActive?"#fff7ed":"transparent", border:"none", borderLeft:isActive?"2px solid #10b981":"2px solid transparent", textAlign:"left", marginBottom:2 }}>
-                <span style={{ fontSize:16, color:isActive?"#f97316":"#a1a1aa", fontWeight:700, minWidth:20, textAlign:"center" }}>{s.icon}</span>
-                <span style={{ fontSize:15, color:isActive?"#18181b":"#52525b", fontWeight:isActive?600:400 }}>{s.short}</span>
-              </button>
+              <div key={group} style={{ marginBottom: group === "close" ? 0 : 16 }}>
+                <div style={{ fontSize:9, fontWeight:700, color:"#52525b", letterSpacing:"0.15em", textTransform:"uppercase", padding:"0 8px", marginBottom:6 }}>{groupLabel}</div>
+                {groupStages.map(s => {
+                  const isActive = s.id === activeStage;
+                  const isFramework = s.group === "framework";
+                  return (
+                    <button key={s.id} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:10, padding:"11px 10px", borderRadius:8, background:isActive?"rgba(249,115,22,0.15)":"transparent", border:"none", borderLeft:isActive?"2px solid #f97316":"2px solid transparent", textAlign:"left", marginBottom:2 }}>
+                      {isFramework ? (
+                        <span style={{ fontSize:11, fontWeight:800, width:22, height:22, borderRadius:6, background:isActive?"#f97316":"#27272a", color:isActive?"#fff":"#71717a", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{s.icon}</span>
+                      ) : (
+                        <span style={{ fontSize:14, color:isActive?"#f97316":"#52525b", fontWeight:700, minWidth:22, textAlign:"center" }}>{s.icon}</span>
+                      )}
+                      <span style={{ fontSize:13, color:isActive?"#fafafa":"#71717a", fontWeight:isActive?600:400, lineHeight:1.3 }}>{s.short}</span>
+                    </button>
+                  );
+                })}
+              </div>
             );
           })}
         </div>
+
         {buyerPath && (
-          <div style={{ padding:"16px 22px", borderTop:"1px solid #666" }}>
-            <div style={{ fontSize:10, color:"#aaa", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.1em" }}>Buyer Path</div>
-            <div style={{ display:"inline-flex", fontSize:12, fontWeight:600, padding:"4px 12px", borderRadius:99, background:buyerPath==="evaluating"?"#1e3a5f":buyerPath==="active-pain"?"#7c2d12":"#713f12", color:buyerPath==="evaluating"?"#6aaae8":buyerPath==="active-pain"?"#fb923c":"#e8a84a" }}>
+          <div style={{ padding:"14px 16px", borderTop:"1px solid #27272a" }}>
+            <div style={{ fontSize:9, color:"#52525b", marginBottom:5, textTransform:"uppercase", letterSpacing:"0.1em" }}>Buyer Path</div>
+            <div style={{ display:"inline-flex", fontSize:11, fontWeight:600, padding:"3px 10px", borderRadius:99, background:buyerPath==="evaluating"?"#1e3a5f":buyerPath==="active-pain"?"#7c2d12":"#713f12", color:buyerPath==="evaluating"?"#6aaae8":buyerPath==="active-pain"?"#fb923c":"#e8a84a" }}>
               {buyerPath==="evaluating"?"⚡ Evaluating":buyerPath==="active-pain"?"⚠ Active Pain":"◎ Latent"}
             </div>
-            <button onClick={()=>setBuyerPath(null)} style={{ ...B, display:"block", marginTop:6, fontSize:11, color:"#bbb", background:"none", border:"1px solid #666", borderRadius:5, padding:"3px 8px" }}>← change</button>
+            <button onClick={()=>setBuyerPath(null)} style={{ ...B, display:"block", marginTop:5, fontSize:10, color:"#71717a", background:"none", border:"1px solid #3f3f46", borderRadius:5, padding:"3px 8px" }}>← change</button>
           </div>
         )}
       </div>
@@ -571,26 +619,50 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
 
         {/* TOP BAR */}
-        <div style={{ padding:"22px 36px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
-          <div>
-            <div style={{ fontSize:22, fontWeight:700, color:"#18181b", letterSpacing:"-0.02em" }}>
-              {{prep:"Pre-Call Prep Brief",open:"Open + ROE","buyer-type":"Meet Buyer Where They Are","current-process":"Current Process","business-problem":"Business Problem","negative-impact":"Negative Impact","future-state":"Future State + Decision","next-step":"Secure the Next Step",outputs:"Outputs"}[activeStage]}
+        <div style={{ padding:"16px 28px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
+          <div style={{ flex:1 }}>
+            {/* Framework progress dots — only show during 5-step stages */}
+            {["business-problem","current-process","cause-analysis","negative-impact","future-state"].includes(activeStage) && (
+              <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:8 }}>
+                {[
+                  { id:"business-problem", label:"Business Problem" },
+                  { id:"current-process",  label:"Current State" },
+                  { id:"cause-analysis",   label:"Cause Analysis" },
+                  { id:"negative-impact",  label:"Negative Impact" },
+                  { id:"future-state",     label:"Future State" },
+                ].map((step, i) => {
+                  const isActive = step.id === activeStage;
+                  const isDone = ["business-problem","current-process","cause-analysis","negative-impact","future-state"].indexOf(activeStage) > i;
+                  return (
+                    <button key={step.id} onClick={() => setActiveStage(step.id)} style={{ ...B, display:"flex", alignItems:"center", gap:5, background:"none", border:"none", padding:"2px 4px", borderRadius:4 }}>
+                      <span style={{ width:20, height:20, borderRadius:6, background:isActive?"#f97316":isDone?"#fed7aa":"#f4f4f5", border:isActive?"2px solid #f97316":isDone?"2px solid #fed7aa":"2px solid #e4e4e7", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:800, color:isActive?"#fff":isDone?"#9a3412":"#a1a1aa" }}>{i+1}</span>
+                      <span style={{ fontSize:11, fontWeight:isActive?700:400, color:isActive?"#f97316":isDone?"#9a3412":"#a1a1aa", display:"none" }}>{step.label}</span>
+                    </button>
+                  );
+                })}
+                <span style={{ fontSize:11, color:"#a1a1aa", marginLeft:4, fontWeight:500 }}>
+                  {{"business-problem":"Business Problem","current-process":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State"}[activeStage]}
+                </span>
+              </div>
+            )}
+            <div style={{ fontSize:20, fontWeight:700, color:"#18181b", letterSpacing:"-0.02em", lineHeight:1.2 }}>
+              {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","current-process":"Current State","business-problem":"Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Decision","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
             </div>
-            <div style={{ fontSize:14, color:C.textMuted, marginTop:4 }}>
-              {{prep:"Paste your prep brief. Everything downstream personalizes from this.",open:"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","current-process":"Map where they are today before you peel.","business-problem":"Find the need behind the need. Peel until a CFO would fund it.","negative-impact":"What is this actually costing the business?","future-state":"Contrast painful present with compelling future. Then decision process.","next-step":"Call back the ROE. Make the recommendation.",outputs:"Generate your end-of-call outputs."}[activeStage]}
+            <div style={{ fontSize:13, color:C.textMuted, marginTop:3 }}>
+              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","current-process":"Mutual understanding of where they are today.","business-problem":"Identify and validate THE business problem.","cause-analysis":"Mutually identify the true root cause.","negative-impact":"Explore impact, consequences, and negative ramifications.","future-state":"Desired outcomes, buying process, and the WHY behind it.","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
             </div>
           </div>
-          <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-            <button onClick={()=>setCoachingVisible(v=>!v)} style={{ ...B, fontSize:12, padding:"8px 14px", border:`1px solid ${C.border}`, borderRadius:8, background:coachingVisible?C.emeraldLight:C.white, color:coachingVisible?C.emerald:C.textMuted, fontWeight:600 }}>{coachingVisible?"Hide coaching":"Show coaching"}</button>
-            {showOutputsShortcut && <button onClick={()=>setActiveStage("outputs")} style={{ ...B, fontSize:13, padding:"10px 20px", border:`2px solid ${C.emerald}`, borderRadius:8, background:"transparent", color:C.emerald, fontWeight:700 }}>✦ Outputs</button>}
-            {currentIdx > 0 && <button onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} style={{ ...B, fontSize:14, padding:"10px 22px", border:`1px solid ${C.border}`, borderRadius:8, background:C.white, color:C.textMuted, fontWeight:500 }}>← Back</button>}
-            {currentIdx < STAGES.length-1 && <button onClick={()=>setActiveStage(STAGES[currentIdx+1].id)} style={{ ...B, fontSize:14, padding:"10px 24px", border:"none", borderRadius:8, background:C.emerald, color:C.white, fontWeight:700 }}>Next →</button>}
+          <div style={{ display:"flex", gap:8, alignItems:"center", flexShrink:0 }}>
+            <button onClick={()=>setCoachingVisible(v=>!v)} style={{ ...B, fontSize:11, padding:"6px 12px", border:`1px solid ${C.border}`, borderRadius:6, background:coachingVisible?C.emeraldLight:C.white, color:coachingVisible?C.emerald:C.textMuted, fontWeight:600 }}>{coachingVisible?"Coaching on":"Coaching off"}</button>
+            {showOutputsShortcut && <button onClick={()=>setActiveStage("outputs")} style={{ ...B, fontSize:12, padding:"8px 16px", border:`2px solid ${C.emerald}`, borderRadius:7, background:"transparent", color:C.emerald, fontWeight:700 }}>✦ Outputs</button>}
+            {currentIdx > 0 && <button onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} style={{ ...B, fontSize:22, padding:"6px 14px", border:`1px solid ${C.border}`, borderRadius:7, background:C.white, color:C.textMuted, fontWeight:500, lineHeight:1 }}>←</button>}
+            {currentIdx < STAGES.length-1 && <button onClick={()=>setActiveStage(STAGES[currentIdx+1].id)} style={{ ...B, fontSize:22, padding:"6px 16px", border:"none", borderRadius:7, background:C.emerald, color:C.white, fontWeight:700, lineHeight:1 }}>→</button>}
           </div>
         </div>
 
         {/* BODY */}
         <div style={{ flex:1, display:"flex", overflow:"hidden" }}>
-          <div style={{ flex:1, overflowY:"auto", padding:"32px 36px" }}>
+          <div style={{ flex:1, overflowY:"auto", padding:"32px 36px 0" }}>
 
             {/* PREP */}
             {activeStage === "prep" && (
@@ -813,6 +885,16 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
             )}
 
 
+          {/* NOTES */}
+          <div style={{ position:"sticky", bottom:0, background:C.white, borderTop:`1px solid ${C.border}`, padding:"12px 36px", flexShrink:0 }}>
+            <textarea
+              value={stageNote}
+              onChange={e=>setNotes(n=>({...n,[activeStage]:e.target.value}))}
+              placeholder="Notes for this stage..."
+              rows={2}
+              style={{ width:"100%", fontSize:13, lineHeight:1.7, padding:"8px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, background:"#fafafa", color:"#18181b", resize:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
+            />
+          </div>
           </div>
 
           {/* RIGHT — SPICED + COACH */}
