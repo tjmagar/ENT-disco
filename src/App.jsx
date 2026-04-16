@@ -142,6 +142,7 @@ export default function App() {
   const [notes, setNotes] = useState({});
   const [prepBrief, setPrepBrief] = useState("");
   const [openSpiced, setOpenSpiced] = useState(null);
+  const [prepOpen, setPrepOpen] = useState(false);
   const [outputs, setOutputs] = useState({ spiced:"", email:"", score:"", whatweheard:"", debrief:"" });
   const [outputLoading, setOutputLoading] = useState("");
   const [tipsOpen, setTipsOpen] = useState(false);
@@ -594,11 +595,21 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
             {/* PREP */}
             {activeStage === "prep" && (
               <div style={{ marginBottom:28 }}>
-                <div style={{ background:C.emeraldLight, border:`2px solid ${C.emeraldMid}`, borderRadius:14, padding:26, marginBottom:20 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:C.emerald, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>★ Paste your discovery prep brief</div>
-                  <div style={{ fontSize:15, color:C.textSecondary, marginBottom:16, lineHeight:1.7 }}>Paste the output from your pre-call research. The coach and all outputs will use this to personalize every response.</div>
-                  <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Company] — [Date]\n\nContact: [Name], [Title] | Tenure: X years\nCall Source: Inbound/Outbound\n\nMoney Signals: ...\nTech Stack: ...\nCompelling Trigger: ...\nOpen Gaps: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#f9fafb", color:"#18181b", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
-                  {prepBrief && <div style={{ marginTop:12, fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>}
+                <div style={{ background:C.emeraldLight, border:`2px solid ${C.emeraldMid}`, borderRadius:14, marginBottom:20, overflow:"hidden" }}>
+                  <button onClick={()=>setPrepOpen(o=>!o)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 26px", background:"none", border:"none", cursor:"pointer" }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                      <span style={{ fontSize:13, fontWeight:700, color:C.emerald, letterSpacing:"0.08em", textTransform:"uppercase" }}>★ Discovery Prep Brief</span>
+                      {prepBrief && !prepOpen && <span style={{ fontSize:12, color:C.emerald, fontWeight:600 }}>✓ Loaded</span>}
+                    </div>
+                    <span style={{ fontSize:18, color:C.emerald, transform: prepOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s" }}>▾</span>
+                  </button>
+                  {prepOpen && (
+                    <div style={{ padding:"0 26px 26px" }}>
+                      <div style={{ fontSize:15, color:C.textSecondary, marginBottom:16, lineHeight:1.7 }}>Paste the output from your pre-call research. The coach and all outputs will use this to personalize every response.</div>
+                      <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Company] — [Date]\n\nContact: [Name], [Title] | Tenure: X years\nCall Source: Inbound/Outbound\n\nMoney Signals: ...\nTech Stack: ...\nCompelling Trigger: ...\nOpen Gaps: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#f9fafb", color:"#18181b", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
+                      {prepBrief && <div style={{ marginTop:12, fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>}
+                    </div>
+                  )}
                 </div>
                 <div style={{ background:"#eff6ff", border:"1.5px solid #bfdbfe", borderRadius:12, padding:20, marginBottom:16 }}>
                   <div style={{ fontSize:13, fontWeight:700, color:"#1e40af", marginBottom:14 }}>Pre-call behavioral read — Hughes Six-Minute X-Ray</div>
