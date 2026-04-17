@@ -160,6 +160,7 @@ export default function App() {
   const [collapsedCards, setCollapsedCards] = useState({});
   const [briefFields, setBriefFields] = useState({ prospect:"", company:"", role:"", tool:"", reps:"", volume:"", timePerDoc:"", metric:"", pain:"", integrations:"", approval:"" });
   const [coveredCards, setCoveredCards] = useState({});
+  const [briefParsing, setBriefParsing] = useState(false);
   const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
@@ -268,6 +269,49 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
 
 
   function copyText(t) { navigator.clipboard.writeText(t); }
+
+  async function parseBrief() {
+    if (!prepBrief.trim()) return;
+    setBriefParsing(true);
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          model:"claude-haiku-4-20250514",
+          max_tokens:400,
+          system:"You are a data extractor. Extract structured fields from a sales prep brief. Return ONLY valid JSON, no explanation.",
+          messages:[{ role:"user", content:`Extract these fields from the brief below. Return ONLY a JSON object with these exact keys. Use empty string "" for anything not found. Numbers should be strings.
+
+Keys: prospect, company, role, tool, reps, volume, timePerDoc, metric, integrations, approval, pain
+
+- prospect: first name of the contact
+- company: company name
+- role: their job title
+- tool: current tool(s) they use for documents/signatures
+- reps: number of people on the team sending documents (just the number)
+- volume: documents sent per month (just the number)
+- timePerDoc: minutes per document today (just the number)
+- metric: the business metric they care about (e.g. win rate, close rate, revenue)
+- integrations: tools they'd want to connect to (CRM, etc.)
+- approval: any approval process mentioned
+- pain: their core pain in 1 short sentence
+
+BRIEF:
+${prepBrief}` }]
+        })
+      });
+      const data = await res.json();
+      const raw = data.content?.[0]?.text || "{}";
+      const json = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] || "{}");
+      setBriefFields(prev => {
+        const merged = { ...prev };
+        Object.keys(merged).forEach(k => { if (json[k]) merged[k] = json[k]; });
+        return merged;
+      });
+    } catch(e) { console.error("Brief parse failed", e); }
+    setBriefParsing(false);
+  }
 
   function fillTemplate(text) {
     let t = text;
@@ -740,7 +784,14 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                     <div style={{ padding:"0 26px 26px" }}>
                       <div style={{ fontSize:15, color:C.textSecondary, marginBottom:16, lineHeight:1.7 }}>Paste the output from your pre-call research. The coach and all outputs will use this to personalize every response.</div>
                       <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Company] — [Date]\n\nContact: [Name], [Title] | Tenure: X years\nCall Source: Inbound/Outbound\n\nMoney Signals: ...\nTech Stack: ...\nCompelling Trigger: ...\nOpen Gaps: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#111c28", color:"#eef2f7", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
-                      {prepBrief && <div style={{ marginTop:12, fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>}
+                      {prepBrief && (
+                        <div style={{ marginTop:12, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                          <div style={{ fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>
+                          <button onClick={parseBrief} disabled={briefParsing} style={{ ...B, fontSize:12, padding:"7px 16px", borderRadius:7, border:"none", background: briefParsing ? "#163d2a" : C.emerald, color:"#fff", fontWeight:700, opacity: briefParsing ? 0.7 : 1 }}>
+                            {briefParsing ? "Parsing..." : "⚡ Auto-fill Intel"}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
