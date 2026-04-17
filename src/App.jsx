@@ -158,6 +158,8 @@ export default function App() {
   const [tipsOpen, setTipsOpen] = useState(false);
   const [watchOpen, setWatchOpen] = useState(false);
   const [collapsedCards, setCollapsedCards] = useState({});
+  const [briefFields, setBriefFields] = useState({ prospect:"", company:"", role:"", tool:"", reps:"", volume:"", timePerDoc:"", metric:"", pain:"", integrations:"", approval:"" });
+  const [coveredCards, setCoveredCards] = useState({});
   const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
@@ -267,6 +269,32 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
 
   function copyText(t) { navigator.clipboard.writeText(t); }
 
+  function fillTemplate(text) {
+    let t = text;
+    if (briefFields.metric)     t = t.replace(/\[metric they named\]/g, briefFields.metric);
+    if (briefFields.reps)       t = t.replace(/\[X\] reps/g, `${briefFields.reps} reps`);
+    if (briefFields.volume)     t = t.replace(/\[Y\] agreements a month/g, `${briefFields.volume} agreements a month`);
+    if (briefFields.timePerDoc) t = t.replace(/\[Z\] minutes each/g, `${briefFields.timePerDoc} minutes each`).replace(/\[X minutes\]/g, `${briefFields.timePerDoc} minutes`);
+    return t;
+  }
+
+  function getCardBriefValue(label) {
+    const l = (label || "").toLowerCase();
+    if (l.includes("4 —") || l.includes("current tool"))       return briefFields.tool;
+    if (l.includes("2 —") || l.includes("time to build"))      return briefFields.timePerDoc ? `${briefFields.timePerDoc} min to build` : "";
+    if (l.includes("3 —") || l.includes("who's involved")) {
+      const p = [briefFields.reps && `${briefFields.reps} reps`, briefFields.volume && `${briefFields.volume} docs/mo`].filter(Boolean);
+      return p.join(", ");
+    }
+    if (l.includes("integration"))   return briefFields.integrations;
+    if (l.includes("approval"))      return briefFields.approval;
+    if (l.includes("6 —") || l.includes("roi math")) {
+      const p = [briefFields.reps && `${briefFields.reps} reps`, briefFields.volume && `${briefFields.volume}/mo`, briefFields.timePerDoc && `${briefFields.timePerDoc} min each`, briefFields.metric && `→ ${briefFields.metric}`].filter(Boolean);
+      return p.join(", ");
+    }
+    return "";
+  }
+
   const Collapsible = ({ label, isOpen, onToggle, accent, children }) => (
     <div style={{ marginBottom:16, borderRadius:12, border:`1.5px solid ${accent}30`, overflow:"hidden" }}>
       <button onClick={onToggle} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 18px", background:`${accent}12`, border:"none", textAlign:"left" }}>
@@ -289,14 +317,29 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     const typeTag = { ask:"Question", wallow:"Wallow", segue:"Segue", summarize:"Summarize", validate:"Validate", transition:"Transition" };
     const accent = typeAccent[r.type] || C.emerald;
     const tag = typeTag[r.type] || "Question";
-    const text = r.text || (r.alts ? r.alts.join("\n\n— or —\n\n") : "");
+    const rawText = r.text || (r.alts ? r.alts.join("\n\n— or —\n\n") : "");
+    const text = fillTemplate(rawText);
+    const cardKey = `${prefix}-${idx}`;
+    const briefVal = getCardBriefValue(r.label || "");
+    const manualCovered = coveredCards[cardKey];
+    const isCovered = manualCovered || !!(briefVal && briefVal.trim());
     return (
-      <div style={{ marginBottom:20, paddingLeft:14, borderLeft:`2px solid ${accent}50` }}>
-        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-          <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background:accent, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>{tag}</span>
-          <span style={{ fontSize:15, fontWeight:800, color:"#f2deb8", letterSpacing:"-0.02em", fontStyle:"italic" }}>{r.label}</span>
+      <div style={{ marginBottom:20, paddingLeft:14, borderLeft:`2px solid ${isCovered ? "#4a9e7880" : accent+"50"}`, opacity: isCovered ? 0.65 : 1, transition:"opacity 0.2s" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background: isCovered ? "#4a9e78" : accent, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>{isCovered ? "✓ Covered" : tag}</span>
+            <span style={{ fontSize:15, fontWeight:800, color: isCovered ? "#4a9e78" : "#f2deb8", letterSpacing:"-0.02em", fontStyle:"italic" }}>{r.label}</span>
+          </div>
+          <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: !s[cardKey] }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:`1px solid ${manualCovered ? "#4a9e78" : C.border}`, background: manualCovered ? "#0f2b1e" : "transparent", color: manualCovered ? "#4a9e78" : C.textMuted, fontWeight:600, flexShrink:0 }}>
+            {manualCovered ? "↩ unmark" : "✓ mark covered"}
+          </button>
         </div>
-        <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
+        {briefVal && briefVal.trim() && (
+          <div style={{ fontSize:12, color:"#4a9e78", background:"#0a1f15", padding:"5px 12px", borderRadius:6, marginBottom:8, fontWeight:500, border:"1px solid #1a4a30" }}>
+            From brief: {briefVal}
+          </div>
+        )}
+        <div style={{ fontSize:15, color: isCovered ? C.textMuted : C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
         {r.note && coachingVisible && (
           <div style={{ marginTop:10, fontSize:12, color:C.textSecondary, lineHeight:1.65, background:"#111c28", padding:"10px 14px", borderRadius:7, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
         )}
@@ -656,8 +699,15 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                 </span>
               </div>
             )}
-            <div style={{ fontSize:20, fontWeight:700, color:"#eef2f7", letterSpacing:"-0.02em", lineHeight:1.2 }}>
-              {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","current-process":"Current State","business-problem":"Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Decision","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
+            <div style={{ display:"flex", alignItems:"baseline", gap:10 }}>
+              <div style={{ fontSize:20, fontWeight:700, color:"#eef2f7", letterSpacing:"-0.02em", lineHeight:1.2 }}>
+                {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","current-process":"Current State","business-problem":"Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Decision","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
+              </div>
+              {(briefFields.prospect || briefFields.company) && activeStage !== "prep" && (
+                <span style={{ fontSize:13, color:"#9a80e0", fontWeight:500 }}>
+                  {[briefFields.prospect, briefFields.company].filter(Boolean).join(" @ ")}
+                </span>
+              )}
             </div>
             <div style={{ fontSize:13, color:C.textMuted, marginTop:3 }}>
               {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","current-process":"Mutual understanding of where they are today.","business-problem":"Identify and validate THE business problem.","cause-analysis":"Mutually identify the true root cause.","negative-impact":"Explore impact, consequences, and negative ramifications.","future-state":"Desired outcomes, buying process, and the WHY behind it.","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
@@ -694,6 +744,42 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
                     </div>
                   )}
                 </div>
+                {/* PRE-CALL INTEL */}
+                <div style={{ background:"#16122a", border:"1.5px solid #4a3a9a", borderRadius:12, padding:20, marginBottom:16 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#9a80e0", marginBottom:4 }}>Pre-Call Intel — questionnaire answers</div>
+                  <div style={{ fontSize:12, color:"#7060b0", marginBottom:16, lineHeight:1.6 }}>Fill in what you already know. Cards matching answered fields auto-mark as covered so you don't re-ask live.</div>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                    {[
+                      { key:"prospect",    label:"Prospect name",       placeholder:"e.g. Kimberly" },
+                      { key:"company",     label:"Company",              placeholder:"e.g. Iron Constructor" },
+                      { key:"role",        label:"Their role",           placeholder:"e.g. VP of Sales" },
+                      { key:"tool",        label:"Current tool",         placeholder:"e.g. Word + DocuSign" },
+                      { key:"reps",        label:"Team size (# reps)",   placeholder:"e.g. 12" },
+                      { key:"volume",      label:"Docs / month",         placeholder:"e.g. 50" },
+                      { key:"timePerDoc",  label:"Min per doc today",    placeholder:"e.g. 45" },
+                      { key:"metric",      label:"Their metric / goal",  placeholder:"e.g. win rate, close rate" },
+                      { key:"integrations",label:"Integrations needed",  placeholder:"e.g. HubSpot, Salesforce" },
+                      { key:"approval",    label:"Approval process",     placeholder:"e.g. manager approves before send" },
+                      { key:"pain",        label:"Known pain",           placeholder:"e.g. proposals take too long" },
+                    ].map(f => (
+                      <div key={f.key} style={f.key === "pain" ? { gridColumn:"1 / -1" } : {}}>
+                        <div style={{ fontSize:10, color:"#7060b0", fontWeight:700, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.07em" }}>{f.label}</div>
+                        <input
+                          value={briefFields[f.key]}
+                          onChange={e => setBriefFields(s => ({ ...s, [f.key]: e.target.value }))}
+                          placeholder={f.placeholder}
+                          style={{ width:"100%", fontSize:13, padding:"7px 11px", border:"1.5px solid #4a3a9a", borderRadius:7, background:"#111c28", color:"#eef2f7", outline:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif" }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  {Object.values(briefFields).some(v => v) && (
+                    <div style={{ marginTop:14, padding:"8px 14px", background:"#0f2b1e", borderRadius:8, border:"1px solid #4a9e78", fontSize:12, color:"#4a9e78", fontWeight:600 }}>
+                      ✓ Intel loaded — matching cards will show pre-answered during the call
+                    </div>
+                  )}
+                </div>
+
                 <div style={{ background:"#111d30", border:"1.5px solid #1e3a5f", borderRadius:12, padding:20, marginBottom:16 }}>
                   <div style={{ fontSize:13, fontWeight:700, color:"#5b8fd4", marginBottom:14 }}>Pre-call behavioral read — Hughes Six-Minute X-Ray</div>
                   <div style={{ fontSize:13, color:"#7ab0d8", lineHeight:1.7, marginBottom:12 }}>Based on their email, LinkedIn, or context — profile before you dial. You're looking for three things:</div>
