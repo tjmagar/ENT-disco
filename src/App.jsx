@@ -21,6 +21,7 @@ const STAGES = [
   { id:"prep",             icon:"◎",  short:"Prep Brief",       group:"setup" },
   { id:"open",             icon:"①",  short:"Open",             group:"setup" },
   { id:"buyer-type",       icon:"②",  short:"Buyer Type",       group:"setup" },
+  { id:"deal-scope",       icon:"③",  short:"Deal Scope",       group:"setup" },
   { id:"business-problem", icon:"1",  short:"Business Problem", group:"framework" },
   { id:"current-process",  icon:"2",  short:"Current State",    group:"framework" },
   { id:"cause-analysis",   icon:"3",  short:"Cause Analysis",   group:"framework" },
@@ -410,8 +411,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("deal-scope")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + move to Deal Scope</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
 
@@ -430,8 +431,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("deal-scope")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + move to Deal Scope</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
 
@@ -461,8 +462,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>
-          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("deal-scope")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + move to Deal Scope</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
       </div>
@@ -470,6 +471,37 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
   }
 
   const STAGE_DATA = {
+    "deal-scope": {
+      rule: "Size the deal early. Ask lightly — the answers shape your pricing and everything downstream.",
+      rhythm: [
+        { type:"transition", label:"0 — Frame it first (say this once)", text: "Before we get too deep — I find it helpful to get a quick lay of the land on your side. Just a few things that'll help me make sure I'm thinking about this the right way. Mind if I ask?", note: "This turns what follows from interrogation to curiosity. Say it once — no need to re-intro each question." },
+        { type:"ask", label:"1 — Who's involved", text: "Who's typically involved in creating and sending documents — and roughly how many people?", note: "Gets you headcount for licensing scope. Don't anchor with a number first — let them." },
+        { type:"ask", label:"2 — Other departments", text: "What other departments do you think would be positively impacted from using a tool like PandaDoc?", note: "Expands scope beyond the obvious team. Sales reps often undercount Legal, Finance, HR, CS." },
+        { type:"ask", label:"3 — Volume", text: "Ballpark — how many documents go out in a typical month?", note: "Volume shapes the ROI math you'll do later. Get a number even if rough." },
+        { type:"ask", label:"4 — Templates", text: "How many templates do you think you'd need to start?", note: "Template count signals complexity and onboarding scope. High count = longer ramp. Feeds a PS conversation." },
+        { type:"ask", label:"5 — Process", text: "Walk me through your document process start to finish — what types go out, in what format, and where do they end up?", note: "Open-ended — let them describe it. The friction almost always surfaces here without you having to ask." },
+        { type:"ask", label:"6 — Current tool", text: "What are you using today to create and send documents?", note: "Tells you the competitive landscape and switching cost. Listen for: Google Docs, Word, DocuSign standalone, or nothing." },
+        { type:"ask", label:"7 — Integrations", text: "What else would you want this to plug into?", note: "CRM is usually first. Dig for HRIS, billing, project management. Each integration = stickiness and complexity." },
+        { type:"ask", label:"8 — Internal approval", text: "Does anyone need to approve internally before a document goes out?", note: "Approval workflows = higher tier product need. If yes, this is a feature conversation, not just seat count." },
+        { type:"ask", label:"9 — Audience", text: "Are you typically sending to one person or a buying committee?", note: "Committee = more complex signature workflows. Also hints at use cases beyond simple e-sign." },
+        { type:"ask", label:"10 — Engagement tracking", text: "Once it's out the door — how do you track engagement and manage follow-ups?", note: "Most say 'I don't' or 'I just call.' Sets up the document analytics conversation perfectly." },
+        { type:"ask", label:"11 — Metric callback", text: "To what extent would it be helpful in improving [metric they shared is struggling] — to be able to act the second they've opened it?", note: "Ties document analytics to their stated metric. This is the moment it goes from feature to solution." },
+        { type:"ask", label:"12 — Proposals (if sales)", text: "How do you make your proposals stand out from the competition?", note: "Only if they're in sales. Opens the content library, brand, and interactive pricing conversation." },
+        { type:"ask", label:"13 — Security + compliance", text: "Any compliance, security, or data residency requirements we should know about?", note: "One question covers all three. If yes — get specific before promising anything. HIPAA, SOC2, GDPR vary by plan." },
+        { type:"ask", label:"14 — Notary (if legal)", text: "Ever need notarization?", note: "Only if they're in legal, real estate, or similar. PandaDoc Notary is a separate SKU — don't introduce it unless relevant." },
+      ],
+      tips: [
+        "Frame these questions as 'getting a lay of the land' — one soft intro covers all of them.",
+        "Volume + team size early gives you the ROI math foundation for later.",
+        "The metric callback (card 11) is the moment deal scope connects to their pain — don't skip it.",
+        "Cards 12 and 14 are conditional — use judgment on whether they apply.",
+      ],
+      watch: [
+        "Running through these as a checklist — ask, pause, react genuinely before moving on",
+        "Skipping the frame at card 0 — without it, cards 1-4 feel like a questionnaire",
+        "Asking the metric callback before you have a metric — wait for it to surface naturally first",
+      ],
+    },
     "business-problem": {
       bridgeBanner: true,
       rule:"Summarize what you heard. Prioritize. Validate it is a raging fire. Summarize before moving on.",
@@ -682,10 +714,10 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               </div>
             )}
             <div style={{ fontSize:20, fontWeight:700, color:"#eef2f7", letterSpacing:"-0.02em", lineHeight:1.2 }}>
-              {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","current-process":"Current State","business-problem":"Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Decision","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
+              {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","deal-scope":"Deal Scope","current-process":"Current State","business-problem":"Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Decision","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
             </div>
             <div style={{ fontSize:13, color:C.textMuted, marginTop:3 }}>
-              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","current-process":"Mutual understanding of where they are today.","business-problem":"Identify and validate THE business problem.","cause-analysis":"Mutually identify the true root cause.","negative-impact":"Explore impact, consequences, and negative ramifications.","future-state":"Desired outcomes, buying process, and the WHY behind it.","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
+              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","deal-scope":"Size the deal early. Ask lightly — the answers shape your pricing and everything downstream.","current-process":"Mutual understanding of where they are today.","business-problem":"Identify and validate THE business problem.","cause-analysis":"Mutually identify the true root cause.","negative-impact":"Explore impact, consequences, and negative ramifications.","future-state":"Desired outcomes, buying process, and the WHY behind it.","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
             </div>
           </div>
           <div style={{ display:"flex", gap:8, alignItems:"center", flexShrink:0 }}>
