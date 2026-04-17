@@ -790,13 +790,23 @@ ${prepBrief}` }]
                 </div>
                 {/* PRE-CALL INTEL */}
                 <div style={{ background:"#16122a", border:"1.5px solid #4a3a9a", borderRadius:12, padding:20, marginBottom:16 }}>
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:4 }}>
-                    <div style={{ fontSize:13, fontWeight:700, color:"#9a80e0" }}>Pre-Call Intel — questionnaire answers</div>
-                    <button onClick={parseBrief} disabled={briefParsing || !prepBrief.trim()} style={{ ...B, fontSize:12, padding:"6px 14px", borderRadius:7, border:"none", background: briefParsing ? "#163d2a" : !prepBrief.trim() ? "#2a2040" : C.emerald, color: !prepBrief.trim() ? "#5a4a80" : "#fff", fontWeight:700, cursor: !prepBrief.trim() ? "default" : "pointer" }}>
-                      {briefParsing ? "Parsing..." : "⚡ Auto-fill from brief"}
-                    </button>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#9a80e0", marginBottom:12 }}>Pre-Call Intel</div>
+                  <div style={{ marginBottom:12 }}>
+                    <div style={{ fontSize:10, color:"#7060b0", fontWeight:700, marginBottom:6, textTransform:"uppercase", letterSpacing:"0.07em" }}>Paste prep brief or questionnaire → auto-fill fields</div>
+                    <div style={{ display:"flex", gap:8 }}>
+                      <textarea
+                        value={prepBrief}
+                        onChange={e => setPrepBrief(e.target.value)}
+                        placeholder="Paste your call brief or questionnaire answers here..."
+                        rows={3}
+                        style={{ flex:1, fontSize:12, padding:"8px 12px", border:"1.5px solid #4a3a9a", borderRadius:7, background:"#111c28", color:"#eef2f7", resize:"none", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
+                      />
+                      <button onClick={parseBrief} disabled={briefParsing || !prepBrief.trim()} style={{ ...B, fontSize:12, padding:"0 16px", borderRadius:7, border:"none", background: briefParsing ? "#163d2a" : !prepBrief.trim() ? "#2a2040" : C.emerald, color: !prepBrief.trim() ? "#5a4a80" : "#fff", fontWeight:700, whiteSpace:"nowrap", alignSelf:"stretch" }}>
+                        {briefParsing ? "Parsing..." : "⚡ Auto-fill"}
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ fontSize:12, color:"#7060b0", marginBottom:16, lineHeight:1.6 }}>{prepBrief.trim() ? "Click ⚡ to auto-fill from your pasted brief, or fill in manually below." : "Paste your brief in the Discovery Prep Brief above, then click ⚡ to auto-fill. Or fill in manually."}</div>
+                  <div style={{ fontSize:11, color:"#5a4a80", marginBottom:16 }}>Or fill in manually below:</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                     {[
                       { key:"prospect",    label:"Prospect name",       placeholder:"e.g. Kimberly" },
