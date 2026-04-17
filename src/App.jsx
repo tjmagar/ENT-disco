@@ -274,14 +274,14 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     if (!prepBrief.trim()) return;
     setBriefParsing(true);
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/claude", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
-          model:"claude-haiku-4-20250514",
+          model:"claude-sonnet-4-20250514",
           max_tokens:400,
-          system:"You are a data extractor. Extract structured fields from a sales prep brief. Return ONLY valid JSON, no explanation.",
-          messages:[{ role:"user", content:`Extract these fields from the brief below. Return ONLY a JSON object with these exact keys. Use empty string "" for anything not found. Numbers should be strings.
+          system:"You are a data extractor. Extract structured fields from a sales prep brief. Return ONLY valid JSON, no explanation, no markdown.",
+          messages:[{ role:"user", content:`Extract these fields from the brief below. Return ONLY a raw JSON object with these exact keys. Use empty string "" for anything not found. Numbers should be strings (not integers).
 
 Keys: prospect, company, role, tool, reps, volume, timePerDoc, metric, integrations, approval, pain
 
@@ -289,9 +289,9 @@ Keys: prospect, company, role, tool, reps, volume, timePerDoc, metric, integrati
 - company: company name
 - role: their job title
 - tool: current tool(s) they use for documents/signatures
-- reps: number of people on the team sending documents (just the number)
-- volume: documents sent per month (just the number)
-- timePerDoc: minutes per document today (just the number)
+- reps: number of people on the team sending documents (just the number as a string)
+- volume: documents sent per month (just the number as a string)
+- timePerDoc: minutes per document today (just the number as a string)
 - metric: the business metric they care about (e.g. win rate, close rate, revenue)
 - integrations: tools they'd want to connect to (CRM, etc.)
 - approval: any approval process mentioned
