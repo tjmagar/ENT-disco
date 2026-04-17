@@ -784,21 +784,19 @@ ${prepBrief}` }]
                     <div style={{ padding:"0 26px 26px" }}>
                       <div style={{ fontSize:15, color:C.textSecondary, marginBottom:16, lineHeight:1.7 }}>Paste the output from your pre-call research. The coach and all outputs will use this to personalize every response.</div>
                       <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Company] — [Date]\n\nContact: [Name], [Title] | Tenure: X years\nCall Source: Inbound/Outbound\n\nMoney Signals: ...\nTech Stack: ...\nCompelling Trigger: ...\nOpen Gaps: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#111c28", color:"#eef2f7", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
-                      {prepBrief && (
-                        <div style={{ marginTop:12, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                          <div style={{ fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>
-                          <button onClick={parseBrief} disabled={briefParsing} style={{ ...B, fontSize:12, padding:"7px 16px", borderRadius:7, border:"none", background: briefParsing ? "#163d2a" : C.emerald, color:"#fff", fontWeight:700, opacity: briefParsing ? 0.7 : 1 }}>
-                            {briefParsing ? "Parsing..." : "⚡ Auto-fill Intel"}
-                          </button>
-                        </div>
-                      )}
+                      {prepBrief && <div style={{ marginTop:12, fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>}
                     </div>
                   )}
                 </div>
                 {/* PRE-CALL INTEL */}
                 <div style={{ background:"#16122a", border:"1.5px solid #4a3a9a", borderRadius:12, padding:20, marginBottom:16 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#9a80e0", marginBottom:4 }}>Pre-Call Intel — questionnaire answers</div>
-                  <div style={{ fontSize:12, color:"#7060b0", marginBottom:16, lineHeight:1.6 }}>Fill in what you already know. Cards matching answered fields auto-mark as covered so you don't re-ask live.</div>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:4 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:"#9a80e0" }}>Pre-Call Intel — questionnaire answers</div>
+                    <button onClick={parseBrief} disabled={briefParsing || !prepBrief.trim()} style={{ ...B, fontSize:12, padding:"6px 14px", borderRadius:7, border:"none", background: briefParsing ? "#163d2a" : !prepBrief.trim() ? "#2a2040" : C.emerald, color: !prepBrief.trim() ? "#5a4a80" : "#fff", fontWeight:700, cursor: !prepBrief.trim() ? "default" : "pointer" }}>
+                      {briefParsing ? "Parsing..." : "⚡ Auto-fill from brief"}
+                    </button>
+                  </div>
+                  <div style={{ fontSize:12, color:"#7060b0", marginBottom:16, lineHeight:1.6 }}>{prepBrief.trim() ? "Click ⚡ to auto-fill from your pasted brief, or fill in manually below." : "Paste your brief in the Discovery Prep Brief above, then click ⚡ to auto-fill. Or fill in manually."}</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                     {[
                       { key:"prospect",    label:"Prospect name",       placeholder:"e.g. Kimberly" },
