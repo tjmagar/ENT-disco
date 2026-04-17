@@ -21,7 +21,6 @@ const STAGES = [
   { id:"prep",             icon:"◎",  short:"Prep Brief",       group:"setup" },
   { id:"open",             icon:"①",  short:"Open",             group:"setup" },
   { id:"buyer-type",       icon:"②",  short:"Buyer Type",       group:"setup" },
-  { id:"deal-scope",       icon:"③",  short:"Deal Scope",       group:"setup" },
   { id:"business-problem", icon:"1",  short:"Business Problem", group:"framework" },
   { id:"current-process",  icon:"2",  short:"Current State",    group:"framework" },
   { id:"cause-analysis",   icon:"3",  short:"Cause Analysis",   group:"framework" },
@@ -161,7 +160,7 @@ export default function App() {
   const [collapsedCards, setCollapsedCards] = useState({});
   const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
-  const [rightPanelOpen, setRightPanelOpen] = useState(true);
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [coachingVisible, setCoachingVisible] = useState(false);
   const [callTranscript, setCallTranscript] = useState("");
@@ -279,58 +278,22 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
   );
 
   function RhythmCard({ r, idx, prefix }) {
-    const tagColors = {
-      ask:{ bg:"#0f2b1e", border:"1.5px solid #1e4a32", badge:"#4a9e78", badgeText:"#fff", tag:"Ask" },
-      wallow:{ bg:"#111d30", border:"1.5px solid #1e3a5f", badge:"#3b7dd8", badgeText:"#fff", tag:"Wallow" },
-      segue:{ bg:"#1c1a0e", border:"1.5px solid #4a3800", badge:"#c08a20", badgeText:"#fff", tag:"Segue" },
-      summarize:{ bg:"#1c1a0e", border:"1.5px solid #5a4800", badge:"#b07a14", badgeText:"#fff", tag:"Summarize" },
-      validate:{ bg:"#16122a", border:"1.5px solid #3a2a7a", badge:"#8060d0", badgeText:"#fff", tag:"Validate" },
-      transition:{ bg:"#111d30", border:"1.5px solid #1e3a6f", badge:"#5060c0", badgeText:"#fff", tag:"Transition" },
+    const typeAccent = {
+      ask: C.emerald,
+      wallow: "#5b8fd4",
+      segue: "#c08a20",
+      summarize: "#b07a14",
+      validate: "#8060d0",
+      transition: "#5b8fd4",
     };
-    const tc = tagColors[r.type] || tagColors.ask;
-    const key = `${prefix}-${idx}`;
-    const defaultOpen = idx === 0;
-    const open = collapsedCards[key] !== undefined ? !collapsedCards[key] : defaultOpen;
-    const isEditing = editingKey === key;
-    const editKey = `rc-${key}`;
-    const originalText = r.text || (r.alts ? r.alts.join("\n\n") : "");
-    const displayText = scriptEdits[editKey] !== undefined ? scriptEdits[editKey] : originalText;
-    const previewText = displayText ? displayText.replace(/\n/g,' ').slice(0, 90) + (displayText.length > 90 ? '…' : '') : '';
+    const accent = typeAccent[r.type] || C.emerald;
+    const text = r.text || (r.alts ? r.alts.join("\n\n— or —\n\n") : "");
     return (
-      <div style={{ marginBottom:8, borderRadius:12, overflow:"hidden", border:open?tc.border:`1.5px solid ${C.border}`, background:C.white }}>
-        <button onClick={() => setCollapsedCards(s=>({...s,[key]:open}))} style={{ ...B, width:"100%", display:"flex", alignItems:"flex-start", gap:12, padding:"13px 18px", background:open?tc.bg:C.white, border:"none", textAlign:"left" }}>
-          <span style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:99, background:tc.badge, color:tc.badgeText, flexShrink:0, letterSpacing:"0.06em", textTransform:"uppercase", marginTop:2 }}>{tc.tag}</span>
-          <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, letterSpacing:"-0.01em" }}>{r.label}</div>
-            {!open && previewText && <div style={{ fontSize:12, color:C.textMuted, marginTop:3, lineHeight:1.4, overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis" }}>{previewText}</div>}
-          </div>
-          <span style={{ fontSize:12, color:C.textMuted, fontWeight:700, flexShrink:0, marginTop:2 }}>{open?"▲":"▼"}</span>
-        </button>
-        {open && (
-          <div style={{ background:tc.bg, borderTop:`1px solid ${C.border}` }}>
-            {isEditing ? (
-              <div style={{ padding:"16px 20px" }}>
-                <textarea
-                  value={displayText}
-                  onChange={e => setScriptEdits(s=>({...s,[editKey]:e.target.value}))}
-                  style={{ width:"100%", minHeight:120, fontSize:15, lineHeight:1.8, padding:"12px 14px", background:"#111c28", color:"#eef2f7", border:"1.5px solid "+tc.badge, borderRadius:8, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
-                  autoFocus
-                />
-                <div style={{ display:"flex", gap:8, marginTop:10 }}>
-                  <button onClick={()=>setEditingKey(null)} style={{ ...B, fontSize:12, padding:"6px 16px", background:tc.badge, color:tc.badgeText, border:"none", borderRadius:6, fontWeight:700 }}>Save</button>
-                  <button onClick={()=>{ setScriptEdits(s=>({...s,[editKey]:originalText})); setEditingKey(null); }} style={{ ...B, fontSize:12, padding:"6px 16px", background:"transparent", color:"#7d9ab5", border:"1px solid #21262d", borderRadius:6 }}>Reset</button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div style={{ padding:"18px 22px 8px", fontSize:16, color:"#eef2f7", lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{displayText}</div>
-                <div style={{ padding:"0 22px 14px" }}>
-                  <button onClick={e=>{ e.stopPropagation(); setEditingKey(key); }} style={{ ...B, fontSize:11, padding:"4px 12px", background:"transparent", color:"#4d6478", border:"1px solid #21262d", borderRadius:5, fontWeight:600 }}>✎ Edit</button>
-                </div>
-                {r.note && coachingVisible && <div style={{ margin:"0 22px 16px", fontSize:14, color:"#7d9ab5", lineHeight:1.75, background:"#111c28", padding:"12px 16px", borderRadius:8, borderLeft:`3px solid ${tc.badge}` }}>{r.note}</div>}
-              </div>
-            )}
-          </div>
+      <div style={{ marginBottom:20, paddingLeft:14, borderLeft:`2px solid ${accent}50` }}>
+        <div style={{ fontSize:11, fontWeight:700, color:accent, letterSpacing:"0.07em", textTransform:"uppercase", marginBottom:8, opacity:0.8 }}>{r.label}</div>
+        <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
+        {r.note && coachingVisible && (
+          <div style={{ marginTop:10, fontSize:12, color:C.textSecondary, lineHeight:1.65, background:"#111c28", padding:"10px 14px", borderRadius:7, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
         )}
       </div>
     );
@@ -411,8 +374,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("deal-scope")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + move to Deal Scope</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
 
@@ -431,8 +394,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("deal-scope")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + move to Deal Scope</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
 
@@ -462,8 +425,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>
-          <button onClick={()=>setActiveStage("deal-scope")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + move to Deal Scope</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
       </div>
@@ -471,37 +434,6 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
   }
 
   const STAGE_DATA = {
-    "deal-scope": {
-      rule: "Size the deal early. Ask lightly — the answers shape your pricing and everything downstream.",
-      rhythm: [
-        { type:"transition", label:"0 — Frame it first (say this once)", text: "Before we get too deep — I find it helpful to get a quick lay of the land on your side. Just a few things that'll help me make sure I'm thinking about this the right way. Mind if I ask?", note: "This turns what follows from interrogation to curiosity. Say it once — no need to re-intro each question." },
-        { type:"ask", label:"1 — Who's involved", text: "Who's typically involved in creating and sending documents — and roughly how many people?", note: "Gets you headcount for licensing scope. Don't anchor with a number first — let them." },
-        { type:"ask", label:"2 — Other departments", text: "What other departments do you think would be positively impacted from using a tool like PandaDoc?", note: "Expands scope beyond the obvious team. Sales reps often undercount Legal, Finance, HR, CS." },
-        { type:"ask", label:"3 — Volume", text: "Ballpark — how many documents go out in a typical month?", note: "Volume shapes the ROI math you'll do later. Get a number even if rough." },
-        { type:"ask", label:"4 — Templates", text: "How many templates do you think you'd need to start?", note: "Template count signals complexity and onboarding scope. High count = longer ramp. Feeds a PS conversation." },
-        { type:"ask", label:"5 — Process", text: "Walk me through your document process start to finish — what types go out, in what format, and where do they end up?", note: "Open-ended — let them describe it. The friction almost always surfaces here without you having to ask." },
-        { type:"ask", label:"6 — Current tool", text: "What are you using today to create and send documents?", note: "Tells you the competitive landscape and switching cost. Listen for: Google Docs, Word, DocuSign standalone, or nothing." },
-        { type:"ask", label:"7 — Integrations", text: "What else would you want this to plug into?", note: "CRM is usually first. Dig for HRIS, billing, project management. Each integration = stickiness and complexity." },
-        { type:"ask", label:"8 — Internal approval", text: "Does anyone need to approve internally before a document goes out?", note: "Approval workflows = higher tier product need. If yes, this is a feature conversation, not just seat count." },
-        { type:"ask", label:"9 — Audience", text: "Are you typically sending to one person or a buying committee?", note: "Committee = more complex signature workflows. Also hints at use cases beyond simple e-sign." },
-        { type:"ask", label:"10 — Engagement tracking", text: "Once it's out the door — how do you track engagement and manage follow-ups?", note: "Most say 'I don't' or 'I just call.' Sets up the document analytics conversation perfectly." },
-        { type:"ask", label:"11 — Metric callback", text: "To what extent would it be helpful in improving [metric they shared is struggling] — to be able to act the second they've opened it?", note: "Ties document analytics to their stated metric. This is the moment it goes from feature to solution." },
-        { type:"ask", label:"12 — Proposals (if sales)", text: "How do you make your proposals stand out from the competition?", note: "Only if they're in sales. Opens the content library, brand, and interactive pricing conversation." },
-        { type:"ask", label:"13 — Security + compliance", text: "Any compliance, security, or data residency requirements we should know about?", note: "One question covers all three. If yes — get specific before promising anything. HIPAA, SOC2, GDPR vary by plan." },
-        { type:"ask", label:"14 — Notary (if legal)", text: "Ever need notarization?", note: "Only if they're in legal, real estate, or similar. PandaDoc Notary is a separate SKU — don't introduce it unless relevant." },
-      ],
-      tips: [
-        "Frame these questions as 'getting a lay of the land' — one soft intro covers all of them.",
-        "Volume + team size early gives you the ROI math foundation for later.",
-        "The metric callback (card 11) is the moment deal scope connects to their pain — don't skip it.",
-        "Cards 12 and 14 are conditional — use judgment on whether they apply.",
-      ],
-      watch: [
-        "Running through these as a checklist — ask, pause, react genuinely before moving on",
-        "Skipping the frame at card 0 — without it, cards 1-4 feel like a questionnaire",
-        "Asking the metric callback before you have a metric — wait for it to surface naturally first",
-      ],
-    },
     "business-problem": {
       bridgeBanner: true,
       rule:"Summarize what you heard. Prioritize. Validate it is a raging fire. Summarize before moving on.",
@@ -517,30 +449,38 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       watch:["Stopping at the first answer — it is almost always a symptom","Moving on before validating priority","Happy ears — getting excited before validating it is a raging fire"],
     },
     "current-process": {
-      rule:"Map where they are today. The metric will surface naturally. Don't hunt for it.",
+      rule:"Map where they are today. Scope the deal as you go. The metric will surface naturally.",
       rhythm:[
-        { type:"ask", label:"1 — Time to build", text:"One thing I want to zero in on — how long does that process actually take, from the moment someone starts building a document to when it lands in the recipient's inbox?", note:"Get the number. Everything else builds from here. If they give a range — take the midpoint and use it. They already described the process in Deal Scope — this is about isolating the time cost." },
-        { type:"ask", label:"2 — Active listening reminders", alts:["Hear a number → mirror it back. '3 hours?' [silence — they almost always elaborate upward]","Hear 'lost a deal' → 'What's the average deal size?' then 'Is this something that happens often or was that a rare one-off?'","Hear any number → mirror it, go silent, let them elaborate. The elaboration is always bigger than the original.","Hear '45 minutes' → 'What about that process is taking 45 minutes?' — find where the time goes"], note:"This is a behavior card not a script. When they give you something significant — slow down. React genuinely. The number they elaborate to is almost always bigger than what they said first." },
-        { type:"ask", label:"3 — Baseline expectation", text:"So [X minutes] today — how does that compare to where you or your leadership team would want it to be?", note:"Get their expectation before you show them the delta. The gap between where they are and where they want to be is the business case." },
-        { type:"ask", label:"4 — ROI math (Orlob-softened)", text:"So if I'm doing the math right — [X] reps from what you shared, [Y] agreements a month, [Z] minutes each — that's roughly [total hours] a month just in the process itself. That's a lot of time that could go back to selling. Any big revenue goals on the horizon that your team could put that time toward?", note:"You already have team size and volume from Deal Scope — plug those in before you get here. Let the number speak. Don't pitch. Just do the math out loud and ask what they'd do with the time back." },
-        { fallback:true, type:"ask", label:"5 — Find the friction", alts:["Every process has at least one part that tends to be more painful than the rest — where does yours tend to break down?","When things go sideways in that process — what usually causes it?","What part of that takes a little longer than it probably should?"], note:"Hughes: complaint bait. Only use this if they haven't already told you where it breaks down. They identify the friction themselves — which means they own it." },
-        { fallback:true, type:"ask", label:"6 — Lego technique", alts:["It sounds like a lot of the friction is on the front end — getting the thing built and out the door. [pause] And then separately, once it's out there's not a lot of visibility. [pause — let them connect it]","So there's the creation side, and then there's what happens after. Which one causes more pain day to day?"], note:"Hughes: lay two pieces on the table, never connect them. Their brain connects them and the conclusion feels like their own. Only use this if the friction hasn't surfaced naturally." },
-        { fallback:true, type:"ask", label:"7 — Root cause context", text:"Before I get a deeper understanding — is this something that's been a known issue internally, or is it kind of just how things have always been done and nobody's really questioned it?", note:"Tells you how much urgency already exists internally. Accepted norm = lower urgency. Known problem = higher urgency. Changes how hard you need to push on cost of inaction." },
-        { fallback:true, type:"ask", label:"8 — Metric fallback", alts:["Help me understand — what number would move the most if you solved this?","What metric is suffering as a result of what you've shared with me?"], note:"Orlob Script #6. Only use this if you don't have a number yet. If you asked the active listening questions well the number already came out. This is the safety net." },
-        { fallback:true, type:"ask", label:"9 — Trajectory", text:"Has it always been that way — or is it getting better, getting worse, or staying flat?", note:"Trajectory changes urgency. Getting worse fast = raging fire. Flat forever = they've accepted it. Getting better = find out why and whether it's sustainable." },
-        { type:"summarize", label:"10 — Summarize", text:"Let me see if I've understood you so far. [Problem in their words + the metric + where it stands today + trajectory.] Did I get that right?", note:"Their exact words — never paraphrase. When they say that's right you have alignment." },
-        { type:"validate", label:"11 — Validate priority", text:"Is this the problem we should anchor the rest of our conversation to — or is there something more pressing I should know about?", note:"Ask this before you move to Negative Impact. Better to know now than three weeks into a deal that goes dark." },
+        { type:"ask", label:"1 — Map the process", text:"Thanks for sharing all of that. What I'd love to do now is zoom out and talk about the actual process — from draft to signature. Walk me through that.", note:"Open, neutral. Don't name what you expect to find. Get them talking, then stop." },
+        { type:"ask", label:"2 — Time to build", text:"How long does that process take — from the moment someone starts building to when it lands in the prospect's inbox?", note:"Get the number. Everything else builds from here. If they give a range — take the midpoint." },
+        { type:"ask", label:"3 — Who's involved + volume", text:"And how many people on your team are doing this? Ballpark — how many documents go out in a typical month?", note:"Team size × volume × time = the real scope. You need all three for the ROI math." },
+        { type:"ask", label:"4 — Current tool", text:"What are you using today to create and send them?", note:"Tells you competitive landscape and switching cost. Listen for: Google Docs, Word, DocuSign standalone, or nothing." },
+        { type:"ask", label:"5 — Baseline expectation", text:"So [X minutes] today — how does that compare to where you or your leadership team would want it to be?", note:"Get their expectation before you show the delta. The gap is the business case." },
+        { type:"ask", label:"6 — ROI math", text:"So if I'm doing the math right — [X] reps, [Y] agreements a month, [Z] minutes each — that's roughly [total hours] a month just in the process itself. That's a lot of time that could go back to selling. Any big revenue goals on the horizon your team could put that time toward?", note:"Let the number speak. Don't pitch. Do the math out loud and ask what they'd do with the time back." },
+        { type:"summarize", label:"7 — Summarize", text:"Let me see if I've understood you so far. [Problem in their words + the metric + where it stands today + trajectory.] Did I get that right?", note:"Their exact words — never paraphrase. When they say that's right you have alignment." },
+        { type:"validate", label:"8 — Validate priority", text:"Is this the problem we should anchor the rest of our conversation to — or is there something more pressing I should know about?", note:"Ask this before you move to Negative Impact. Better to know now than three weeks into a deal that goes dark." },
+        { fallback:true, type:"ask", label:"Integrations", text:"What else would you want this to plug into?", note:"CRM is usually first. Dig for HRIS, billing, project management. Each integration = stickiness." },
+        { fallback:true, type:"ask", label:"Approval workflow", text:"Does anyone need to approve internally before a document goes out?", note:"Approval workflows = higher tier product need. If yes, this is a feature conversation, not just seat count." },
+        { fallback:true, type:"ask", label:"Audience", text:"Are you typically sending to one person or a buying committee?", note:"Committee = more complex signature workflows." },
+        { fallback:true, type:"ask", label:"Engagement + metric callback", alts:["Once it's out the door — how do you track engagement and manage follow-ups?","To what extent would it be helpful in improving [metric they shared] — to be able to act the second they've opened it?"], note:"Set up document analytics. Tie it to their stated metric." },
+        { fallback:true, type:"ask", label:"Other departments", text:"What other departments do you think would be positively impacted from using a tool like PandaDoc?", note:"Expands scope beyond the obvious team. Sales reps often undercount Legal, Finance, HR, CS." },
+        { fallback:true, type:"ask", label:"Templates", text:"How many templates do you think you'd need to start?", note:"High count = longer ramp. Feeds a PS conversation." },
+        { fallback:true, type:"ask", label:"Security + compliance", text:"Any compliance, security, or data residency requirements we should know about?", note:"One question covers all three. HIPAA, SOC2, GDPR vary by plan." },
+        { fallback:true, type:"ask", label:"Proposals (if sales)", text:"How do you make your proposals stand out from the competition?", note:"Only if they're in sales. Opens content library, brand, and interactive pricing." },
+        { fallback:true, type:"ask", label:"Notary (if legal)", text:"Ever need notarization?", note:"Only if legal, real estate, or similar. PandaDoc Notary is a separate SKU." },
+        { fallback:true, type:"ask", label:"Find the friction", alts:["Every process has at least one part that's more painful than the rest — where does yours break down?","When things go sideways — what usually causes it?"], note:"Hughes: complaint bait. Only use if friction hasn't surfaced naturally." },
+        { fallback:true, type:"ask", label:"Lego technique", alts:["It sounds like a lot of the friction is on the front end — getting the thing built and out the door. [pause] And then separately, once it's out there's not a lot of visibility. [pause]","So there's the creation side, and then there's what happens after. Which one causes more pain day to day?"], note:"Hughes: lay two pieces on the table, never connect them. Their brain connects them." },
+        { fallback:true, type:"ask", label:"Trajectory", text:"Has it always been that way — or is it getting better, worse, or staying flat?", note:"Trajectory changes urgency. Getting worse fast = raging fire." },
       ],
       tips:[
         "The metric will surface naturally if you ask the active listening questions well. Don't hunt for it.",
-        "Team size and volume are already captured in Deal Scope — plug them into the ROI math before you get here.",
-        "The baseline expectation question (where do you want it to be) is more important than the current state question. The gap is the business case.",
-        "Trajectory changes everything. A metric in freefall has different urgency than one that's been flat for years.",
+        "Team size × volume × time per doc = the real scope. Get all three before the ROI math.",
+        "The baseline expectation (where do you want it to be) is more important than the current state. The gap is the business case.",
       ],
       watch:[
-        "Re-asking about process or team size — you have that from Deal Scope, reference it instead",
-        "Hunting for the metric with a direct question — let it surface naturally through the active listening moves",
-        "Moving to Negative Impact without validating priority — you might be anchoring to the wrong problem",
+        "Hunting for the metric with a direct question — let it surface through active listening",
+        "Moving to Negative Impact without validating priority",
+        "Re-asking things they already told you in the word vomit — reference it instead",
       ],
     },
     "cause-analysis": {
@@ -712,14 +652,14 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
               </div>
             )}
             <div style={{ fontSize:20, fontWeight:700, color:"#eef2f7", letterSpacing:"-0.02em", lineHeight:1.2 }}>
-              {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","deal-scope":"Deal Scope","current-process":"Current State","business-problem":"Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Decision","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
+              {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","current-process":"Current State","business-problem":"Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Decision","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
             </div>
             <div style={{ fontSize:13, color:C.textMuted, marginTop:3 }}>
-              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","deal-scope":"Size the deal early. Ask lightly — the answers shape your pricing and everything downstream.","current-process":"Mutual understanding of where they are today.","business-problem":"Identify and validate THE business problem.","cause-analysis":"Mutually identify the true root cause.","negative-impact":"Explore impact, consequences, and negative ramifications.","future-state":"Desired outcomes, buying process, and the WHY behind it.","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
+              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","current-process":"Mutual understanding of where they are today.","business-problem":"Identify and validate THE business problem.","cause-analysis":"Mutually identify the true root cause.","negative-impact":"Explore impact, consequences, and negative ramifications.","future-state":"Desired outcomes, buying process, and the WHY behind it.","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
             </div>
           </div>
           <div style={{ display:"flex", gap:8, alignItems:"center", flexShrink:0 }}>
-            <button onClick={()=>setCoachingVisible(v=>!v)} style={{ ...B, fontSize:11, padding:"6px 12px", border:`1px solid ${C.border}`, borderRadius:6, background:coachingVisible?C.emeraldLight:C.white, color:coachingVisible?C.emerald:C.textMuted, fontWeight:600 }}>{coachingVisible?"Coaching on":"Coaching off"}</button>
+            <button onClick={()=>setCoachingVisible(v=>!v)} style={{ ...B, fontSize:11, padding:"6px 12px", border:`1px solid ${C.border}`, borderRadius:6, background:coachingVisible?C.emeraldLight:C.white, color:coachingVisible?C.emerald:C.textMuted, fontWeight:600 }}>{coachingVisible?"Hide notes":"Show notes"}</button>
             {showOutputsShortcut && <button onClick={()=>setActiveStage("outputs")} style={{ ...B, fontSize:12, padding:"8px 16px", border:`2px solid ${C.emerald}`, borderRadius:7, background:"transparent", color:C.emerald, fontWeight:700 }}>✦ Outputs</button>}
             {currentIdx > 0 && <button onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} style={{ ...B, fontSize:22, padding:"6px 14px", border:`1px solid ${C.border}`, borderRadius:7, background:C.white, color:C.textMuted, fontWeight:500, lineHeight:1 }}>←</button>}
             {currentIdx < STAGES.length-1 && <button onClick={()=>setActiveStage(STAGES[currentIdx+1].id)} style={{ ...B, fontSize:22, padding:"6px 16px", border:"none", borderRadius:7, background:C.emerald, color:C.white, fontWeight:700, lineHeight:1 }}>→</button>}
