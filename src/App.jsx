@@ -286,11 +286,16 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       validate: "#8060d0",
       transition: "#5b8fd4",
     };
+    const typeTag = { ask:"Question", wallow:"Wallow", segue:"Segue", summarize:"Summarize", validate:"Validate", transition:"Transition" };
     const accent = typeAccent[r.type] || C.emerald;
+    const tag = typeTag[r.type] || "Question";
     const text = r.text || (r.alts ? r.alts.join("\n\n— or —\n\n") : "");
     return (
       <div style={{ marginBottom:20, paddingLeft:14, borderLeft:`2px solid ${accent}50` }}>
-        <div style={{ fontSize:11, fontWeight:700, color:accent, letterSpacing:"0.07em", textTransform:"uppercase", marginBottom:8, opacity:0.8 }}>{r.label}</div>
+        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+          <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background:accent, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>{tag}</span>
+          <span style={{ fontSize:15, fontWeight:800, color:"#f2deb8", letterSpacing:"-0.02em", fontStyle:"italic" }}>{r.label}</span>
+        </div>
         <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
         {r.note && coachingVisible && (
           <div style={{ marginTop:10, fontSize:12, color:C.textSecondary, lineHeight:1.65, background:"#111c28", padding:"10px 14px", borderRadius:7, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
