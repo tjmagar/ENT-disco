@@ -161,6 +161,7 @@ export default function App() {
   const [briefFields, setBriefFields] = useState({ prospect:"", company:"", role:"", tool:"", reps:"", volume:"", timePerDoc:"", metric:"", pain:"", integrations:"", approval:"" });
   const [coveredCards, setCoveredCards] = useState({});
   const [briefParsing, setBriefParsing] = useState(false);
+  const [briefParseStatus, setBriefParseStatus] = useState("");
   const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
@@ -273,43 +274,43 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
   async function parseBrief() {
     if (!prepBrief.trim()) return;
     setBriefParsing(true);
+    setBriefParseStatus("");
     try {
-      const res = await fetch("/api/claude", {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
         method:"POST",
-        headers:{"Content-Type":"application/json"},
+        headers:{
+          "Content-Type":"application/json",
+          "x-api-key":"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",
+          "anthropic-version":"2023-06-01",
+          "anthropic-dangerous-direct-browser-access":"true"
+        },
         body: JSON.stringify({
-          model:"claude-sonnet-4-20250514",
-          max_tokens:400,
-          system:"You are a data extractor. Extract structured fields from a sales prep brief. Return ONLY valid JSON, no explanation, no markdown.",
-          messages:[{ role:"user", content:`Extract these fields from the brief below. Return ONLY a raw JSON object with these exact keys. Use empty string "" for anything not found. Numbers should be strings (not integers).
+          model:"claude-haiku-4-5",
+          max_tokens:600,
+          system:"You extract structured fields from sales prep briefs. Return ONLY a valid JSON object, no markdown, no explanation.",
+          messages:[{ role:"user", content:`Extract fields from this brief. Return ONLY a JSON object with these keys (use "" for anything not found):
 
-Keys: prospect, company, role, tool, reps, volume, timePerDoc, metric, integrations, approval, pain
-
-- prospect: first name of the contact
-- company: company name
-- role: their job title
-- tool: current tool(s) they use for documents/signatures
-- reps: number of people on the team sending documents (just the number as a string)
-- volume: documents sent per month (just the number as a string)
-- timePerDoc: minutes per document today (just the number as a string)
-- metric: the business metric they care about (e.g. win rate, close rate, revenue)
-- integrations: tools they'd want to connect to (CRM, etc.)
-- approval: any approval process mentioned
-- pain: their core pain in 1 short sentence
+prospect, company, role, tool, reps, volume, timePerDoc, metric, integrations, approval, pain
 
 BRIEF:
 ${prepBrief}` }]
         })
       });
       const data = await res.json();
-      const raw = data.content?.[0]?.text || "{}";
-      const json = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] || "{}");
+      const raw = data.content?.[0]?.text || "";
+      if (!raw) { setBriefParseStatus("error: no response — " + JSON.stringify(data).slice(0,100)); setBriefParsing(false); return; }
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (!match) { setBriefParseStatus("error: couldn't parse JSON from: " + raw.slice(0,80)); setBriefParsing(false); return; }
+      const json = JSON.parse(match[0]);
       setBriefFields(prev => {
         const merged = { ...prev };
         Object.keys(merged).forEach(k => { if (json[k]) merged[k] = json[k]; });
         return merged;
       });
-    } catch(e) { console.error("Brief parse failed", e); }
+      setBriefParseStatus("ok");
+    } catch(e) {
+      setBriefParseStatus("error: " + e.message);
+    }
     setBriefParsing(false);
   }
 
@@ -832,7 +833,9 @@ ${prepBrief}` }]
                       </div>
                     ))}
                   </div>
-                  {Object.values(briefFields).some(v => v) && (
+                  {briefParseStatus === "ok" && <div style={{ marginTop:12, padding:"7px 14px", background:"#0f2b1e", borderRadius:8, border:"1px solid #4a9e78", fontSize:12, color:"#4a9e78", fontWeight:600 }}>✓ Fields populated from brief</div>}
+                  {briefParseStatus.startsWith("error") && <div style={{ marginTop:12, padding:"7px 14px", background:"#1e1010", borderRadius:8, border:"1px solid #e05c5c", fontSize:11, color:"#e05c5c", fontWeight:500, wordBreak:"break-all" }}>{briefParseStatus}</div>}
+                  {Object.values(briefFields).some(v => v) && briefParseStatus !== "ok" && (
                     <div style={{ marginTop:14, padding:"8px 14px", background:"#0f2b1e", borderRadius:8, border:"1px solid #4a9e78", fontSize:12, color:"#4a9e78", fontWeight:600 }}>
                       ✓ Intel loaded — matching cards will show pre-answered during the call
                     </div>
