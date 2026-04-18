@@ -282,10 +282,21 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         body: JSON.stringify({
           model:"claude-sonnet-4-20250514",
           max_tokens:600,
-          system:"You extract structured fields from sales prep briefs. Return ONLY a valid JSON object, no markdown, no explanation.",
-          messages:[{ role:"user", content:`Extract fields from this brief. Return ONLY a JSON object with these keys (use "" for anything not found):
+          system:"You extract structured fields from sales prep briefs. Only populate fields that are EXPLICITLY stated — do not infer or guess. Return ONLY a valid JSON object, no markdown, no explanation.",
+          messages:[{ role:"user", content:`Extract ONLY explicitly stated fields. If something is not clearly written in the brief, use "". Do not infer, guess, or calculate.
 
-prospect, company, role, tool, reps, volume, timePerDoc, metric, integrations, approval, pain
+Return a JSON object with these keys:
+- prospect: first name only (explicit)
+- company: company name (explicit)
+- role: their exact job title (explicit)
+- tool: current doc/sign tool explicitly named
+- reps: number of people sending docs — digits only e.g. "15", NOT words like "fifteen". Use "" if not a specific number
+- volume: docs per month — digits only. Use "" if not stated
+- timePerDoc: minutes per doc — digits only. Use "" if not stated
+- metric: business metric they explicitly care about (e.g. "win rate"). Use "" if not stated
+- integrations: tools explicitly mentioned for integration
+- approval: approval process if explicitly described
+- pain: one sentence summary of their stated pain
 
 BRIEF:
 ${prepBrief}` }]
