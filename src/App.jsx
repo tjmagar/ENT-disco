@@ -161,6 +161,7 @@ export default function App() {
   const [briefFields, setBriefFields] = useState({ prospect:"", company:"", role:"", tool:"", reps:"", volume:"", timePerDoc:"", metric:"", pain:"", integrations:"", approval:"" });
   const [coveredCards, setCoveredCards] = useState({});
   const [briefParsing, setBriefParsing] = useState(false);
+  const [questionnaireText, setQuestionnaireText] = useState("");
   const [briefParseStatus, setBriefParseStatus] = useState("");
   const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
@@ -272,7 +273,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
   function copyText(t) { navigator.clipboard.writeText(t); }
 
   async function parseBrief() {
-    if (!prepBrief.trim()) return;
+    const combinedText = [prepBrief, questionnaireText].filter(s => s.trim()).join("\n\n---\n\n");
+    if (!combinedText.trim()) return;
     setBriefParsing(true);
     setBriefParseStatus("");
     try {
@@ -282,8 +284,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
         body: JSON.stringify({
           model:"claude-sonnet-4-20250514",
           max_tokens:600,
-          system:"You extract structured fields from sales prep briefs. Only populate fields that are EXPLICITLY stated — do not infer or guess. Return ONLY a valid JSON object, no markdown, no explanation.",
-          messages:[{ role:"user", content:`Extract ONLY explicitly stated fields. If something is not clearly written in the brief, use "". Do not infer, guess, or calculate.
+          system:"You extract structured fields from sales prep briefs and questionnaire answers. Only populate fields that are EXPLICITLY stated — do not infer or guess. Return ONLY a valid JSON object, no markdown, no explanation.",
+          messages:[{ role:"user", content:`Extract ONLY explicitly stated fields from the text below (may include a prep brief and/or questionnaire answers separated by ---). If something is not clearly written, use "". Do not infer, guess, or calculate.
 
 Return a JSON object with these keys:
 - prospect: first name only (explicit)
@@ -298,8 +300,8 @@ Return a JSON object with these keys:
 - approval: approval process if explicitly described
 - pain: one sentence summary of their stated pain
 
-BRIEF:
-${prepBrief}` }]
+TEXT:
+${combinedText}` }]
         })
       });
       const data = await res.json();
@@ -340,7 +342,10 @@ ${prepBrief}` }]
     if (l.includes("integration"))   return briefFields.integrations;
     if (l.includes("approval"))      return briefFields.approval;
     if (l.includes("6 —") || l.includes("roi math")) {
-      const p = [briefFields.reps && `${briefFields.reps}`, briefFields.volume && `${briefFields.volume}/mo`, briefFields.timePerDoc && `${briefFields.timePerDoc} min each`, briefFields.metric && `→ ${briefFields.metric}`].filter(Boolean);
+      // Only auto-cover ROI if we have enough to actually compute math (reps + volume or reps + timePerDoc)
+      const hasMinROI = briefFields.reps && (briefFields.volume || briefFields.timePerDoc);
+      if (!hasMinROI) return "";
+      const p = [briefFields.reps && `${briefFields.reps} reps`, briefFields.volume && `${briefFields.volume}/mo`, briefFields.timePerDoc && `${briefFields.timePerDoc} min each`, briefFields.metric && `→ ${briefFields.metric}`].filter(Boolean);
       return p.join(", ");
     }
     return "";
@@ -372,8 +377,8 @@ ${prepBrief}` }]
     const text = fillTemplate(rawText);
     const cardKey = `${prefix}-${idx}`;
     const briefVal = getCardBriefValue(r.label || "");
-    const manualCovered = coveredCards[cardKey];
-    const isCovered = manualCovered || !!(briefVal && briefVal.trim());
+    const cardState = coveredCards[cardKey]; // true = manually marked, false = dismissed
+    const isCovered = cardState === true;
 
     if (isCovered) return (
       <div style={{ marginBottom:8, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 12px", borderRadius:8, background:"#0a1f15", border:"1px solid #1a4a30" }}>
@@ -382,7 +387,7 @@ ${prepBrief}` }]
           <span style={{ fontSize:13, fontWeight:700, color:"#4a9e78", fontStyle:"italic" }}>{r.label}</span>
           {briefVal && <span style={{ fontSize:11, color:"#2a7a50" }}>— {briefVal}</span>}
         </div>
-        <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: !s[cardKey] }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:"1px solid #1a4a30", background:"transparent", color:"#2a7a50", fontWeight:600, flexShrink:0 }}>↩ unmark</button>
+        <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: false }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:"1px solid #1a4a30", background:"transparent", color:"#2a7a50", fontWeight:600, flexShrink:0 }}>↩ unmark</button>
       </div>
     );
 
@@ -393,7 +398,7 @@ ${prepBrief}` }]
             <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background:accent, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>{tag}</span>
             <span style={{ fontSize:15, fontWeight:800, color:"#f2deb8", letterSpacing:"-0.02em", fontStyle:"italic" }}>{r.label}</span>
           </div>
-          <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: !s[cardKey] }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:`1px solid ${C.border}`, background:"transparent", color:C.textMuted, fontWeight:600, flexShrink:0 }}>✓ mark covered</button>
+          <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: true }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:`1px solid ${C.border}`, background:"transparent", color:C.textMuted, fontWeight:600, flexShrink:0 }}>✓ mark covered</button>
         </div>
         <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
         {r.note && coachingVisible && (
@@ -804,16 +809,16 @@ ${prepBrief}` }]
                 <div style={{ background:"#16122a", border:"1.5px solid #4a3a9a", borderRadius:12, padding:20, marginBottom:16 }}>
                   <div style={{ fontSize:13, fontWeight:700, color:"#9a80e0", marginBottom:12 }}>Pre-Call Intel</div>
                   <div style={{ marginBottom:12 }}>
-                    <div style={{ fontSize:10, color:"#7060b0", fontWeight:700, marginBottom:6, textTransform:"uppercase", letterSpacing:"0.07em" }}>Paste prep brief or questionnaire → auto-fill fields</div>
+                    <div style={{ fontSize:10, color:"#7060b0", fontWeight:700, marginBottom:6, textTransform:"uppercase", letterSpacing:"0.07em" }}>Paste questionnaire answers (brief goes above ↑) → auto-fill fields</div>
                     <div style={{ display:"flex", gap:8 }}>
                       <textarea
-                        value={prepBrief}
-                        onChange={e => setPrepBrief(e.target.value)}
-                        placeholder="Paste your call brief or questionnaire answers here..."
+                        value={questionnaireText}
+                        onChange={e => setQuestionnaireText(e.target.value)}
+                        placeholder="Paste questionnaire answers or additional context here..."
                         rows={3}
                         style={{ flex:1, fontSize:12, padding:"8px 12px", border:"1.5px solid #4a3a9a", borderRadius:7, background:"#111c28", color:"#eef2f7", resize:"none", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
                       />
-                      <button onClick={parseBrief} disabled={briefParsing || !prepBrief.trim()} style={{ ...B, fontSize:12, padding:"0 16px", borderRadius:7, border:"none", background: briefParsing ? "#163d2a" : !prepBrief.trim() ? "#2a2040" : C.emerald, color: !prepBrief.trim() ? "#5a4a80" : "#fff", fontWeight:700, whiteSpace:"nowrap", alignSelf:"stretch" }}>
+                      <button onClick={parseBrief} disabled={briefParsing || (!prepBrief.trim() && !questionnaireText.trim())} style={{ ...B, fontSize:12, padding:"0 16px", borderRadius:7, border:"none", background: briefParsing ? "#163d2a" : (!prepBrief.trim() && !questionnaireText.trim()) ? "#2a2040" : C.emerald, color: (!prepBrief.trim() && !questionnaireText.trim()) ? "#5a4a80" : "#fff", fontWeight:700, whiteSpace:"nowrap", alignSelf:"stretch" }}>
                         {briefParsing ? "Parsing..." : "⚡ Auto-fill"}
                       </button>
                     </div>
