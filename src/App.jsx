@@ -336,8 +336,9 @@ ${combinedText}` }]
     if (l.includes("4 —") || l.includes("current tool"))       return briefFields.tool;
     if (l.includes("2 —") || l.includes("time to build"))      return briefFields.timePerDoc ? `${briefFields.timePerDoc} min to build` : "";
     if (l.includes("3 —") || l.includes("who's involved")) {
-      const p = [briefFields.reps && `${briefFields.reps}`, briefFields.volume && `${briefFields.volume} docs/mo`].filter(Boolean);
-      return p.join(", ");
+      // Only show hint if we have BOTH team size and volume — one alone isn't the full picture
+      if (!briefFields.reps || !briefFields.volume) return "";
+      return `${briefFields.reps} reps, ${briefFields.volume} docs/mo`;
     }
     if (l.includes("integration"))   return briefFields.integrations;
     if (l.includes("approval"))      return briefFields.approval;
@@ -376,7 +377,6 @@ ${combinedText}` }]
     const rawText = r.text || (r.alts ? r.alts.join("\n\n— or —\n\n") : "");
     const text = fillTemplate(rawText);
     const cardKey = `${prefix}-${idx}`;
-    const briefVal = getCardBriefValue(r.label || "");
     const cardState = coveredCards[cardKey]; // true = manually marked, false = dismissed
     const isCovered = cardState === true;
 
@@ -385,7 +385,6 @@ ${combinedText}` }]
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:99, background:"#4a9e78", color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>✓</span>
           <span style={{ fontSize:13, fontWeight:700, color:"#4a9e78", fontStyle:"italic" }}>{r.label}</span>
-          {briefVal && <span style={{ fontSize:11, color:"#2a7a50" }}>— {briefVal}</span>}
         </div>
         <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: false }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:"1px solid #1a4a30", background:"transparent", color:"#2a7a50", fontWeight:600, flexShrink:0 }}>↩ unmark</button>
       </div>
