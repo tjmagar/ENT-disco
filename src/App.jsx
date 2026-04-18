@@ -413,9 +413,13 @@ ${combinedText}` }]
         {noteOpen[cardKey] && (
           <textarea
             autoFocus
-            value={notes[cardKey] || ""}
-            onChange={e => setNotes(s => ({ ...s, [cardKey]: e.target.value }))}
-            onBlur={() => { if (!notes[cardKey]?.trim()) setNotes(s => { const n={...s}; delete n[cardKey]; return n; }); setNoteOpen(s => ({ ...s, [cardKey]: false })); }}
+            defaultValue={notes[cardKey] || ""}
+            onBlur={e => {
+              const val = e.target.value.trim();
+              if (!val) setNotes(s => { const n={...s}; delete n[cardKey]; return n; });
+              else setNotes(s => ({ ...s, [cardKey]: val }));
+              setNoteOpen(s => ({ ...s, [cardKey]: false }));
+            }}
             placeholder="Add context or edit your approach for this card..."
             rows={2}
             style={{ marginTop:8, width:"100%", fontSize:12, padding:"8px 12px", border:"1.5px solid #4a3a9a", borderRadius:7, background:"#111c28", color:"#eef2f7", resize:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
