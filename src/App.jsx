@@ -276,16 +276,11 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
     setBriefParsing(true);
     setBriefParseStatus("");
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/claude", {
         method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          "x-api-key":"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",
-          "anthropic-version":"2023-06-01",
-          "anthropic-dangerous-direct-browser-access":"true"
-        },
+        headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
-          model:"claude-haiku-4-5",
+          model:"claude-sonnet-4-20250514",
           max_tokens:600,
           system:"You extract structured fields from sales prep briefs. Return ONLY a valid JSON object, no markdown, no explanation.",
           messages:[{ role:"user", content:`Extract fields from this brief. Return ONLY a JSON object with these keys (use "" for anything not found):
