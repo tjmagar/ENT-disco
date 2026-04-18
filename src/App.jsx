@@ -154,6 +154,8 @@ export default function App() {
   const [liveMode, setLiveMode] = useState(false);
   const [liveMeetingTitle, setLiveMeetingTitle] = useState("");
   const [liveAnalyzing, setLiveAnalyzing] = useState(false);
+  const [liveStatus, setLiveStatus] = useState(""); // status message shown in UI
+  const [liveLastPoll, setLiveLastPoll] = useState(null); // timestamp of last successful poll
   const liveLastLength = useRef(0);
   const cardRegistry = useRef({});
   const [prepBrief, setPrepBrief] = useState("");
@@ -323,18 +325,28 @@ If nothing is covered yet, return [].` }]
 
   useEffect(() => {
     if (!liveMode) return;
+    setLiveStatus("Connecting to bridge...");
     async function poll() {
       try {
         const res = await fetch('http://localhost:3001/transcript');
-        if (!res.ok) return;
+        if (!res.ok) { setLiveStatus(`Bridge error: HTTP ${res.status}`); return; }
         const data = await res.json();
-        if (data.error || !data.transcript) return;
+        if (data.error) { setLiveStatus(`Bridge error: ${data.error}`); return; }
+        if (!data.transcript) { setLiveStatus(`Connected — no transcript yet (is Granola recording?)`); return; }
         setLiveMeetingTitle(data.title || '');
-        if (data.transcript.length > liveLastLength.current + 200) {
-          liveLastLength.current = data.transcript.length;
-          analyzeLiveTranscript(data.transcript);
+        setLiveLastPoll(new Date());
+        const chars = data.transcript.length;
+        if (chars <= liveLastLength.current + 200) {
+          setLiveStatus(`Listening — ${data.title?.slice(0,30) || 'meeting'} — ${data.segments} segments, no new content`);
+        } else {
+          liveLastLength.current = chars;
+          setLiveStatus(`New transcript — analyzing ${data.segments} segments...`);
+          await analyzeLiveTranscript(data.transcript);
+          setLiveStatus(`✓ Analysis done — ${data.segments} segments, next check in 30s`);
         }
-      } catch(e) { /* bridge not running */ }
+      } catch(e) {
+        setLiveStatus(`Can't reach bridge — is "node bridge.js" running? (${e.message})`);
+      }
     }
     poll();
     const interval = setInterval(poll, 30000);
@@ -883,6 +895,15 @@ ${combinedText}` }]
             {currentIdx < STAGES.length-1 && <button onClick={()=>setActiveStage(STAGES[currentIdx+1].id)} style={{ ...B, fontSize:22, padding:"6px 16px", border:"none", borderRadius:7, background:C.emerald, color:C.white, fontWeight:700, lineHeight:1 }}>→</button>}
           </div>
         </div>
+
+        {/* LIVE STATUS BAR */}
+        {liveMode && (
+          <div style={{ padding:"6px 28px", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#2a0f0f" : "#0f1f0f", borderBottom:`1px solid ${liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#6b2020" : "#1a4a30"}`, display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
+            <span style={{ width:6, height:6, borderRadius:"50%", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#e05c5c" : "#4a9e78", display:"inline-block", flexShrink:0, animation:"pulse 1.5s infinite" }} />
+            <span style={{ fontSize:11, color: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#e05c5c" : "#4a9e78", fontWeight:500 }}>{liveStatus}</span>
+            {liveLastPoll && !liveStatus.startsWith("Can't") && <span style={{ fontSize:10, color:"#2a7a50", marginLeft:"auto" }}>Last checked {liveLastPoll.toLocaleTimeString()}</span>}
+          </div>
+        )}
 
         {/* BODY */}
         <div style={{ flex:1, display:"flex", overflow:"hidden" }}>
