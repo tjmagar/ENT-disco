@@ -334,13 +334,13 @@ ${prepBrief}` }]
     if (l.includes("4 —") || l.includes("current tool"))       return briefFields.tool;
     if (l.includes("2 —") || l.includes("time to build"))      return briefFields.timePerDoc ? `${briefFields.timePerDoc} min to build` : "";
     if (l.includes("3 —") || l.includes("who's involved")) {
-      const p = [briefFields.reps && `${briefFields.reps} reps`, briefFields.volume && `${briefFields.volume} docs/mo`].filter(Boolean);
+      const p = [briefFields.reps && `${briefFields.reps}`, briefFields.volume && `${briefFields.volume} docs/mo`].filter(Boolean);
       return p.join(", ");
     }
     if (l.includes("integration"))   return briefFields.integrations;
     if (l.includes("approval"))      return briefFields.approval;
     if (l.includes("6 —") || l.includes("roi math")) {
-      const p = [briefFields.reps && `${briefFields.reps} reps`, briefFields.volume && `${briefFields.volume}/mo`, briefFields.timePerDoc && `${briefFields.timePerDoc} min each`, briefFields.metric && `→ ${briefFields.metric}`].filter(Boolean);
+      const p = [briefFields.reps && `${briefFields.reps}`, briefFields.volume && `${briefFields.volume}/mo`, briefFields.timePerDoc && `${briefFields.timePerDoc} min each`, briefFields.metric && `→ ${briefFields.metric}`].filter(Boolean);
       return p.join(", ");
     }
     return "";
@@ -374,23 +374,28 @@ ${prepBrief}` }]
     const briefVal = getCardBriefValue(r.label || "");
     const manualCovered = coveredCards[cardKey];
     const isCovered = manualCovered || !!(briefVal && briefVal.trim());
+
+    if (isCovered) return (
+      <div style={{ marginBottom:8, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 12px", borderRadius:8, background:"#0a1f15", border:"1px solid #1a4a30" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:99, background:"#4a9e78", color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>✓</span>
+          <span style={{ fontSize:13, fontWeight:700, color:"#4a9e78", fontStyle:"italic" }}>{r.label}</span>
+          {briefVal && <span style={{ fontSize:11, color:"#2a7a50" }}>— {briefVal}</span>}
+        </div>
+        <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: !s[cardKey] }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:"1px solid #1a4a30", background:"transparent", color:"#2a7a50", fontWeight:600, flexShrink:0 }}>↩ unmark</button>
+      </div>
+    );
+
     return (
-      <div style={{ marginBottom:20, paddingLeft:14, borderLeft:`2px solid ${isCovered ? "#4a9e7880" : accent+"50"}`, opacity: isCovered ? 0.65 : 1, transition:"opacity 0.2s" }}>
+      <div style={{ marginBottom:20, paddingLeft:14, borderLeft:`2px solid ${accent}50` }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background: isCovered ? "#4a9e78" : accent, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>{isCovered ? "✓ Covered" : tag}</span>
-            <span style={{ fontSize:15, fontWeight:800, color: isCovered ? "#4a9e78" : "#f2deb8", letterSpacing:"-0.02em", fontStyle:"italic" }}>{r.label}</span>
+            <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background:accent, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>{tag}</span>
+            <span style={{ fontSize:15, fontWeight:800, color:"#f2deb8", letterSpacing:"-0.02em", fontStyle:"italic" }}>{r.label}</span>
           </div>
-          <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: !s[cardKey] }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:`1px solid ${manualCovered ? "#4a9e78" : C.border}`, background: manualCovered ? "#0f2b1e" : "transparent", color: manualCovered ? "#4a9e78" : C.textMuted, fontWeight:600, flexShrink:0 }}>
-            {manualCovered ? "↩ unmark" : "✓ mark covered"}
-          </button>
+          <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: !s[cardKey] }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:`1px solid ${C.border}`, background:"transparent", color:C.textMuted, fontWeight:600, flexShrink:0 }}>✓ mark covered</button>
         </div>
-        {briefVal && briefVal.trim() && (
-          <div style={{ fontSize:12, color:"#4a9e78", background:"#0a1f15", padding:"5px 12px", borderRadius:6, marginBottom:8, fontWeight:500, border:"1px solid #1a4a30" }}>
-            From brief: {briefVal}
-          </div>
-        )}
-        <div style={{ fontSize:15, color: isCovered ? C.textMuted : C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
+        <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
         {r.note && coachingVisible && (
           <div style={{ marginTop:10, fontSize:12, color:C.textSecondary, lineHeight:1.65, background:"#111c28", padding:"10px 14px", borderRadius:7, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
         )}
