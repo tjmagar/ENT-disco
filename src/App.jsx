@@ -150,6 +150,7 @@ export default function App() {
   const [buyerPath, setBuyerPath] = useState(null);
   const [callSource, setCallSource] = useState(null);
   const [notes, setNotes] = useState({});
+  const [noteOpen, setNoteOpen] = useState({});
   const [prepBrief, setPrepBrief] = useState("");
   const [openSpiced, setOpenSpiced] = useState(null);
   const [prepOpen, setPrepOpen] = useState(false);
@@ -402,6 +403,28 @@ ${combinedText}` }]
         <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
         {r.note && coachingVisible && (
           <div style={{ marginTop:10, fontSize:12, color:C.textSecondary, lineHeight:1.65, background:"#111c28", padding:"10px 14px", borderRadius:7, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
+        )}
+        {/* Per-card context note */}
+        {notes[cardKey] && !noteOpen[cardKey] && (
+          <div style={{ marginTop:8, fontSize:12, color:"#9a80e0", background:"#16122a", padding:"7px 12px", borderRadius:7, borderLeft:"2px solid #4a3a9a", cursor:"pointer" }} onClick={() => setNoteOpen(s => ({ ...s, [cardKey]: true }))}>
+            📝 {notes[cardKey]}
+          </div>
+        )}
+        {noteOpen[cardKey] && (
+          <textarea
+            autoFocus
+            value={notes[cardKey] || ""}
+            onChange={e => setNotes(s => ({ ...s, [cardKey]: e.target.value }))}
+            onBlur={() => { if (!notes[cardKey]?.trim()) setNotes(s => { const n={...s}; delete n[cardKey]; return n; }); setNoteOpen(s => ({ ...s, [cardKey]: false })); }}
+            placeholder="Add context or edit your approach for this card..."
+            rows={2}
+            style={{ marginTop:8, width:"100%", fontSize:12, padding:"8px 12px", border:"1.5px solid #4a3a9a", borderRadius:7, background:"#111c28", color:"#eef2f7", resize:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
+          />
+        )}
+        {!noteOpen[cardKey] && (
+          <button onClick={() => setNoteOpen(s => ({ ...s, [cardKey]: true }))} style={{ ...B, marginTop:6, fontSize:10, padding:"2px 8px", borderRadius:5, border:`1px solid ${C.border}`, background:"transparent", color:C.textMuted, fontWeight:600 }}>
+            {notes[cardKey] ? "✎ edit note" : "＋ note"}
+          </button>
         )}
       </div>
     );
