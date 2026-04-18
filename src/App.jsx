@@ -151,6 +151,11 @@ export default function App() {
   const [callSource, setCallSource] = useState(null);
   const [notes, setNotes] = useState({});
   const [noteOpen, setNoteOpen] = useState({});
+  const [liveMode, setLiveMode] = useState(false);
+  const [liveMeetingTitle, setLiveMeetingTitle] = useState("");
+  const [liveAnalyzing, setLiveAnalyzing] = useState(false);
+  const liveLastLength = useRef(0);
+  const cardRegistry = useRef({});
   const [prepBrief, setPrepBrief] = useState("");
   const [openSpiced, setOpenSpiced] = useState(null);
   const [prepOpen, setPrepOpen] = useState(false);
@@ -273,6 +278,69 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
 
   function copyText(t) { navigator.clipboard.writeText(t); }
 
+  // Live transcript analysis
+  async function analyzeLiveTranscript(transcript) {
+    const cards = Object.entries(cardRegistry.current);
+    if (!cards.length || !transcript.trim()) return;
+    setLiveAnalyzing(true);
+    try {
+      const cardList = cards.map(([key, label]) => `${key}|||${label}`).join('\n');
+      const res = await fetch('/api/claude', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 400,
+          system: 'You analyze sales call transcripts to determine which discovery topics have been covered. Be conservative — only mark something covered if it was clearly discussed.',
+          messages: [{ role: 'user', content: `Which of these discovery card topics were clearly covered in the transcript below? A topic is covered if it was asked OR organically answered by the prospect.
+
+TRANSCRIPT:
+${transcript}
+
+CARDS (cardKey|||label):
+${cardList}
+
+Return ONLY a JSON array of cardKeys that were clearly covered. Example: ["current-state-2", "business-problem-0"]
+If nothing is covered yet, return [].` }]
+        })
+      });
+      const data = await res.json();
+      const raw = data.content?.[0]?.text || '';
+      const match = raw.match(/\[[\s\S]*?\]/);
+      if (match) {
+        const coveredKeys = JSON.parse(match[0]);
+        if (Array.isArray(coveredKeys) && coveredKeys.length > 0) {
+          setCoveredCards(s => {
+            const next = { ...s };
+            coveredKeys.forEach(k => { if (next[k] !== false) next[k] = true; });
+            return next;
+          });
+        }
+      }
+    } catch(e) { console.error('live analyze error', e); }
+    setLiveAnalyzing(false);
+  }
+
+  useEffect(() => {
+    if (!liveMode) return;
+    async function poll() {
+      try {
+        const res = await fetch('http://localhost:3001/transcript');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.error || !data.transcript) return;
+        setLiveMeetingTitle(data.title || '');
+        if (data.transcript.length > liveLastLength.current + 200) {
+          liveLastLength.current = data.transcript.length;
+          analyzeLiveTranscript(data.transcript);
+        }
+      } catch(e) { /* bridge not running */ }
+    }
+    poll();
+    const interval = setInterval(poll, 30000);
+    return () => clearInterval(interval);
+  }, [liveMode]);
+
   async function parseBrief() {
     const combinedText = [prepBrief, questionnaireText].filter(s => s.trim()).join("\n\n---\n\n");
     if (!combinedText.trim()) return;
@@ -378,6 +446,7 @@ ${combinedText}` }]
     const rawText = r.text || (r.alts ? r.alts.join("\n\n— or —\n\n") : "");
     const text = fillTemplate(rawText);
     const cardKey = `${prefix}-${idx}`;
+    cardRegistry.current[cardKey] = r.label; // register for live transcript analysis
     const cardState = coveredCards[cardKey]; // true = manually marked, false = dismissed
     const isCovered = cardState === true;
 
@@ -801,6 +870,13 @@ ${combinedText}` }]
             </div>
           </div>
           <div style={{ display:"flex", gap:8, alignItems:"center", flexShrink:0 }}>
+            <button
+              onClick={() => { setLiveMode(v => !v); liveLastLength.current = 0; }}
+              style={{ ...B, fontSize:11, padding:"6px 12px", border:`1px solid ${liveMode ? "#e05c5c" : C.border}`, borderRadius:6, background:liveMode ? "#2a0f0f" : C.white, color:liveMode ? "#e05c5c" : C.textMuted, fontWeight:700, display:"flex", alignItems:"center", gap:5 }}
+            >
+              <span style={{ width:7, height:7, borderRadius:"50%", background:liveMode ? "#e05c5c" : C.textMuted, display:"inline-block", animation: liveMode ? "pulse 1.5s infinite" : "none" }} />
+              {liveAnalyzing ? "Analyzing..." : liveMode ? `Live${liveMeetingTitle ? ` — ${liveMeetingTitle.slice(0,20)}` : ""}` : "Go Live"}
+            </button>
             <button onClick={()=>setCoachingVisible(v=>!v)} style={{ ...B, fontSize:11, padding:"6px 12px", border:`1px solid ${C.border}`, borderRadius:6, background:coachingVisible?C.emeraldLight:C.white, color:coachingVisible?C.emerald:C.textMuted, fontWeight:600 }}>{coachingVisible?"Hide notes":"Show notes"}</button>
             {showOutputsShortcut && <button onClick={()=>setActiveStage("outputs")} style={{ ...B, fontSize:12, padding:"8px 16px", border:`2px solid ${C.emerald}`, borderRadius:7, background:"transparent", color:C.emerald, fontWeight:700 }}>✦ Outputs</button>}
             {currentIdx > 0 && <button onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} style={{ ...B, fontSize:22, padding:"6px 14px", border:`1px solid ${C.border}`, borderRadius:7, background:C.white, color:C.textMuted, fontWeight:500, lineHeight:1 }}>←</button>}
