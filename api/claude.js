@@ -5,7 +5,7 @@ export default async function handler(req) {
     return new Response('Method not allowed', { status: 405 })
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY || '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'
+  const apiKey = process.env.ANTHROPIC_API_KEY
 
   const body = await req.json()
 
