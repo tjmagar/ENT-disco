@@ -112,21 +112,38 @@ const TREES = [
   {
     id: "proposals-slow",
     label: "Proposals take too long",
-    sub: "Starting from scratch, 30-45 min each, copy-paste from Word",
+    sub: "Starting from scratch, 30–45 min each, copy-paste from Word",
     situation: [
-      { text: "Walk me through how a proposal gets built today — from when you decide to send one to when it goes out. Who touches it?", note: "Open and neutral. Don't name what you expect to find — let them describe the process." },
-      { text: "How long does a typical proposal take your team to put together?", note: "Get the number. This becomes your ROI anchor." },
-      { text: "What tool are you building them in today?", note: "Determines the gap. Word/PPT/Google Slides = big opportunity." },
+      { text: "Walk me through how a proposal gets built today — from when you decide to send one to when it goes out. Who touches it?", note: "Open and neutral. Don't name what you expect to find — let them describe the mess." },
+      { text: "How long does a typical proposal take your team to put together?", note: "Get the number. This is your ROI anchor. Don't accept 'it depends' — push for an average." },
+      { text: "What tool are you building them in today?", note: "Word/PPT/Google Slides = massive gap. Existing proposal tool = you're displacing. CRM-built = process problem." },
+      { text: "How many proposals is your team sending in a typical month?", note: "Volume × time = total hours burning. You'll use this in Impact." },
     ],
-    exec: [
-      { text: "So what does that pace mean for how many proposals you can actually get out in a week — or in a month?", note: "Connects time per doc to volume capacity. They'll do the math themselves." },
-      { text: "When deals are waiting on a proposal — what's that doing to your pipeline velocity?", note: "Pivots from operational friction to business consequence." },
-      { text: "If your team is spending [X min] on every proposal — what's getting pushed aside?", note: "Surface the opportunity cost. What else could those hours be doing?" },
+    pain: [
+      { text: "What is going on in your business that's driving this to be a priority right now?", note: "The peel-the-onion opener. They almost always chuckle. That chuckle means you hit it. Shut up and let them go." },
+      { text: "Aside from the time it takes — is there something going on behind the scenes making this urgent?", note: "Ask the same question twice, naturally. Second answer is almost always the real one." },
+      { text: "What's your take on why proposals take as long as they do? What's the root cause in your opinion?", note: "They've been thinking about this longer than you. Their diagnosis is the truth. Don't interrupt it." },
+      { text: "What have you tried to fix it? Did it work?", note: "Failed attempts prove the problem is real and not simple. Each failure is evidence." },
+      { text: "Is getting this solved a nice-to-have or a need-to-have right now?", note: "Priority check. Nice-to-have means you're not at the real problem yet. Keep peeling." },
     ],
     impact: [
-      { text: "What metric is below expectations as a result of this — is it close rate, deal velocity, revenue per rep?", note: "Land on the CFO-worthy number. Symptoms get ghosted. Problems get funded." },
-      { text: "Have you lost deals because a proposal went out too slow?", note: "Concrete loss question. One story here is worth 10 abstract answers." },
-      { text: "If your team got those hours back — what would they be doing with them?", note: "Future state framing. Let them paint the picture." },
+      { text: "What metric is below expectations as a result of this — close rate, deal velocity, revenue per rep?", note: "Land on the CFO-worthy number. No metric = no business case. Symptoms get ghosted. Problems get funded." },
+      { text: "What are the ripple effects this is having across the business?", note: "Not 'how does this impact you' — ripple effects. Opens the full blast radius. Who else feels it upstream." },
+      { text: "If your team is spending [X min] on every proposal — what's getting pushed aside?", note: "Surface the opportunity cost. Time on proposals is time not spent selling." },
+      { text: "Have you lost deals because a proposal went out too slow? Tell me about one.", note: "One story here is worth 10 abstract answers. Let them recall it — it reinforces the pain." },
+      { text: "Imagine we solved this completely. Put yourself 365 days from now — what would have to be true for you to feel good about the progress?", note: "The future state question. Buyers exhale here. Emotional contrast between painful present and compelling future is where value lives." },
+    ],
+    critical: [
+      { text: "When do you need this solved by? What happens if you can't hit that timeline?", note: "'What happens if not' is the real question — that's where consequences live." },
+      { text: "Why now — what changed that made this worth addressing at this specific moment?", note: "The trigger question. Something brought this to a head. Find it." },
+      { text: "Would anything prevent your team from moving forward this quarter if everything checked out?", note: "Smoke out blockers early — budget freeze, competing priorities, pending reorg." },
+      { text: "I'm getting the sense this might not be the top priority right now — am I off on that?", note: "The disqualifier. Use when you feel them going through the motions. Forces an honest answer." },
+    ],
+    decision: [
+      { text: "What steps do you and your company need to take to make a go or no-go decision on this?", note: "Map the path. You're building a mutual close plan in real time." },
+      { text: "Who would be involved in each of those steps — and who ultimately signs off?", note: "'Who ultimately signs off' is the phrase that matters. Find the economic buyer now." },
+      { text: "Whose budget would this come from?", note: "If they don't know, they're not the buyer. Don't get three calls deep before figuring this out." },
+      { text: "What are the hurdles you've run into getting a solution like this approved in the past?", note: "Past predicts future. If it got killed before, find out why — and get ahead of it now." },
     ],
   },
   {
@@ -134,18 +151,35 @@ const TREES = [
     label: "Chasing signatures",
     sub: "Deals stuck after send, no visibility, following up blind",
     situation: [
-      { text: "Walk me through what happens after you hit send on a proposal. What does follow-up look like?", note: "Let them describe the black hole. Don't lead." },
-      { text: "How do you know today if someone has opened or read what you sent?", note: "They almost always say 'I don't' — that's the moment." },
-      { text: "What's your average time from proposal sent to signature?", note: "Baseline the cycle. You'll use this number later." },
+      { text: "Walk me through what happens after you hit send on a proposal — what does follow-up look like?", note: "Let them describe the black hole. Don't lead." },
+      { text: "How do you know today if someone has opened or read what you sent?", note: "Almost always 'I don't.' That's the moment." },
+      { text: "What's your average time from proposal sent to signature?", note: "Baseline the cycle. You'll use this number in Impact." },
+      { text: "How many follow-up attempts do you typically make before you get a response — or give up?", note: "Surfaces wasted effort and unqualified persistence." },
     ],
-    exec: [
-      { text: "What does that mean for your pipeline velocity if deals are sitting unsigned for [X days]?", note: "Connect wait time to pipeline consequence." },
-      { text: "When you're following up blind — how are you deciding which deals to prioritize?", note: "They'll admit they're guessing. That's the exec problem." },
-      { text: "How does that show up in your forecasting — if you don't know when a deal will close?", note: "This lands with anyone who has a quota or a board." },
+    pain: [
+      { text: "What is going on in your business that's making this a priority right now?", note: "Let them name it. Pipeline review problems? Forecast miss? A deal that died silently?" },
+      { text: "Aside from the frustration of following up blind — is there a specific deal or situation that brought this to a head?", note: "There's almost always a story. A deal that ghosted. Get it — one story is worth everything." },
+      { text: "What's your read on why deals go quiet after the proposal goes out?", note: "Their diagnosis is the truth. Are they blaming themselves, their product, their pricing, their process?" },
+      { text: "What have you tried to fix it — any tools, sequences, process changes?", note: "Failed attempts = real problem. Each one is evidence the solution isn't obvious." },
+      { text: "Is this affecting your quota attainment now, or is it more of an operational frustration?", note: "Tie it to a number or it stays a nice-to-have." },
     ],
     impact: [
-      { text: "Have you been blindsided by a deal you thought was moving that just went silent?", note: "One story here is worth more than any statistic." },
-      { text: "What's the revenue impact if even 2-3 deals per month close a week faster?", note: "Let them calculate. Don't do the math for them." },
+      { text: "What metric is suffering most — pipeline velocity, close rate, or forecast accuracy?", note: "Get the number. No metric = no business case." },
+      { text: "What are the ripple effects? How does this show up in your manager's view of your pipeline?", note: "Pipeline confidence affects everyone upstream. This isn't just a rep problem." },
+      { text: "How much time a week do you estimate goes into follow-up on deals that were already dead?", note: "Let them calculate. Even rough: 3 hrs × 48 weeks = significant. Then multiply by team size." },
+      { text: "What's the revenue impact if 2–3 deals per month closed just one week faster?", note: "Let them do the math. Their number is always more powerful than yours." },
+      { text: "Put yourself 365 days from now — if you solved this, what does good look like?", note: "Future state. Cast their imagination forward. Contrast between painful now and compelling future is where value lives." },
+    ],
+    critical: [
+      { text: "Is there a quarter-end, a hiring plan, or a specific goal that makes solving this now important?", note: "Tie urgency to something real — a commitment they've already made." },
+      { text: "Why now — what changed that made this worth taking a call about today?", note: "The trigger. Something shifted. Find it." },
+      { text: "If everything checked out, is there anything that would slow down a decision this quarter?", note: "Budget freeze, competing tool eval, leadership change — surface it now." },
+    ],
+    decision: [
+      { text: "What steps would you and your company need to take to make a go or no-go decision?", note: "Build the close plan together in real time." },
+      { text: "Who else would need to be involved — sales ops, IT, your manager?", note: "Find all stakeholders. Surprises in evaluation = lost deal." },
+      { text: "Whose budget would this come from — sales tech, RevOps, something else?", note: "If they don't know, they're not the buyer." },
+      { text: "What's gotten in the way of solving this before?", note: "Budget, priority, past failed tools — get the obstacle now before it kills the deal later." },
     ],
   },
   {
@@ -153,18 +187,35 @@ const TREES = [
     label: "Reps sending off-brand proposals",
     sub: "Everyone builds their own version, pricing varies, no control",
     situation: [
-      { text: "How are your reps creating proposals today — is there a standard template, or does everyone have their own version?", note: "The answer 'their own version' opens everything." },
-      { text: "When a new rep joins — how do they learn what a proposal should look like?", note: "Exposes the onboarding gap. Usually 'they copy someone else's'." },
-      { text: "How much variation is there between what one rep sends versus another?", note: "Get them to describe the range. Some will laugh." },
+      { text: "How are your reps creating proposals today — is there a standard template, or does everyone build their own?", note: "'Their own version' opens everything." },
+      { text: "When a new rep joins — how do they learn what a proposal should look like?", note: "Exposes the onboarding gap. Usually 'they copy someone else's' or 'we give them a Word doc.'" },
+      { text: "How much variation is there between what one rep sends versus another?", note: "Get them to describe the range. Some will laugh. That laugh is the tell." },
+      { text: "Who owns proposal quality today — is there a review process before anything goes out?", note: "Usually nobody or 'the manager sometimes.' Either answer is a gap." },
     ],
-    exec: [
-      { text: "So what does that mean for brand consistency and pricing accuracy going out the door?", note: "Pivots from rep behavior to business risk." },
-      { text: "If reps are building their own versions — who's catching errors before they go out?", note: "Usually the answer is 'nobody' or 'the manager, sometimes'." },
-      { text: "What happens to client perception when a proposal doesn't look polished?", note: "Trust and first impression. Especially for SMBs selling on credibility." },
+    pain: [
+      { text: "What is going on in your business that's making proposal consistency a priority right now?", note: "Is it a lost deal? A compliance scare? A new sales leader? Find the trigger." },
+      { text: "Aside from the brand inconsistency — what's the real concern underneath this?", note: "Dig deeper. Pricing errors? Legal risk? A specific client situation that stung?" },
+      { text: "What's your take on why reps are building their own versions — is it process, tools, or something else?", note: "Their root cause analysis tells you what they've already tried to solve." },
+      { text: "Has a bad proposal ever cost you a deal or created a client issue you had to clean up?", note: "One story here anchors the impact. Let them recall it." },
+      { text: "What have you tried — templates, training, manager reviews? What happened?", note: "Failed attempts = real problem. What broke down in each attempt?" },
     ],
     impact: [
-      { text: "Have you had a pricing error go out and had to eat it — or re-negotiate?", note: "This one stings. If it's happened once they remember it exactly." },
-      { text: "What does it cost you — in time or deals — when a bad proposal goes out under your brand?", note: "Connect to both revenue and reputation." },
+      { text: "What metric is suffering — win rate, average deal size, or time to close?", note: "Get the number." },
+      { text: "What are the ripple effects when a bad proposal goes out under your brand?", note: "Trust, client perception, re-work, management time — open the full blast radius." },
+      { text: "Have you had to eat a pricing error or re-negotiate because the wrong number went out?", note: "This one stings. If it happened once they remember exactly. Let them tell it." },
+      { text: "What does it cost in management time to review and fix proposals before they go out?", note: "Quantify the oversight tax. Manager hours are expensive." },
+      { text: "365 days from now — if reps were sending consistent, on-brand proposals every time, what changes?", note: "Future state. Contrast the chaos they described with the world where it's solved." },
+    ],
+    critical: [
+      { text: "Is there a specific growth goal, new market, or compliance requirement that makes this urgent now?", note: "Tie to something real — a number or a deadline." },
+      { text: "Why now — what brought this to the surface at this moment?", note: "New sales leader? Lost deal? Customer complaint? Find the trigger." },
+      { text: "If everything checked out, what would it take to get this prioritized and budgeted this quarter?", note: "You're pre-qualifying budget before you ever submit a proposal." },
+    ],
+    decision: [
+      { text: "How does a decision like this get made — who's in the room?", note: "RevOps, marketing, legal, IT — find all the seats at the table." },
+      { text: "Who ultimately signs off?", note: "Economic buyer. Don't assume it's the person you're talking to." },
+      { text: "Whose budget would this fall under?", note: "Sales enablement? Marketing? RevOps? The answer tells you who else to loop in." },
+      { text: "What's gotten in the way of solving this in the past?", note: "The obstacle you don't know about is the one that kills the deal." },
     ],
   },
   {
@@ -174,15 +225,33 @@ const TREES = [
     situation: [
       { text: "Walk me through your approval process — who needs to sign off before a proposal goes out?", note: "Get the number of people and the path. More steps = more friction." },
       { text: "How does that approval happen today — email, Slack, in-person?", note: "Email chains are where proposals go to die." },
-      { text: "How long does a typical proposal sit waiting for approval?", note: "Baseline it. An hour? A day? 'It depends' is an answer too." },
+      { text: "How long does a typical proposal sit waiting for approval before it goes out?", note: "Baseline it. An hour? A day? 'It depends' is an answer too — get the range." },
+      { text: "What happens to a deal when it's waiting — does the rep keep working it or does it stall?", note: "Surfaces whether the delay creates compounding risk." },
     ],
-    exec: [
-      { text: "What happens to a deal's momentum when a proposal sits in someone's inbox for review?", note: "Buyer intent decays fast. They feel this." },
-      { text: "If approvals are happening over email — what gets missed or buried in those threads?", note: "Version confusion, missed edits, no audit trail." },
+    pain: [
+      { text: "What is going on that's making approval bottlenecks a priority right now?", note: "Did a deal die in approval? Did a manager complain? Find the trigger." },
+      { text: "Aside from the delay — what's the real cost of doing approvals over email?", note: "Version confusion, missed context, no audit trail — dig into what actually breaks." },
+      { text: "What's your take on why the process is set up this way — is it about compliance, pricing control, or something else?", note: "Understanding the WHY behind the process tells you what a solution needs to preserve." },
+      { text: "What have you tried — workflow tools, Slack approvals, designated windows?", note: "What broke in each attempt? That's your differentiation." },
+      { text: "Is this slowing down a few deals or is it a systemic drag on your whole pipeline?", note: "Scope the blast radius before you start quantifying." },
     ],
     impact: [
-      { text: "Have you lost urgency on a deal because the proposal took too long to get out?", note: "Get the story. Where did the deal go after that?" },
-      { text: "What does a 24-48 hour approval delay cost you if it's happening on 20-30 proposals a month?", note: "Let them do the math. You've given them the inputs." },
+      { text: "What metric is suffering most — deal velocity, close rate, or proposal output per rep?", note: "Get the number that matters to their manager." },
+      { text: "What are the ripple effects when a proposal sits in someone's inbox for 24–48 hours?", note: "Buyer intent decays fast. Open the full cost: lost momentum, missed follow-up windows, deals that went cold." },
+      { text: "Have you lost urgency on a deal — or lost the deal entirely — because approval took too long?", note: "One story is worth more than any statistic. Let them tell it." },
+      { text: "What does a 24–48 hour approval delay cost you if it's happening on 20–30 proposals a month?", note: "Let them calculate. Give them the inputs — they do the math." },
+      { text: "365 days from now — if approvals happened in minutes instead of days, what changes for the team?", note: "Future state. Contrast the drag they described with instant approvals." },
+    ],
+    critical: [
+      { text: "Is there a growth target, a new product line, or a compliance deadline making this urgent now?", note: "Tie to something already on their plate." },
+      { text: "Why now — what made this worth putting on the calendar?", note: "The trigger. Someone got burned recently, or a goal is at risk." },
+      { text: "Would anything prevent your team from moving forward this quarter if you had the right solution?", note: "Smoke out the real blocker before you invest more time." },
+    ],
+    decision: [
+      { text: "What steps would it take to get something like this approved and in place?", note: "You're evaluating their buying process before you go deeper." },
+      { text: "Who else would need to be involved — Legal, IT, Finance, your manager?", note: "Compliance and workflow tools often pull in more stakeholders than expected." },
+      { text: "Whose budget would this come from?", note: "Sales ops? RevOps? Legal? The answer determines who else you need in the room." },
+      { text: "What's killed solutions like this in the past — budget, priority, or something else?", note: "Get the obstacle on the table now." },
     ],
   },
   {
@@ -190,17 +259,35 @@ const TREES = [
     label: "No visibility after the proposal goes out",
     sub: "Don't know if it was opened, who saw it, or where it stands",
     situation: [
-      { text: "After a proposal goes out — how do you know if it's been opened? Do you get any signal?", note: "Almost always no. That's the gap." },
-      { text: "When you follow up, are you working from data or just guessing?", note: "Direct. They'll tell you they're guessing." },
-      { text: "How many follow-up attempts do you typically make before you get a response — or give up?", note: "Surfaces wasted effort and unqualified persistence." },
+      { text: "After a proposal goes out — how do you know if it's been opened? Do you get any signal at all?", note: "Almost always no. That absence of signal is the entire problem." },
+      { text: "When you follow up, are you working from data or are you essentially guessing?", note: "Direct. They'll tell you they're guessing." },
+      { text: "How many follow-up attempts do you typically make before you get a response or give up?", note: "Surfaces wasted effort. The number usually surprises them when they say it out loud." },
+      { text: "How does your team currently prioritize which proposals to chase?", note: "Usually gut feel or recency. That's the gap." },
     ],
-    exec: [
-      { text: "Without knowing if someone opened it — how are you prioritizing which deals to chase?", note: "They're prioritizing on gut, not signal. That's a sales leader problem." },
-      { text: "What does flying blind in follow-up do to your forecasting confidence?", note: "Forecasting accuracy is a board-level concern." },
+    pain: [
+      { text: "What is going on in your business that's making this visibility gap a priority right now?", note: "Is it a missed forecast? A rep complaining? A deal that ghosted at the worst time?" },
+      { text: "Aside from the follow-up frustration — what's the real problem this is creating for you?", note: "Go one level deeper. Is it forecasting accuracy? Manager credibility? Rep morale?" },
+      { text: "What's your read on why this has been hard to solve — is it a tool problem, a process problem, or something else?", note: "Their diagnosis tells you what they've already ruled out." },
+      { text: "What have you tried — read receipts, follow-up sequences, CRM tasks?", note: "What broke in each attempt? That gap is your opening." },
+      { text: "Is this affecting your forecast confidence now, or is it more of a rep-level frustration?", note: "Tie it to forecast accuracy and it becomes a leadership problem, not just a rep problem." },
     ],
     impact: [
-      { text: "How much time a week do you estimate goes into follow-up on deals that were already dead?", note: "Let them estimate. Even a rough number is valuable." },
-      { text: "Have you been blindsided — thought a deal was alive, then it ghosted?", note: "One story here carries more weight than any stat." },
+      { text: "What metric is suffering most because you're flying blind — win rate, deal velocity, forecast accuracy?", note: "Get the number. Forecast accuracy especially resonates with managers and VPs." },
+      { text: "What are the ripple effects? How does this show up when you're building a pipeline call or a board update?", note: "Opens up the leadership visibility problem — not just the rep problem." },
+      { text: "How much time a week do you estimate goes into chasing proposals that were already dead?", note: "Quantify the waste. Even a rough estimate — 3 hrs × team size × 48 weeks = significant." },
+      { text: "Have you been blindsided by a deal you thought was moving that went silent at the worst possible moment?", note: "One story here carries everything. Let them tell it." },
+      { text: "365 days from now — if you had perfect visibility into every proposal, what changes for the team?", note: "Future state. Let them describe the world with the problem solved." },
+    ],
+    critical: [
+      { text: "Is there a specific quarter, forecast commitment, or leadership review that makes solving this now important?", note: "Tie to something they've already committed to." },
+      { text: "Why now — what brought this to the surface at this specific moment?", note: "A missed number? A board question? A rep who quit? Find it." },
+      { text: "If everything checked out, is there anything that would slow down a decision this quarter?", note: "Budget, competing tools, headcount freeze — surface it now." },
+    ],
+    decision: [
+      { text: "What steps would it take for you and your team to evaluate and approve something like this?", note: "Map the buying process." },
+      { text: "Who else needs to be in the conversation — RevOps, your manager, IT?", note: "Visibility tools often touch multiple teams. Find all the stakeholders." },
+      { text: "Whose budget would this come from?", note: "RevOps? Sales enablement? The answer determines who needs to be involved." },
+      { text: "What's gotten in the way of solving this before?", note: "The unsurfaced obstacle is always the one that kills the deal." },
     ],
   },
   {
@@ -209,16 +296,34 @@ const TREES = [
     sub: "Copy-paste from CRM, manual data entry, systems disconnected",
     situation: [
       { text: "Walk me through your current stack — CRM, proposals, e-sign. Are those connected, or are they separate systems?", note: "Map the gap before naming the solution." },
-      { text: "How does deal data get from your CRM into a proposal today?", note: "'We copy it over' is the answer you're waiting for." },
-      { text: "What happens after a contract is signed — how does that information get back into your CRM?", note: "Exposes the back-end manual loop." },
+      { text: "How does deal data get from your CRM into a proposal today?", note: "'We copy it over' or 'manually' is the answer you're waiting for." },
+      { text: "What happens after a contract is signed — how does that information get back into your CRM?", note: "Exposes the back-end manual loop that's usually even worse than the front-end." },
+      { text: "How many people touch a deal between CRM, proposal, and final signature?", note: "More handoffs = more errors, more time, more risk of something falling through." },
     ],
-    exec: [
-      { text: "So what does that copy-paste workflow mean for accuracy — and for how much time your team spends on it?", note: "Two pain points in one question: errors and time." },
-      { text: "If your CRM isn't updated in real time — what happens to your reporting and forecasting?", note: "This lands with RevOps, VPs, and anyone running a pipeline call." },
+    pain: [
+      { text: "What is going on that's making the disconnection between your tools a priority right now?", note: "Was there a data error? A compliance audit? A new CRM they just rolled out? Find the trigger." },
+      { text: "Aside from the manual work — what's the real risk of your tools not talking to each other?", note: "Errors that go out to clients? CRM data that can't be trusted? Bad reporting? Go deeper." },
+      { text: "What's your take on why this hasn't been solved already — is it a technical limitation, a budget thing, or something else?", note: "Their explanation tells you what they've tried and ruled out." },
+      { text: "What have you tried — Zapier, native integrations, manual processes?", note: "Each failed attempt is evidence the problem is real." },
+      { text: "Is this a frustration or is it creating actual business risk right now?", note: "The difference between a nice-to-have and a need-to-have." },
     ],
     impact: [
-      { text: "How much time a week do you estimate is spent on manual data transfer between systems?", note: "Get a number. Even a rough estimate is a data point." },
-      { text: "Have you had a data integrity issue — wrong contact, wrong pricing — come from the manual handoff?", note: "One story here is worth more than the estimate." },
+      { text: "What metric is suffering — data accuracy, time to close, reporting reliability?", note: "Get the number. Bad CRM data affects forecasting which affects leadership credibility." },
+      { text: "What are the ripple effects of your tools not talking — who else in the business feels it?", note: "Open the blast radius: Finance, RevOps, leadership, customer success." },
+      { text: "How much time a week do you estimate your team spends on manual data transfer between systems?", note: "Get a number. Even rough: X hrs × team size × 48 weeks = significant." },
+      { text: "Have you had a data integrity issue — wrong contact, wrong pricing, wrong terms — come from the manual handoff?", note: "One story here. Let them recall it. That's the moment that makes it real." },
+      { text: "365 days from now — if your CRM and proposals were fully synced automatically, what changes?", note: "Future state. Contrast the manual chaos they described with seamless data flow." },
+    ],
+    critical: [
+      { text: "Is there a CRM migration, a compliance requirement, or a growth goal that makes solving this now important?", note: "Tie urgency to something already on their roadmap." },
+      { text: "Why now — what changed that brought this to the surface?", note: "New CRM? New sales leader? Audit finding? Find the trigger." },
+      { text: "Would anything slow down a decision this quarter if you found the right solution?", note: "Budget, IT bandwidth, competing initiatives — smoke them out." },
+    ],
+    decision: [
+      { text: "Who needs to be involved in evaluating and approving something like this — IT, RevOps, your manager?", note: "Integration projects almost always involve IT. Find all the seats." },
+      { text: "Who ultimately signs off?", note: "Economic buyer. Don't assume it's the person you're talking to." },
+      { text: "Whose budget would this come from?", note: "RevOps? IT? The answer changes who you need in the room." },
+      { text: "What's killed integration projects like this in the past?", note: "IT pushback, security reviews, scope creep — get the obstacles now." },
     ],
   },
   {
@@ -227,16 +332,34 @@ const TREES = [
     sub: "Payment separate from signing, AR aging, cash flow hit",
     situation: [
       { text: "What happens after a contract is signed — how do you collect payment?", note: "Exposes whether payment is connected to signing or totally decoupled." },
-      { text: "Is payment collection tied to the signing moment, or does it happen separately — invoice, then follow up?", note: "If it's decoupled, there's a lag and a follow-up burden." },
-      { text: "What's your typical time from contract signed to payment received?", note: "Baseline the cash conversion cycle." },
+      { text: "Is payment collection tied to the signing moment, or does it happen separately through invoicing?", note: "If it's decoupled, there's a lag and a follow-up burden." },
+      { text: "What's your typical time from contract signed to payment received?", note: "Baseline the cash conversion cycle. You'll use this in Impact." },
+      { text: "Who owns payment follow-up — sales, finance, or someone else?", note: "Surfaces the ownership gap. Usually nobody really owns it." },
     ],
-    exec: [
-      { text: "What does slow payment collection mean for your cash flow month to month?", note: "This is a CFO question, but founders and ops leaders feel it too." },
-      { text: "If payment collection is decoupled from signing — who owns that follow-up? How much time does it take?", note: "Surfaces hidden labor cost." },
+    pain: [
+      { text: "What is going on in your business that's making payment collection a priority right now?", note: "Cash flow crunch? AR aging review? Board pressure? Find the trigger." },
+      { text: "Aside from the cash flow impact — is there something else making this urgent?", note: "Dig deeper. Customer disputes over terms? Reps distracted by collections? Legal exposure?" },
+      { text: "What's your take on why payment collection is so disconnected from the signing moment?", note: "Their root cause tells you what they've already tried to patch." },
+      { text: "What have you tried — early payment incentives, invoicing automation, collections follow-up?", note: "What broke? Each failed attempt is evidence." },
+      { text: "Is slow payment a frustration or is it creating real cash flow pressure right now?", note: "Tie it to a number — AR aging, days to collect, cash on hand — before you move forward." },
     ],
     impact: [
-      { text: "What's sitting in AR right now that's been open for 30+ days?", note: "Concrete number. Makes the problem real." },
-      { text: "If you collected payment at the moment of signing — what would that do to your cash position?", note: "Future state. Let them imagine the delta." },
+      { text: "What metric is suffering — days sales outstanding, cash flow, or revenue recognition timing?", note: "Get the CFO-worthy number. This one often has a finance stakeholder." },
+      { text: "What are the ripple effects of slow payment — who else in the business feels it?", note: "Finance, leadership, investors, operations — open the full blast radius." },
+      { text: "What's sitting in AR right now that's been open for 30+ days?", note: "Concrete number. Makes the problem real and quantified." },
+      { text: "If you collected payment at the moment of signing — what would that do to your cash position?", note: "Future state embedded in a question. Let them calculate the delta." },
+      { text: "365 days from now — if payment was collected automatically at signing, what changes for the business?", note: "Let them describe the world with the problem solved." },
+    ],
+    critical: [
+      { text: "Is there a fundraise, a hiring plan, or a financial close that makes improving cash flow timing urgent now?", note: "Tie to something real and near-term." },
+      { text: "Why now — what brought this to the surface at this specific moment?", note: "Board meeting? Quarter-end review? A specific customer dispute? Find it." },
+      { text: "What would it take to get this prioritized this quarter?", note: "Pre-qualify the budget conversation." },
+    ],
+    decision: [
+      { text: "Who needs to be involved in a decision like this — Finance, your CEO, operations?", note: "Payment and AR often pull in Finance or a CFO. Find all the seats." },
+      { text: "Who ultimately signs off?", note: "Economic buyer. Finance might have veto even if Sales is driving." },
+      { text: "Whose budget would this come from?", note: "Sales? Finance? Ops? The answer determines who else needs to be in the room." },
+      { text: "What's gotten in the way of solving this before?", note: "The unsurfaced obstacle is always the one that kills the deal." },
     ],
   },
   {
@@ -244,20 +367,39 @@ const TREES = [
     label: "Version chaos and re-negotiation",
     sub: "Both sides editing, multiple versions flying, no single source of truth",
     situation: [
-      { text: "What happens when a prospect wants to make changes to your proposal — how does that back-and-forth play out?", note: "Let them describe the chaos. Don't lead with the word 'version'." },
-      { text: "How do you track changes between drafts — is there a clear record of what was agreed to?", note: "Usually no. Email threads, unmarked PDFs." },
-      { text: "Who owns the final version of a contract, and how does everyone know it's the final one?", note: "This is where confusion lives." },
+      { text: "What happens when a prospect wants to make changes to your proposal — how does that back-and-forth play out?", note: "Let them describe the chaos. Don't lead with the word 'version.'" },
+      { text: "How do you track changes between drafts — is there a clear record of what was agreed to?", note: "Usually email threads and unmarked PDFs. That's the gap." },
+      { text: "Who owns the final version of a contract, and how does everyone know it's the final one?", note: "This is where confusion lives. 'I think it was the one I sent Thursday' is the answer." },
+      { text: "How often do deals stall or get re-opened because both sides are working from different versions?", note: "Frequency matters. Even once a quarter with a big deal is a real problem." },
     ],
-    exec: [
-      { text: "When both sides are editing at the same time — what happens to deal velocity?", note: "Redlines and re-sends slow everything down." },
-      { text: "If there's no audit trail of changes — what's your exposure if there's a dispute after signing?", note: "Legal and ops risk. Not just a sales problem." },
+    pain: [
+      { text: "What is going on that's making version control and re-negotiation a priority right now?", note: "Did a deal re-open after signing? A compliance issue? A client dispute? Find the trigger." },
+      { text: "Aside from the back-and-forth — what's the real risk of having no audit trail on what was agreed?", note: "Legal exposure, client disputes, revenue recognition issues — go deeper." },
+      { text: "What's your take on why this keeps happening — is it the tool, the process, or the nature of your deals?", note: "Their diagnosis tells you what they've already tried." },
+      { text: "What have you tried — tracked changes in Word, shared drives, email rules?", note: "What broke? Each failed attempt is evidence." },
+      { text: "Is this a frustration or is it creating real legal or financial exposure?", note: "Legal risk or revenue risk makes this a CFO and Legal problem, not just a sales problem." },
     ],
     impact: [
-      { text: "Have you had a deal re-open after signing because the wrong version was executed?", note: "If this happened once, they remember it. Let them tell the story." },
-      { text: "How much time per deal goes into managing versions — forwards, re-sends, 'wait, which one is current'?", note: "Quantify the drag." },
+      { text: "What metric is suffering — deal velocity, legal costs, or close rate?", note: "Re-negotiation drags velocity. Legal reviews cost real money. Get the number." },
+      { text: "What are the ripple effects when a deal re-opens — who else gets pulled in?", note: "Legal, Finance, Sales leadership — open the full blast radius of a re-opened deal." },
+      { text: "Have you had a deal re-open after signing because the wrong version was executed?", note: "One story here. If it happened once, they remember exactly. Let them tell it." },
+      { text: "How much time per deal goes into managing versions — email threads, re-sends, 'wait, which one is current'?", note: "Quantify the drag. Even 2–3 hours per deal × volume = significant." },
+      { text: "365 days from now — if there was one version, one source of truth, one audit trail — what changes?", note: "Future state. Let them describe the world without the chaos." },
+    ],
+    critical: [
+      { text: "Is there a compliance requirement, a legal review, or a specific deal complexity driving this to be urgent now?", note: "Tie to something real — a deadline, a risk, a commitment." },
+      { text: "Why now — what happened that made this worth addressing?", note: "The trigger. A deal that blew up. A client that pushed back. Find it." },
+      { text: "If everything checked out, what would it take to get this budgeted this quarter?", note: "Pre-qualify before you go deeper." },
+    ],
+    decision: [
+      { text: "Who needs to be involved in evaluating something like this — Legal, IT, your manager?", note: "Version control and audit trails often pull in Legal. Find all the seats." },
+      { text: "Who ultimately signs off?", note: "Economic buyer. Don't assume." },
+      { text: "Whose budget would this come from?", note: "Legal? Sales? RevOps? The answer changes who you need." },
+      { text: "What's killed solutions like this in the past — was it Legal pushback, IT requirements, or something else?", note: "The obstacle you don't know about is always the one that kills the deal." },
     ],
   },
 ];
+
 
 const PANDADOC_CONTEXT = `You are an AI sales coach in a live PandaDoc SMB discovery call companion. Coach using Chris Orlob's framework from pclub.io.
 
@@ -615,11 +757,13 @@ ${combinedText}` }]
     );
 
     const sectionStyles = [
-      { label:"Situation", sub:"Understand the context — what does this look like day to day?", accent:"#5b8fd4", bg:"#eef4ff", border:"#b0ccf0" },
-      { label:"Executive Problem", sub:"Escalate — what does this mean for the business?", accent:C.emerald, bg:C.emeraldLight, border:C.emeraldMid },
-      { label:"Business Impact", sub:"Quantify — what metric is suffering, what is it costing?", accent:"#d4a03a", bg:"#fdf7e6", border:"#c09818" },
+      { key:"situation",  label:"S — Situation",       sub:"Map their process. Understand the context.",                  accent:"#5b8fd4", bg:"#eef4ff", border:"#b0ccf0" },
+      { key:"pain",       label:"P — Pain",             sub:"Find the need behind the need. Don't stop at the symptom.",   accent:C.emerald, bg:C.emeraldLight, border:C.emeraldMid },
+      { key:"impact",     label:"I — Impact",           sub:"Quantify — metric, ripple effects, cost of inaction.",        accent:"#a07820", bg:"#fdf7e6", border:"#c09818" },
+      { key:"critical",   label:"C — Critical Event",   sub:"Why now? What happens if this doesn't get solved?",           accent:"#b060a0", bg:"#fef0f8", border:"#c078b0" },
+      { key:"decision",   label:"D — Decision",         sub:"Who decides, how, and what are the hurdles?",                 accent:"#7a60c8", bg:"#f4f0ff", border:"#9080d8" },
     ];
-    const layers = [tree.situation, tree.exec, tree.impact];
+    const layers = sectionStyles.map(s => tree[s.key] || []);
 
     return (
       <div>
