@@ -18,16 +18,13 @@ const C = {
 };
 
 const STAGES = [
-  { id:"prep",             icon:"◎",  short:"Prep Brief",       group:"setup" },
-  { id:"open",             icon:"①",  short:"Open",             group:"setup" },
-  { id:"buyer-type",       icon:"②",  short:"Buyer Type",       group:"setup" },
-  { id:"business-problem", icon:"1",  short:"Business Problem", group:"framework" },
-  { id:"current-process",  icon:"2",  short:"Current State",    group:"framework" },
-  { id:"cause-analysis",   icon:"3",  short:"Cause Analysis",   group:"framework" },
-  { id:"negative-impact",  icon:"4",  short:"Negative Impact",  group:"framework" },
-  { id:"future-state",     icon:"5",  short:"Future State",     group:"framework" },
-  { id:"next-step",        icon:"⑦",  short:"Next Step",        group:"close" },
-  { id:"outputs",          icon:"✦",  short:"Outputs",          group:"close" },
+  { id:"prep",         icon:"◎",  short:"Prep Brief",    group:"setup" },
+  { id:"open",         icon:"①",  short:"Open",          group:"setup" },
+  { id:"buyer-type",   icon:"②",  short:"Buyer Type",    group:"setup" },
+  { id:"tree-picker",  icon:"③",  short:"Pick the Tree", group:"discovery" },
+  { id:"tree",         icon:"④",  short:"Discovery Tree",group:"discovery" },
+  { id:"next-step",    icon:"⑦",  short:"Next Step",     group:"close" },
+  { id:"outputs",      icon:"✦",  short:"Outputs",       group:"close" },
 ];
 
 const SPICED_QUESTIONS = [
@@ -111,6 +108,157 @@ const SPICED_QUESTIONS = [
   },
 ];
 
+const TREES = [
+  {
+    id: "proposals-slow",
+    label: "Proposals take too long",
+    sub: "Starting from scratch, 30-45 min each, copy-paste from Word",
+    situation: [
+      { text: "Walk me through how a proposal gets built today — from when you decide to send one to when it goes out. Who touches it?", note: "Open and neutral. Don't name what you expect to find — let them describe the process." },
+      { text: "How long does a typical proposal take your team to put together?", note: "Get the number. This becomes your ROI anchor." },
+      { text: "What tool are you building them in today?", note: "Determines the gap. Word/PPT/Google Slides = big opportunity." },
+    ],
+    exec: [
+      { text: "So what does that pace mean for how many proposals you can actually get out in a week — or in a month?", note: "Connects time per doc to volume capacity. They'll do the math themselves." },
+      { text: "When deals are waiting on a proposal — what's that doing to your pipeline velocity?", note: "Pivots from operational friction to business consequence." },
+      { text: "If your team is spending [X min] on every proposal — what's getting pushed aside?", note: "Surface the opportunity cost. What else could those hours be doing?" },
+    ],
+    impact: [
+      { text: "What metric is below expectations as a result of this — is it close rate, deal velocity, revenue per rep?", note: "Land on the CFO-worthy number. Symptoms get ghosted. Problems get funded." },
+      { text: "Have you lost deals because a proposal went out too slow?", note: "Concrete loss question. One story here is worth 10 abstract answers." },
+      { text: "If your team got those hours back — what would they be doing with them?", note: "Future state framing. Let them paint the picture." },
+    ],
+  },
+  {
+    id: "chasing-signatures",
+    label: "Chasing signatures",
+    sub: "Deals stuck after send, no visibility, following up blind",
+    situation: [
+      { text: "Walk me through what happens after you hit send on a proposal. What does follow-up look like?", note: "Let them describe the black hole. Don't lead." },
+      { text: "How do you know today if someone has opened or read what you sent?", note: "They almost always say 'I don't' — that's the moment." },
+      { text: "What's your average time from proposal sent to signature?", note: "Baseline the cycle. You'll use this number later." },
+    ],
+    exec: [
+      { text: "What does that mean for your pipeline velocity if deals are sitting unsigned for [X days]?", note: "Connect wait time to pipeline consequence." },
+      { text: "When you're following up blind — how are you deciding which deals to prioritize?", note: "They'll admit they're guessing. That's the exec problem." },
+      { text: "How does that show up in your forecasting — if you don't know when a deal will close?", note: "This lands with anyone who has a quota or a board." },
+    ],
+    impact: [
+      { text: "Have you been blindsided by a deal you thought was moving that just went silent?", note: "One story here is worth more than any statistic." },
+      { text: "What's the revenue impact if even 2-3 deals per month close a week faster?", note: "Let them calculate. Don't do the math for them." },
+    ],
+  },
+  {
+    id: "rep-inconsistency",
+    label: "Reps sending off-brand proposals",
+    sub: "Everyone builds their own version, pricing varies, no control",
+    situation: [
+      { text: "How are your reps creating proposals today — is there a standard template, or does everyone have their own version?", note: "The answer 'their own version' opens everything." },
+      { text: "When a new rep joins — how do they learn what a proposal should look like?", note: "Exposes the onboarding gap. Usually 'they copy someone else's'." },
+      { text: "How much variation is there between what one rep sends versus another?", note: "Get them to describe the range. Some will laugh." },
+    ],
+    exec: [
+      { text: "So what does that mean for brand consistency and pricing accuracy going out the door?", note: "Pivots from rep behavior to business risk." },
+      { text: "If reps are building their own versions — who's catching errors before they go out?", note: "Usually the answer is 'nobody' or 'the manager, sometimes'." },
+      { text: "What happens to client perception when a proposal doesn't look polished?", note: "Trust and first impression. Especially for SMBs selling on credibility." },
+    ],
+    impact: [
+      { text: "Have you had a pricing error go out and had to eat it — or re-negotiate?", note: "This one stings. If it's happened once they remember it exactly." },
+      { text: "What does it cost you — in time or deals — when a bad proposal goes out under your brand?", note: "Connect to both revenue and reputation." },
+    ],
+  },
+  {
+    id: "approval-bottlenecks",
+    label: "Proposals stuck in approvals",
+    sub: "Manager sign-off required, deals waiting, email chains",
+    situation: [
+      { text: "Walk me through your approval process — who needs to sign off before a proposal goes out?", note: "Get the number of people and the path. More steps = more friction." },
+      { text: "How does that approval happen today — email, Slack, in-person?", note: "Email chains are where proposals go to die." },
+      { text: "How long does a typical proposal sit waiting for approval?", note: "Baseline it. An hour? A day? 'It depends' is an answer too." },
+    ],
+    exec: [
+      { text: "What happens to a deal's momentum when a proposal sits in someone's inbox for review?", note: "Buyer intent decays fast. They feel this." },
+      { text: "If approvals are happening over email — what gets missed or buried in those threads?", note: "Version confusion, missed edits, no audit trail." },
+    ],
+    impact: [
+      { text: "Have you lost urgency on a deal because the proposal took too long to get out?", note: "Get the story. Where did the deal go after that?" },
+      { text: "What does a 24-48 hour approval delay cost you if it's happening on 20-30 proposals a month?", note: "Let them do the math. You've given them the inputs." },
+    ],
+  },
+  {
+    id: "no-visibility",
+    label: "No visibility after the proposal goes out",
+    sub: "Don't know if it was opened, who saw it, or where it stands",
+    situation: [
+      { text: "After a proposal goes out — how do you know if it's been opened? Do you get any signal?", note: "Almost always no. That's the gap." },
+      { text: "When you follow up, are you working from data or just guessing?", note: "Direct. They'll tell you they're guessing." },
+      { text: "How many follow-up attempts do you typically make before you get a response — or give up?", note: "Surfaces wasted effort and unqualified persistence." },
+    ],
+    exec: [
+      { text: "Without knowing if someone opened it — how are you prioritizing which deals to chase?", note: "They're prioritizing on gut, not signal. That's a sales leader problem." },
+      { text: "What does flying blind in follow-up do to your forecasting confidence?", note: "Forecasting accuracy is a board-level concern." },
+    ],
+    impact: [
+      { text: "How much time a week do you estimate goes into follow-up on deals that were already dead?", note: "Let them estimate. Even a rough number is valuable." },
+      { text: "Have you been blindsided — thought a deal was alive, then it ghosted?", note: "One story here carries more weight than any stat." },
+    ],
+  },
+  {
+    id: "disconnected-tools",
+    label: "Tools don't talk to each other",
+    sub: "Copy-paste from CRM, manual data entry, systems disconnected",
+    situation: [
+      { text: "Walk me through your current stack — CRM, proposals, e-sign. Are those connected, or are they separate systems?", note: "Map the gap before naming the solution." },
+      { text: "How does deal data get from your CRM into a proposal today?", note: "'We copy it over' is the answer you're waiting for." },
+      { text: "What happens after a contract is signed — how does that information get back into your CRM?", note: "Exposes the back-end manual loop." },
+    ],
+    exec: [
+      { text: "So what does that copy-paste workflow mean for accuracy — and for how much time your team spends on it?", note: "Two pain points in one question: errors and time." },
+      { text: "If your CRM isn't updated in real time — what happens to your reporting and forecasting?", note: "This lands with RevOps, VPs, and anyone running a pipeline call." },
+    ],
+    impact: [
+      { text: "How much time a week do you estimate is spent on manual data transfer between systems?", note: "Get a number. Even a rough estimate is a data point." },
+      { text: "Have you had a data integrity issue — wrong contact, wrong pricing — come from the manual handoff?", note: "One story here is worth more than the estimate." },
+    ],
+  },
+  {
+    id: "slow-payments",
+    label: "Slow payment collection",
+    sub: "Payment separate from signing, AR aging, cash flow hit",
+    situation: [
+      { text: "What happens after a contract is signed — how do you collect payment?", note: "Exposes whether payment is connected to signing or totally decoupled." },
+      { text: "Is payment collection tied to the signing moment, or does it happen separately — invoice, then follow up?", note: "If it's decoupled, there's a lag and a follow-up burden." },
+      { text: "What's your typical time from contract signed to payment received?", note: "Baseline the cash conversion cycle." },
+    ],
+    exec: [
+      { text: "What does slow payment collection mean for your cash flow month to month?", note: "This is a CFO question, but founders and ops leaders feel it too." },
+      { text: "If payment collection is decoupled from signing — who owns that follow-up? How much time does it take?", note: "Surfaces hidden labor cost." },
+    ],
+    impact: [
+      { text: "What's sitting in AR right now that's been open for 30+ days?", note: "Concrete number. Makes the problem real." },
+      { text: "If you collected payment at the moment of signing — what would that do to your cash position?", note: "Future state. Let them imagine the delta." },
+    ],
+  },
+  {
+    id: "version-chaos",
+    label: "Version chaos and re-negotiation",
+    sub: "Both sides editing, multiple versions flying, no single source of truth",
+    situation: [
+      { text: "What happens when a prospect wants to make changes to your proposal — how does that back-and-forth play out?", note: "Let them describe the chaos. Don't lead with the word 'version'." },
+      { text: "How do you track changes between drafts — is there a clear record of what was agreed to?", note: "Usually no. Email threads, unmarked PDFs." },
+      { text: "Who owns the final version of a contract, and how does everyone know it's the final one?", note: "This is where confusion lives." },
+    ],
+    exec: [
+      { text: "When both sides are editing at the same time — what happens to deal velocity?", note: "Redlines and re-sends slow everything down." },
+      { text: "If there's no audit trail of changes — what's your exposure if there's a dispute after signing?", note: "Legal and ops risk. Not just a sales problem." },
+    ],
+    impact: [
+      { text: "Have you had a deal re-open after signing because the wrong version was executed?", note: "If this happened once, they remember it. Let them tell the story." },
+      { text: "How much time per deal goes into managing versions — forwards, re-sends, 'wait, which one is current'?", note: "Quantify the drag." },
+    ],
+  },
+];
+
 const PANDADOC_CONTEXT = `You are an AI sales coach in a live PandaDoc SMB discovery call companion. Coach using Chris Orlob's framework from pclub.io.
 
 VALUE SELLING = 3 things: 1) Painful measurable current state 2) Compelling measurable future state 3) Your product as the bridge.
@@ -148,6 +296,7 @@ Be specific, brief, direct. Word-for-word scripts. Personalize using prep brief 
 export default function App() {
   const [activeStage, setActiveStage] = useState("prep");
   const [buyerPath, setBuyerPath] = useState(null);
+  const [selectedTree, setSelectedTree] = useState(null);
   const [callSource, setCallSource] = useState(null);
   const [notes, setNotes] = useState({});
   const [noteOpen, setNoteOpen] = useState({});
@@ -433,6 +582,75 @@ ${combinedText}` }]
     return "";
   }
 
+  function renderTreePicker() {
+    return (
+      <div>
+        <div style={{ fontSize:14, color:C.textMuted, marginBottom:24, lineHeight:1.7 }}>
+          Tap the pain that's the raging fire. You heard it while they were talking — this is where you go deep.
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+          {TREES.map(tree => (
+            <button
+              key={tree.id}
+              onClick={() => { setSelectedTree(tree.id); setActiveStage("tree"); }}
+              style={{ ...B, textAlign:"left", padding:"18px 20px", borderRadius:12, border:`1.5px solid ${C.border}`, background:C.white, transition:"border-color 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = C.emerald}
+              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
+            >
+              <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:5, lineHeight:1.3 }}>{tree.label}</div>
+              <div style={{ fontSize:12, color:C.textMuted, lineHeight:1.5 }}>{tree.sub}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function renderTree() {
+    const tree = TREES.find(t => t.id === selectedTree);
+    if (!tree) return (
+      <div style={{ color:C.textMuted, fontSize:14 }}>
+        No tree selected. <button onClick={() => setActiveStage("tree-picker")} style={{ ...B, color:C.emerald, background:"none", border:"none", fontWeight:600 }}>← Go back</button>
+      </div>
+    );
+
+    const sectionStyles = [
+      { label:"Situation", sub:"Understand the context — what does this look like day to day?", accent:"#5b8fd4", bg:"#111d30", border:"#1e3a5f" },
+      { label:"Executive Problem", sub:"Escalate — what does this mean for the business?", accent:C.emerald, bg:C.emeraldLight, border:C.emeraldMid },
+      { label:"Business Impact", sub:"Quantify — what metric is suffering, what is it costing?", accent:"#d4a03a", bg:"#1c1a0e", border:"#7a6010" },
+    ];
+    const layers = [tree.situation, tree.exec, tree.impact];
+
+    return (
+      <div>
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24, padding:"12px 16px", borderRadius:10, background:C.emeraldLight, border:`1.5px solid ${C.emeraldMid}` }}>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:11, fontWeight:700, color:C.emerald, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>Raging fire</div>
+            <div style={{ fontSize:17, fontWeight:700, color:C.textPrimary }}>{tree.label}</div>
+          </div>
+          <button onClick={() => setActiveStage("tree-picker")} style={{ ...B, fontSize:11, color:C.textMuted, background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"5px 12px", fontWeight:600 }}>← change</button>
+        </div>
+
+        {sectionStyles.map((section, si) => (
+          <div key={si} style={{ marginBottom:24 }}>
+            <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:12 }}>
+              <div style={{ fontSize:13, fontWeight:800, color:section.accent, textTransform:"uppercase", letterSpacing:"0.08em" }}>{section.label}</div>
+              <div style={{ fontSize:12, color:C.textMuted }}>{section.sub}</div>
+            </div>
+            {layers[si].map((item, i) => (
+              <div key={i} style={{ marginBottom:10, padding:"16px 20px", borderRadius:10, background:section.bg, border:`1.5px solid ${section.border}` }}>
+                <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.85, fontWeight:400 }}>&ldquo;{item.text}&rdquo;</div>
+                {coachingVisible && item.note && (
+                  <div style={{ marginTop:10, paddingTop:10, borderTop:`1px solid ${section.border}`, fontSize:12, color:section.accent, lineHeight:1.6 }}>{item.note}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   const Collapsible = ({ label, isOpen, onToggle, accent, children }) => (
     <div style={{ marginBottom:16, borderRadius:12, border:`1.5px solid ${accent}30`, overflow:"hidden" }}>
       <button onClick={onToggle} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 18px", background:`${accent}12`, border:"none", textAlign:"left" }}>
@@ -590,8 +808,8 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("tree-picker")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
 
@@ -610,8 +828,8 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("tree-picker")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
 
@@ -641,8 +859,8 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>
-          <button onClick={()=>setActiveStage("business-problem")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + move to Business Problem</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("tree-picker")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
       </div>
@@ -801,15 +1019,15 @@ ${combinedText}` }]
 
         <div style={{ flex:1, padding:"4px 8px" }}>
           {/* Setup group */}
-          {["setup","framework","close"].map(group => {
+          {["setup","discovery","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
-            const groupLabel = group === "setup" ? "Setup" : group === "framework" ? "5-Step Framework" : "Close";
+            const groupLabel = group === "setup" ? "Setup" : group === "discovery" ? "Discovery Tree" : "Close";
             return (
-              <div key={group} style={{ marginBottom: group === "close" ? 0 : 16 }}>
+              <div key={group} style={{ marginBottom: group === "close" ? 0 : 16, display: groupStages.length ? "block" : "none" }}>
                 <div style={{ fontSize:9, fontWeight:700, color:"#7d9ab5", letterSpacing:"0.15em", textTransform:"uppercase", padding:"0 8px", marginBottom:6 }}>{groupLabel}</div>
                 {groupStages.map(s => {
                   const isActive = s.id === activeStage;
-                  const isFramework = s.group === "framework";
+                  const isFramework = s.group === "discovery";
                   return (
                     <button key={s.id} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:10, padding:"11px 10px", borderRadius:8, background:isActive?"rgba(249,115,22,0.15)":"transparent", border:"none", borderLeft:isActive?"2px solid #f97316":"2px solid transparent", textAlign:"left", marginBottom:2 }}>
                       {isFramework ? (
@@ -843,33 +1061,29 @@ ${combinedText}` }]
         {/* TOP BAR */}
         <div style={{ padding:"16px 28px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
           <div style={{ flex:1 }}>
-            {/* Framework progress dots — only show during 5-step stages */}
-            {["business-problem","current-process","cause-analysis","negative-impact","future-state"].includes(activeStage) && (
+            {/* Discovery tree progress dots */}
+            {["tree-picker","tree"].includes(activeStage) && (
               <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:8 }}>
                 {[
-                  { id:"business-problem", label:"Business Problem" },
-                  { id:"current-process",  label:"Current State" },
-                  { id:"cause-analysis",   label:"Cause Analysis" },
-                  { id:"negative-impact",  label:"Negative Impact" },
-                  { id:"future-state",     label:"Future State" },
+                  { id:"tree-picker", label:"Pick" },
+                  { id:"tree",        label:"Go Deep" },
                 ].map((step, i) => {
                   const isActive = step.id === activeStage;
-                  const isDone = ["business-problem","current-process","cause-analysis","negative-impact","future-state"].indexOf(activeStage) > i;
+                  const isDone = ["tree-picker","tree"].indexOf(activeStage) > i;
                   return (
                     <button key={step.id} onClick={() => setActiveStage(step.id)} style={{ ...B, display:"flex", alignItems:"center", gap:5, background:"none", border:"none", padding:"2px 4px", borderRadius:4 }}>
                       <span style={{ width:20, height:20, borderRadius:6, background:isActive?"#4a9e78":isDone?"#163d2a":"#1e2d3e", border:isActive?"2px solid #4a9e78":isDone?"2px solid #2d6a48":"2px solid #263548", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:800, color:isActive?"#fff":isDone?"#4a9e78":"#4d6478" }}>{i+1}</span>
-                      <span style={{ fontSize:11, fontWeight:isActive?700:400, color:isActive?"#4a9e78":isDone?"#4a9e78":"#4d6478", display:"none" }}>{step.label}</span>
                     </button>
                   );
                 })}
                 <span style={{ fontSize:11, color:"#4d6478", marginLeft:4, fontWeight:500 }}>
-                  {{"business-problem":"Business Problem","current-process":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State"}[activeStage]}
+                  {{"tree-picker":"Pick the raging fire","tree":"Go deep"}[activeStage]}
                 </span>
               </div>
             )}
             <div style={{ display:"flex", alignItems:"baseline", gap:10 }}>
               <div style={{ fontSize:20, fontWeight:700, color:"#eef2f7", letterSpacing:"-0.02em", lineHeight:1.2 }}>
-                {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","current-process":"Current State","business-problem":"Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Negative Impact","future-state":"Future State + Decision","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
+                {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","tree-picker":"Pick the Discovery Tree","tree": TREES.find(t=>t.id===selectedTree)?.label || "Discovery Tree","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
               </div>
               {(briefFields.prospect || briefFields.company) && activeStage !== "prep" && (
                 <span style={{ fontSize:13, color:"#9a80e0", fontWeight:500 }}>
@@ -878,7 +1092,7 @@ ${combinedText}` }]
               )}
             </div>
             <div style={{ fontSize:13, color:C.textMuted, marginTop:3 }}>
-              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","current-process":"Mutual understanding of where they are today.","business-problem":"Identify and validate THE business problem.","cause-analysis":"Mutually identify the true root cause.","negative-impact":"Explore impact, consequences, and negative ramifications.","future-state":"Desired outcomes, buying process, and the WHY behind it.","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
+              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","tree-picker":"What pain bucket did they reveal? Tap the raging fire.","tree":"Situation → Executive Problem → Business Impact","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
             </div>
           </div>
           <div style={{ display:"flex", gap:8, alignItems:"center", flexShrink:0 }}>
@@ -1085,6 +1299,12 @@ ${combinedText}` }]
 
             {/* BUYER TYPE */}
             {activeStage === "buyer-type" && renderBuyerType()}
+
+            {/* TREE PICKER */}
+            {activeStage === "tree-picker" && renderTreePicker()}
+
+            {/* DISCOVERY TREE */}
+            {activeStage === "tree" && renderTree()}
 
                         {/* RHYTHM STAGES */}
             {sd && (
