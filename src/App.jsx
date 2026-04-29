@@ -452,8 +452,9 @@ export default function App() {
   const [prepBrief, setPrepBrief] = useState("");
   const [openSpiced, setOpenSpiced] = useState(null);
   const [prepOpen, setPrepOpen] = useState(false);
-  const [outputs, setOutputs] = useState({ spiced:"", email:"", score:"", whatweheard:"", debrief:"" });
+  const [outputs, setOutputs] = useState({ spiced:"", email:"", score:"", whatweheard:"", debrief:"", fixplan:"" });
   const [outputLoading, setOutputLoading] = useState("");
+  const [fixPlanLoading, setFixPlanLoading] = useState(false);
   const [tipsOpen, setTipsOpen] = useState(false);
   const [watchOpen, setWatchOpen] = useState(false);
   const [collapsedCards, setCollapsedCards] = useState({});
@@ -550,6 +551,46 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       setOutputs(o => ({ ...o, debrief: data.content?.[0]?.text || "Failed." }));
     } catch { setOutputs(o => ({ ...o, debrief:"Generation failed." })); }
     setDebriefLoading(false);
+  }
+
+  async function generateFixPlan() {
+    if (!callTranscript.trim()) return;
+    setFixPlanLoading(true);
+    setOutputs(o => ({ ...o, fixplan:"" }));
+    try {
+      const debriefContext = outputs.debrief ? `\n\nDEBRIEF ALREADY RUN:\n${outputs.debrief}` : "";
+      const res = await fetch("/api/claude", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1800, system: PANDADOC_CONTEXT,
+          messages:[{ role:"user", content:`You are a PandaDoc sales coach. Based on this transcript, tell me EXACTLY what to do to fix and advance this deal. Be surgical. No fluff.
+
+TRANSCRIPT:
+${callTranscript}
+${debriefContext}
+
+PREP BRIEF (if available):
+${prepBrief || "None"}
+
+Give me four sections:
+
+1. EMAIL TO SEND TODAY
+Write the full subject line and email body. Use their exact words from the call. Reference what they said. The goal is to re-anchor to the problem, show you heard them, and earn the next conversation. Make it sound like a human wrote it, not a template. Short. No corporate speak.
+
+2. AGENDA FOR NEXT CALL
+What are the first 3 things I say when the call starts? What specific discovery gaps do I need to fill — give me the exact questions word for word. What must I get them to say out loud before I can move forward?
+
+3. WHAT TO SHOW IN THE DEMO
+Based on their specific situation from this call, what PandaDoc features should I actually demo? Map each feature directly to something THEY said. If they mentioned Salesforce integration, show that. If they mentioned approval bottlenecks, show approval workflows. Be specific to this account — not a generic demo list.
+
+4. DEAL RISK + HOW TO DE-RISK IT
+What are the 1-2 things most likely to kill this deal? For each one, give me the exact words to say on the next call to get ahead of it.
+
+Use their actual language from the transcript. Make every line actionable. This is for the AE to read 5 minutes before the next call.` }] }),
+      });
+      const data = await res.json();
+      setOutputs(o => ({ ...o, fixplan: data.content?.[0]?.text || "Failed." }));
+    } catch { setOutputs(o => ({ ...o, fixplan:"Generation failed." })); }
+    setFixPlanLoading(false);
   }
 
   async function generateOutput(type) {
@@ -1554,6 +1595,27 @@ ${combinedText}` }]
                   {outputs.debrief && (
                     <div style={{ marginTop:20 }}>
                       <div style={{ fontSize:15, color:C.textSecondary, lineHeight:1.9, whiteSpace:"pre-wrap", borderTop:`1px solid ${C.border}`, paddingTop:16 }}>{outputs.debrief}</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* FIX PLAN */}
+                <div style={{ background:C.white, border:`2px solid #7a60c8`, borderRadius:14, padding:26, marginBottom:18 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom: outputs.fixplan ? 0 : 0 }}>
+                    <div>
+                      <div style={{ fontSize:18, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Deal Fix Plan</div>
+                      <div style={{ fontSize:14, color:C.textMuted, lineHeight:1.6 }}>Email to send today, next call agenda, what to demo, and how to de-risk — all mapped to what they actually said.</div>
+                    </div>
+                    <button
+                      onClick={generateFixPlan}
+                      disabled={fixPlanLoading || !callTranscript.trim()}
+                      style={{ ...B, fontSize:14, padding:"10px 22px", border:"none", borderRadius:8, background:fixPlanLoading||!callTranscript.trim()?"#f0eeff":"#7a60c8", color:fixPlanLoading||!callTranscript.trim()?"#7a60c8":"#fff", fontWeight:700, flexShrink:0, marginLeft:16 }}>
+                      {fixPlanLoading ? "Building plan..." : "Fix This Deal ↗"}
+                    </button>
+                  </div>
+                  {outputs.fixplan && (
+                    <div style={{ marginTop:20 }}>
+                      <div style={{ fontSize:15, color:C.textSecondary, lineHeight:1.9, whiteSpace:"pre-wrap", borderTop:"1px solid #e8e0f8", paddingTop:16 }}>{outputs.fixplan}</div>
                     </div>
                   )}
                 </div>
