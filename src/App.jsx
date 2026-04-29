@@ -561,7 +561,7 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       const debriefContext = outputs.debrief ? `\n\nDEBRIEF ALREADY RUN:\n${outputs.debrief}` : "";
       const res = await fetch("/api/claude", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1800, system: PANDADOC_CONTEXT,
+        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:2400, system: PANDADOC_CONTEXT,
           messages:[{ role:"user", content:`You are a PandaDoc sales coach. Based on this transcript, tell me EXACTLY what to do to fix and advance this deal. Be surgical. No fluff.
 
 TRANSCRIPT:
@@ -571,7 +571,7 @@ ${debriefContext}
 PREP BRIEF (if available):
 ${prepBrief || "None"}
 
-Give me four sections:
+Give me five sections:
 
 1. EMAIL TO SEND TODAY
 Write the full subject line and email body. Use their exact words from the call. Reference what they said. The goal is to re-anchor to the problem, show you heard them, and earn the next conversation. Make it sound like a human wrote it, not a template. Short. No corporate speak.
@@ -582,8 +582,15 @@ What are the first 3 things I say when the call starts? What specific discovery 
 3. WHAT TO SHOW IN THE DEMO
 Based on their specific situation from this call, what PandaDoc features should I actually demo? Map each feature directly to something THEY said. If they mentioned Salesforce integration, show that. If they mentioned approval bottlenecks, show approval workflows. Be specific to this account — not a generic demo list.
 
-4. DEAL RISK + HOW TO DE-RISK IT
-What are the 1-2 things most likely to kill this deal? For each one, give me the exact words to say on the next call to get ahead of it.
+4. MULTITHREAD — WHO ELSE I NEED TO BE TALKING TO
+This deal dies if I only have one contact. Based on everything in this transcript:
+- Who else at this company should be in the conversation? (Name the likely titles — economic buyer, end user, IT, legal, finance — and WHY each one matters for this specific deal)
+- What's my ask to my current contact to get introduced? Give me the exact words — a one-sentence ask that doesn't feel like I'm going around them.
+- What's the risk if I don't multithread, specific to this account? What scenario ends the deal?
+- Who is most likely the real economic buyer and what do I know about their priorities from this call?
+
+5. DEAL RISK + HOW TO DE-RISK IT
+What are the 1-2 things most likely to kill this deal beyond single-threading? For each one, give me the exact words to say on the next call to get ahead of it.
 
 Use their actual language from the transcript. Make every line actionable. This is for the AE to read 5 minutes before the next call.` }] }),
       });
