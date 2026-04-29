@@ -574,7 +574,7 @@ ${prepBrief || "None"}
 Give me five sections:
 
 1. EMAIL TO SEND TODAY
-Write the full subject line and email body. Use their exact words from the call. Reference what they said. The goal is to re-anchor to the problem, show you heard them, and earn the next conversation. Make it sound like a human wrote it, not a template. Short. No corporate speak.
+Write the full subject line and email body. Rules: reference ONE specific thing they said — not a summary of everything. Do not list "next steps" like a CRM update. Do not say "as discussed" or "per our conversation" or "excited to work together." Do not open with "Hope this finds you well." Write it the way a sharp rep texts a contact they actually like — direct, specific, a little personality. The goal is to show you actually listened and make them want to reply. Three sentences max for the body, then one clear ask.
 
 2. AGENDA FOR NEXT CALL
 What are the first 3 things I say when the call starts? What specific discovery gaps do I need to fill — give me the exact questions word for word. What must I get them to say out loud before I can move forward?
@@ -592,6 +592,14 @@ This deal dies if I only have one contact. Based on everything in this transcrip
 5. DEAL RISK + HOW TO DE-RISK IT
 What are the 1-2 things most likely to kill this deal beyond single-threading? For each one, give me the exact words to say on the next call to get ahead of it.
 
+CRITICAL LANGUAGE RULES for every script in this output:
+- Do NOT write ROI calculator questions. "What would your team do with that time back?" is banned. "How does that translate to more business for you?" is banned. These sound like a sales training video and every prospect hates them.
+- Do NOT lead with PandaDoc's value prop. Never say "if we could cut your time from X to Y" as a way to set up a question — that's pitching, not asking.
+- Do NOT write rhetorical questions designed to get a yes. "Wouldn't it be great if..." is banned.
+- Do NOT use phrases like "best bang for your buck," "game-changer," "solution," "streamline," or "leverage."
+- Write like a human who listened carefully and is genuinely curious, not like someone running a play. Short sentences. Acknowledge their reality first. Then ask from curiosity.
+- The best scripts sound like something you'd say to a colleague you respect — not something you'd read off a card.
+
 Use their actual language from the transcript. Make every line actionable. This is for the AE to read 5 minutes before the next call.` }] }),
       });
       const data = await res.json();
@@ -605,7 +613,7 @@ Use their actual language from the transcript. Make every line actionable. This 
     const allNotes = Object.entries(notes).filter(([,v])=>v).map(([k,v])=>k+": "+v).join("\n");
     const prompts = {
       spiced:`Filled SPICED + next step for PandaDoc.\nPrep: ${prepBrief||"None"}\nBuyer path: ${buyerPath||"unknown"}\nNotes:\n${allNotes}\nUse their exact words. S=situation, P=need behind the need+root cause, I=metric+cost of inaction, C=timeline+trajectory+dissatisfaction, D=decision process. Recommend next step with What/Who/Why.`,
-      email:`Post-discovery follow-up email for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nGreeting + 4-5 word genuine callback. One sentence in their exact words. Bridge to next steps. Max 4 bullet next steps with dates. Sign off: Excited to tackle this together. No corporate speak.`,
+      email:`Post-discovery follow-up email for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nRules: Reference ONE specific thing they said — not a summary. No "as discussed," no "per our conversation," no "hope this finds you well," no bullet-point next steps list. Do not open with a compliment. Do not say "excited to work together" or "looking forward to the journey." Write it the way a sharp rep messages a contact they actually like — direct, a little personality, three sentences max, one clear ask. Make them want to reply.`,
       score:`Score this PandaDoc call out of 100.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nBuyer path: ${buyerPath||"unknown"}\nScore /20 each: 1) ROE set + buyer journey diagnosed 2) Need behind the need uncovered (not just symptoms) 3) Current state baselined with metric+trajectory 4) Future state quantified with value delta 5) Next step secured with What/Who/Why. Top 3 failure modes. 3 coaching actions for next call.`,
       whatweheard:`Create a 'What We Heard' slide for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\n\nFormat:\nCURRENT STATE: [problem in their exact words + metric suffering + current measurement]\nNEED BEHIND THE NEED: [underlying business problem + why it matters]\nDESIRED STATE: [what good looks like 365 days from now + target metric]\nVALUE DELTA: [current vs desired metric — calculate financial gap if possible]\nNO LOGO TEST: [could someone identify this company from this description alone? Rate 1-5 and explain]\nThis opens the next meeting.`,
     };
