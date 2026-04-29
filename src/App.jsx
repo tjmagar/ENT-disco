@@ -469,8 +469,13 @@ export default function App() {
   const [coachingVisible, setCoachingVisible] = useState(false);
   const [callTranscript, setCallTranscript] = useState("");
   const [debriefLoading, setDebriefLoading] = useState(false);
-  const [scriptEdits, setScriptEdits] = useState({}); // key -> edited text
+  const [scriptEdits, setScriptEdits] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("smb-script-edits") || "{}"); } catch { return {}; }
+  });
   const [editingKey, setEditingKey] = useState(null);  // which card is in edit mode
+  useEffect(() => {
+    try { localStorage.setItem("smb-script-edits", JSON.stringify(scriptEdits)); } catch {}
+  }, [scriptEdits]);
   const currentIdx = STAGES.findIndex(s => s.id === activeStage);
   const stageNote = notes[activeStage] || "";
   const showOutputsShortcut = activeStage !== "outputs";
@@ -758,10 +763,14 @@ ${combinedText}` }]
 
     const sectionStyles = [
       { key:"situation",  label:"S — Situation",       sub:"Map their process. Understand the context.",                  accent:"#5b8fd4", bg:"#eef4ff", border:"#b0ccf0" },
-      { key:"pain",       label:"P — Pain",             sub:"Find the need behind the need. Don't stop at the symptom.",   accent:C.emerald, bg:C.emeraldLight, border:C.emeraldMid },
-      { key:"impact",     label:"I — Impact",           sub:"Quantify — metric, ripple effects, cost of inaction.",        accent:"#a07820", bg:"#fdf7e6", border:"#c09818" },
-      { key:"critical",   label:"C — Critical Event",   sub:"Why now? What happens if this doesn't get solved?",           accent:"#b060a0", bg:"#fef0f8", border:"#c078b0" },
-      { key:"decision",   label:"D — Decision",         sub:"Who decides, how, and what are the hurdles?",                 accent:"#7a60c8", bg:"#f4f0ff", border:"#9080d8" },
+      { key:"pain",       label:"P — Pain",             sub:"Find the need behind the need. Don't stop at the symptom.",   accent:C.emerald, bg:C.emeraldLight, border:C.emeraldMid,
+        transition: "Summarize before you go deeper — \"Let me see if I've got this right — [their exact words]. Did I catch that?\"" },
+      { key:"impact",     label:"I — Impact",           sub:"Quantify — metric, ripple effects, cost of inaction.",        accent:"#a07820", bg:"#fdf7e6", border:"#c09818",
+        transition: "Validate the priority — \"Before we keep going — is this the challenge we should anchor our whole conversation to, or did I lead you somewhere you only mildly care about?\"" },
+      { key:"critical",   label:"C — Critical Event",   sub:"Why now? What happens if this doesn't get solved?",           accent:"#b060a0", bg:"#fef0f8", border:"#c078b0",
+        transition: "Summarize impact before timing — \"So just to make sure I have the full picture — [your impact summary]. Does that feel right?\"" },
+      { key:"decision",   label:"D — Decision",         sub:"Who decides, how, and what are the hurdles?",                 accent:"#7a60c8", bg:"#f4f0ff", border:"#9080d8",
+        transition: "Bridge to process — \"I really appreciate you sharing all of that. Anything I missed before I ask a few questions about how decisions like this typically get made?\"" },
     ];
     const layers = sectionStyles.map(s => tree[s.key] || []);
 
@@ -777,18 +786,55 @@ ${combinedText}` }]
 
         {sectionStyles.map((section, si) => (
           <div key={si} style={{ marginBottom:24 }}>
-            <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:12 }}>
+            <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:10 }}>
               <div style={{ fontSize:13, fontWeight:800, color:section.accent, textTransform:"uppercase", letterSpacing:"0.08em" }}>{section.label}</div>
               <div style={{ fontSize:12, color:C.textMuted }}>{section.sub}</div>
             </div>
-            {layers[si].map((item, i) => (
-              <div key={i} style={{ marginBottom:10, padding:"16px 20px", borderRadius:10, background:section.bg, border:`1.5px solid ${section.border}` }}>
-                <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.85, fontWeight:400 }}>&ldquo;{item.text}&rdquo;</div>
-                {coachingVisible && item.note && (
-                  <div style={{ marginTop:10, paddingTop:10, borderTop:`1px solid ${section.border}`, fontSize:12, color:section.accent, lineHeight:1.6 }}>{item.note}</div>
-                )}
+            {section.transition && (
+              <div style={{ marginBottom:12, padding:"9px 14px", borderRadius:8, background:"#fffbf0", border:"1px solid #e8d080", display:"flex", gap:10, alignItems:"flex-start" }}>
+                <span style={{ fontSize:10, fontWeight:700, color:"#9a7010", letterSpacing:"0.07em", textTransform:"uppercase", flexShrink:0, marginTop:1 }}>Transition</span>
+                <div style={{ fontSize:12, color:"#7a5808", lineHeight:1.6, fontStyle:"italic" }}>{section.transition}</div>
               </div>
-            ))}
+            )}
+            {layers[si].map((item, i) => {
+              const cardKey = `${tree.id}-${section.key}-${i}`;
+              const isEditing = editingKey === cardKey;
+              const displayText = scriptEdits[cardKey] !== undefined ? scriptEdits[cardKey] : item.text;
+              const isCustomized = scriptEdits[cardKey] !== undefined;
+              return (
+                <div key={i} style={{ marginBottom:10, padding:"14px 18px", borderRadius:10, background:section.bg, border:`1.5px solid ${section.border}`, position:"relative" }}>
+                  {isEditing ? (
+                    <>
+                      <textarea
+                        value={scriptEdits[cardKey] !== undefined ? scriptEdits[cardKey] : item.text}
+                        onChange={e => setScriptEdits(s => ({ ...s, [cardKey]: e.target.value }))}
+                        style={{ width:"100%", boxSizing:"border-box", minHeight:90, fontSize:14, lineHeight:1.7, border:`1px solid ${section.border}`, borderRadius:6, padding:"8px 10px", fontFamily:"'Inter', system-ui, sans-serif", resize:"vertical", background:"#fff", color:C.textPrimary }}
+                        autoFocus
+                      />
+                      <div style={{ marginTop:8, display:"flex", gap:8, flexWrap:"wrap" }}>
+                        <button onClick={() => setEditingKey(null)} style={{ ...B, fontSize:11, padding:"4px 14px", borderRadius:5, background:section.accent, color:"#fff", border:"none", fontWeight:700 }}>Save</button>
+                        <button onClick={() => { if (!isCustomized) setScriptEdits(s => { const n={...s}; delete n[cardKey]; return n; }); setEditingKey(null); }} style={{ ...B, fontSize:11, padding:"4px 12px", borderRadius:5, background:"none", border:`1px solid ${section.border}`, color:C.textMuted, fontWeight:600 }}>Cancel</button>
+                        {isCustomized && (
+                          <button onClick={() => { setScriptEdits(s => { const n={...s}; delete n[cardKey]; return n; }); setEditingKey(null); }} style={{ ...B, fontSize:11, padding:"4px 12px", borderRadius:5, background:"none", border:"1px solid #ffb0b0", color:"#c44848", fontWeight:600 }}>Reset</button>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.85, fontWeight:400, paddingRight:36 }}>&ldquo;{displayText}&rdquo;</div>
+                      {coachingVisible && item.note && (
+                        <div style={{ marginTop:10, paddingTop:10, borderTop:`1px solid ${section.border}`, fontSize:12, color:section.accent, lineHeight:1.6 }}>{item.note}</div>
+                      )}
+                      <button
+                        onClick={() => { setScriptEdits(s => s[cardKey] !== undefined ? s : { ...s, [cardKey]: item.text }); setEditingKey(cardKey); }}
+                        style={{ ...B, position:"absolute", top:10, right:10, fontSize:10, padding:"2px 8px", borderRadius:4, background:"none", border:`1px solid ${section.border}`, color:C.textMuted, fontWeight:600, opacity: isCustomized ? 1 : 0.55 }}
+                        title={isCustomized ? "Edited — click to change" : "Edit this script"}
+                      >{isCustomized ? "✎ edited" : "edit"}</button>
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
