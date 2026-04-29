@@ -799,14 +799,15 @@ ${combinedText}` }]
             {layers[si].map((item, i) => {
               const cardKey = `${tree.id}-${section.key}-${i}`;
               const isEditing = editingKey === cardKey;
-              const displayText = scriptEdits[cardKey] !== undefined ? scriptEdits[cardKey] : item.text;
+              const baseText = item.lead ? `${item.lead} ${item.text}` : item.text;
+              const displayText = scriptEdits[cardKey] !== undefined ? scriptEdits[cardKey] : baseText;
               const isCustomized = scriptEdits[cardKey] !== undefined;
               return (
                 <div key={i} style={{ marginBottom:10, padding:"14px 18px", borderRadius:10, background:section.bg, border:`1.5px solid ${section.border}`, position:"relative" }}>
                   {isEditing ? (
                     <>
                       <textarea
-                        value={scriptEdits[cardKey] !== undefined ? scriptEdits[cardKey] : item.text}
+                        value={scriptEdits[cardKey] !== undefined ? scriptEdits[cardKey] : baseText}
                         onChange={e => setScriptEdits(s => ({ ...s, [cardKey]: e.target.value }))}
                         style={{ width:"100%", boxSizing:"border-box", minHeight:90, fontSize:14, lineHeight:1.7, border:`1px solid ${section.border}`, borderRadius:6, padding:"8px 10px", fontFamily:"'Inter', system-ui, sans-serif", resize:"vertical", background:"#fff", color:C.textPrimary }}
                         autoFocus
@@ -821,9 +822,6 @@ ${combinedText}` }]
                     </>
                   ) : (
                     <>
-                      {item.lead && (
-                        <div style={{ fontSize:12, color:C.textMuted, fontStyle:'italic', marginBottom:6, lineHeight:1.5 }}>{item.lead}</div>
-                      )}
                       <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.85, fontWeight:400, paddingRight:36 }}>&ldquo;{displayText}&rdquo;</div>
                       {coachingVisible && item.note && (
                         <div style={{ marginTop:10, paddingTop:10, borderTop:`1px solid ${section.border}`, fontSize:12, color:section.accent, lineHeight:1.6 }}>{item.note}</div>
