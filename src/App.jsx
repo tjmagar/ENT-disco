@@ -18,13 +18,12 @@ const C = {
 };
 
 const STAGES = [
-  { id:"prep",         icon:"◎",  short:"Prep Brief",    group:"setup" },
-  { id:"open",         icon:"①",  short:"Open",          group:"setup" },
-  { id:"buyer-type",   icon:"②",  short:"Buyer Type",    group:"setup" },
-  { id:"tree-picker",  icon:"③",  short:"Pick the Tree", group:"discovery" },
-  { id:"tree",         icon:"④",  short:"Discovery Tree",group:"discovery" },
-  { id:"next-step",    icon:"⑦",  short:"Next Step",     group:"close" },
-  { id:"outputs",      icon:"✦",  short:"Outputs",       group:"close" },
+  { id:"prep",               icon:"◎",  short:"Prep Brief",       group:"setup" },
+  { id:"open",               icon:"①",  short:"Open + ROE",       group:"setup" },
+  { id:"align-buyer",        icon:"②",  short:"Align with Buyer", group:"setup" },
+  { id:"current-situation",  icon:"③",  short:"Current Situation",group:"discovery" },
+  { id:"next-step",          icon:"⑦",  short:"Next Step",        group:"close" },
+  { id:"outputs",            icon:"✦",  short:"Outputs",          group:"close" },
 ];
 
 const SPICED_QUESTIONS = [
@@ -473,7 +472,8 @@ export default function App() {
   const [scriptEdits, setScriptEdits] = useState(() => {
     try { return JSON.parse(localStorage.getItem("smb-script-edits") || "{}"); } catch { return {}; }
   });
-  const [editingKey, setEditingKey] = useState(null);  // which card is in edit mode
+  const [editingKey, setEditingKey] = useState(null);
+  const [situationStep, setSituationStep] = useState(0);
   useEffect(() => {
     try { localStorage.setItem("smb-script-edits", JSON.stringify(scriptEdits)); } catch {}
   }, [scriptEdits]);
@@ -493,7 +493,7 @@ export default function App() {
       const n = parseInt(e.key);
       if (n >= 1 && n <= 9) {
         const cardIdx = n - 1;
-        const prefix = activeStage === "buyer-type"
+        const prefix = activeStage === "align-buyer"
           ? (buyerPath === "evaluating" ? "eval" : buyerPath === "active-pain" ? "active" : "latent")
           : activeStage;
         const key = `${prefix}-${cardIdx}`;
@@ -813,7 +813,7 @@ ${combinedText}` }]
     const tree = TREES.find(t => t.id === selectedTree);
     if (!tree) return (
       <div style={{ color:C.textMuted, fontSize:14 }}>
-        No tree selected. <button onClick={() => setActiveStage("tree-picker")} style={{ ...B, color:C.emerald, background:"none", border:"none", fontWeight:600 }}>← Go back</button>
+        No tree selected. <button onClick={() => setActiveStage("current-situation")} style={{ ...B, color:C.emerald, background:"none", border:"none", fontWeight:600 }}>← Go back</button>
       </div>
     );
 
@@ -837,7 +837,7 @@ ${combinedText}` }]
             <div style={{ fontSize:11, fontWeight:700, color:C.emerald, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>Raging fire</div>
             <div style={{ fontSize:17, fontWeight:700, color:C.textPrimary }}>{tree.label}</div>
           </div>
-          <button onClick={() => setActiveStage("tree-picker")} style={{ ...B, fontSize:11, color:C.textMuted, background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"5px 12px", fontWeight:600 }}>← change</button>
+          <button onClick={() => setActiveStage("current-situation")} style={{ ...B, fontSize:11, color:C.textMuted, background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"5px 12px", fontWeight:600 }}>← change</button>
         </div>
 
         {sectionStyles.map((section, si) => (
@@ -980,6 +980,112 @@ ${combinedText}` }]
     );
   }
 
+  const SITUATION_STEPS = [
+    {
+      step: 1,
+      label: "Open Current State",
+      tag: "Current Process",
+      tagColor: "#5b8fd4",
+      tagBg: "#eef4ff",
+      tagBorder: "#b0ccf0",
+      script: "Great, thanks for helping me understand the motivation for booking the call. Now I'd like to understand where we're starting from so we can map to where you'd like to be — walk me through your current process today on how documents are generated, edited, sent, signed, etc.",
+      note: "Open and neutral. Don't name what you expect to find — let them describe it. You're mapping reality before you pitch anything.",
+      cue: "Once they finish → advance to step 2",
+    },
+    {
+      step: 2,
+      label: "Desired State",
+      tag: "Future State",
+      tagColor: C.emerald,
+      tagBg: C.emeraldLight,
+      tagBorder: C.emeraldMid,
+      script: "Okay, so now I understand how it is today. What are you hoping to achieve or accomplish with a product like PandaDoc?",
+      note: "Let them paint the future in their own words before you describe it for them. Their language becomes your language for the rest of the call.",
+      cue: "Once they tell you what they want → advance to step 3",
+    },
+    {
+      step: 3,
+      label: "Priority Driver",
+      tag: "Why Now",
+      tagColor: "#a07820",
+      tagBg: "#fdf7e6",
+      tagBorder: "#c09818",
+      script: "What's going on in the business that's driving this to be a priority?",
+      note: "The peel-the-onion opener. They'll often chuckle — that chuckle means you hit it. Shut up and let them go. The real reason is almost always one layer below the first answer.",
+      cue: "This is the trigger. Find it. Then move to deeper discovery →",
+    },
+  ];
+
+  function renderCurrentSituation() {
+    const step = SITUATION_STEPS[situationStep];
+    const isLast = situationStep === SITUATION_STEPS.length - 1;
+    return (
+      <div>
+        {/* Step progress */}
+        <div style={{ display:"flex", gap:8, marginBottom:24 }}>
+          {SITUATION_STEPS.map((s, i) => {
+            const isActive = i === situationStep;
+            const isDone = i < situationStep;
+            return (
+              <button
+                key={i}
+                onClick={() => setSituationStep(i)}
+                style={{ ...B, display:"flex", alignItems:"center", gap:8, padding:"8px 14px", borderRadius:8, background: isActive ? C.emerald : isDone ? C.emeraldLight : C.white, border: `1.5px solid ${isActive ? C.emerald : isDone ? C.emeraldMid : C.border}`, flex:1 }}
+              >
+                <span style={{ width:22, height:22, borderRadius:6, background: isActive ? "#fff" : isDone ? C.emerald : C.border, color: isActive ? C.emerald : isDone ? "#fff" : C.textMuted, fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{isDone ? "✓" : i + 1}</span>
+                <span style={{ fontSize:12, fontWeight:700, color: isActive ? "#fff" : isDone ? C.emerald : C.textMuted, lineHeight:1.3 }}>{s.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Active step card */}
+        <div style={{ borderRadius:14, border:`2px solid ${step.tagBorder}`, background:step.tagBg, padding:28, marginBottom:20 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:18 }}>
+            <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:99, background:step.tagColor, color:"#fff", letterSpacing:"0.07em", textTransform:"uppercase" }}>{step.tag}</span>
+            <span style={{ fontSize:11, color:step.tagColor, fontWeight:600 }}>Step {step.step} of {SITUATION_STEPS.length}</span>
+          </div>
+          <div style={{ fontSize:18, color:C.textPrimary, lineHeight:1.9, fontWeight:500, marginBottom: coachingVisible ? 18 : 0 }}>
+            &ldquo;{step.script}&rdquo;
+          </div>
+          {coachingVisible && (
+            <div style={{ borderTop:`1px solid ${step.tagBorder}`, paddingTop:14, fontSize:13, color:step.tagColor, lineHeight:1.7 }}>{step.note}</div>
+          )}
+        </div>
+
+        {/* Cue */}
+        <div style={{ fontSize:13, color:C.textMuted, fontStyle:"italic", marginBottom:24, paddingLeft:4 }}>{step.cue}</div>
+
+        {/* Navigation */}
+        <div style={{ display:"flex", gap:10 }}>
+          {situationStep > 0 && (
+            <button
+              onClick={() => setSituationStep(s => s - 1)}
+              style={{ ...B, fontSize:13, padding:"11px 20px", borderRadius:8, border:`1.5px solid ${C.border}`, background:C.white, color:C.textMuted, fontWeight:600 }}
+            >← Back</button>
+          )}
+          {!isLast ? (
+            <button
+              onClick={() => setSituationStep(s => s + 1)}
+              style={{ ...B, flex:1, fontSize:14, padding:"13px 24px", borderRadius:8, border:"none", background:C.emerald, color:"#fff", fontWeight:700 }}
+            >They responded — next →</button>
+          ) : (
+            <button
+              onClick={() => setActiveStage("next-step")}
+              style={{ ...B, flex:1, fontSize:14, padding:"13px 24px", borderRadius:8, border:"none", background:C.emerald, color:"#fff", fontWeight:700 }}
+            >Discovery complete — Next Step →</button>
+          )}
+        </div>
+
+        {/* SPICED reminder */}
+        <div style={{ marginTop:28, padding:"14px 18px", borderRadius:10, background:C.white, border:`1.5px solid ${C.border}` }}>
+          <div style={{ fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:8 }}>Deep discovery questions</div>
+          <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7 }}>Use the <strong>Question Bank →</strong> in the right panel to go deeper on Situation, Pain, Impact, Critical Event, and Decision as the conversation unfolds.</div>
+        </div>
+      </div>
+    );
+  }
+
   function renderBuyerType() {
     const allPaths = [
       { path:"evaluating", border:"#b0ccf0", bg:"#eef4ff", titleColor:"#5b8fd4", bodyColor:"#2a60a8", badge:"#b0ccf0", badgeText:"#2a60a8", icon:"⚡", title:"Solution language", sub:'"We\'re looking for a product that can do X..." — Actively evaluating. Comparing solutions.', technique:"→ Go Back In Time" },
@@ -1055,7 +1161,7 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("tree-picker")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <button onClick={()=>setActiveStage("current-situation")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
@@ -1075,7 +1181,7 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("tree-picker")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <button onClick={()=>setActiveStage("current-situation")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
@@ -1106,7 +1212,7 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>
-          <button onClick={()=>setActiveStage("tree-picker")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <button onClick={()=>setActiveStage("current-situation")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
@@ -1268,7 +1374,7 @@ ${combinedText}` }]
           {/* Setup group */}
           {["setup","discovery","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
-            const groupLabel = group === "setup" ? "Setup" : group === "discovery" ? "Discovery Tree" : "Close";
+            const groupLabel = group === "setup" ? "Setup" : group === "discovery" ? "Discovery" : "Close";
             return (
               <div key={group} style={{ marginBottom: group === "close" ? 0 : 16, display: groupStages.length ? "block" : "none" }}>
                 <div style={{ fontSize:9, fontWeight:700, color:"#7aba90", letterSpacing:"0.15em", textTransform:"uppercase", padding:"0 8px", marginBottom:6 }}>{groupLabel}</div>
@@ -1308,29 +1414,9 @@ ${combinedText}` }]
         {/* TOP BAR */}
         <div style={{ padding:"16px 28px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
           <div style={{ flex:1 }}>
-            {/* Discovery tree progress dots */}
-            {["tree-picker","tree"].includes(activeStage) && (
-              <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:8 }}>
-                {[
-                  { id:"tree-picker", label:"Pick" },
-                  { id:"tree",        label:"Go Deep" },
-                ].map((step, i) => {
-                  const isActive = step.id === activeStage;
-                  const isDone = ["tree-picker","tree"].indexOf(activeStage) > i;
-                  return (
-                    <button key={step.id} onClick={() => setActiveStage(step.id)} style={{ ...B, display:"flex", alignItems:"center", gap:5, background:"none", border:"none", padding:"2px 4px", borderRadius:4 }}>
-                      <span style={{ width:20, height:20, borderRadius:6, background:isActive?"#4a9e78":isDone?"#c0dac8":"#dce8f0", border:isActive?"2px solid #4a9e78":isDone?"2px solid #60a878":"2px solid #d8e4dc", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:800, color:isActive?"#fff":isDone?"#4a9e78":"#6aaa80" }}>{i+1}</span>
-                    </button>
-                  );
-                })}
-                <span style={{ fontSize:11, color:"#6aaa80", marginLeft:4, fontWeight:500 }}>
-                  {{"tree-picker":"Pick the raging fire","tree":"Go deep"}[activeStage]}
-                </span>
-              </div>
-            )}
             <div style={{ display:"flex", alignItems:"baseline", gap:10 }}>
               <div style={{ fontSize:20, fontWeight:700, color:C.textPrimary, letterSpacing:"-0.02em", lineHeight:1.2 }}>
-                {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","buyer-type":"Meet Buyer Where They Are","tree-picker":"Pick the Discovery Tree","tree": TREES.find(t=>t.id===selectedTree)?.label || "Discovery Tree","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
+                {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","align-buyer":"Align with Buyer","current-situation":"Current Situation","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
               </div>
               {(briefFields.prospect || briefFields.company) && activeStage !== "prep" && (
                 <span style={{ fontSize:13, color:"#9a80e0", fontWeight:500 }}>
@@ -1339,7 +1425,7 @@ ${combinedText}` }]
               )}
             </div>
             <div style={{ fontSize:13, color:C.textMuted, marginTop:3 }}>
-              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","buyer-type":"Listen for their language. Meet them where they are.","tree-picker":"What pain bucket did they reveal? Tap the raging fire.","tree":"Situation → Executive Problem → Business Impact","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
+              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","align-buyer":"Listen for their language. Meet them where they are.","current-situation":"Map where they are today, where they want to go, and why now.","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
             </div>
           </div>
           <div style={{ display:"flex", gap:8, alignItems:"center", flexShrink:0 }}>
@@ -1545,13 +1631,10 @@ ${combinedText}` }]
             )}
 
             {/* BUYER TYPE */}
-            {activeStage === "buyer-type" && renderBuyerType()}
+            {activeStage === "align-buyer" && renderBuyerType()}
 
-            {/* TREE PICKER */}
-            {activeStage === "tree-picker" && renderTreePicker()}
-
-            {/* DISCOVERY TREE */}
-            {activeStage === "tree" && renderTree()}
+            {/* CURRENT SITUATION */}
+            {activeStage === "current-situation" && renderCurrentSituation()}
 
                         {/* RHYTHM STAGES */}
             {sd && (
@@ -1564,7 +1647,7 @@ ${combinedText}` }]
                         {buyerPath==="evaluating"?"Evaluating buyer — they came in solution-mode. You went back in time. Now anchor to the business problem.":buyerPath==="active-pain"?"Active pain buyer — they surfaced a challenge. Now prioritize it and validate it's a raging fire.":"Latent buyer — you ran the Discovery Prompter. Now find what resonated and anchor to it."}
                       </span>
                     </div>
-                    <button onClick={()=>setActiveStage("buyer-type")} style={{ ...B, fontSize:10, color:C.textMuted, background:"transparent", border:`1px solid ${C.border}`, borderRadius:5, padding:"3px 8px", flexShrink:0 }}>← back</button>
+                    <button onClick={()=>setActiveStage("align-buyer")} style={{ ...B, fontSize:10, color:C.textMuted, background:"transparent", border:`1px solid ${C.border}`, borderRadius:5, padding:"3px 8px", flexShrink:0 }}>← back</button>
                   </div>
                 )}
                 <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.06em", marginBottom:16, paddingBottom:12, borderBottom:`1px solid ${C.border}` }}>{sd.rule}</div>
