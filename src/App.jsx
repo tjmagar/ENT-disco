@@ -188,14 +188,14 @@ const STAGE_DATA = {
   },
   "context": {
     rule:"Share context first to earn the right to ask questions. Then let them pick where to start.",
-    screen:"Slides 1–2 · title, the three ways we help",
+    screen:"Slide 1, then slide 2",
     script:[
-      { kind:"say", beats:[
+      { kind:"say", title:"Who we are", screen:"Slide 1 · title", beats:[
         { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
         { cue:"Who we are", text:"So at Clasp, we work **exclusively in healthcare** (full stop)… and within that, we exist to support HR and talent acquisition teams **attract and retain hard-to-fill clinical talent**." },
         { cue:"Proof", text:"Our partners include major systems such as **Novant Health, Northwestern Medicine and Boston Children's**, as well as smaller systems like **Saint Alphonsus**. And even outpatient clinics like **Confluent Health**, specialty clinics, the whole gamut." },
       ]},
-      { kind:"say", beats:[
+      { kind:"say", title:"Three outcomes", screen:"Slide 2 · we help our partners in three distinct ways", beats:[
         { cue:"Who we talk to", text:"So we talk to a lot of HR leaders across the country — talent acquisition, L&D, workforce development, ops and business leaders — **a lot of smart folks**. And we talk to them about a lot of things, but **the three areas where we're able to drive the most value**, and where it often makes sense to work together, are here on your screen." },
         { cue:"Three areas", text:"", list:[
           { tag:"Pipeline", text:"Our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
