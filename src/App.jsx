@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { STAGES, STAGE_META, CAPTURE, STAGE_DATA, QUESTION_BANK } from "./callTrack.js";
 
 const C = {
   pageBg: "#f4f5f7",
@@ -73,361 +74,6 @@ const fmtClock = ms => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 };
 
-const STAGES = [
-  { id:"prep",               icon:"◎",  short:"Prep Brief",               group:"setup" },
-  { id:"rapport-opener",     icon:"1",  short:"Opening + Intros",         group:"setup" },
-  { id:"rules-engagement",   icon:"2",  short:"Objective + Agenda",       group:"setup" },
-  { id:"context",            icon:"3",  short:"Clasp Context",            group:"setup" },
-  { id:"orient",             icon:"4",  short:"Orient to Buyer Focus",    group:"orient" },
-  { id:"value-drop",         icon:"5",  short:"Value Drop",               group:"value" },
-  { id:"summary-buyin",      icon:"6",  short:"Summary + Buy-in",         group:"value" },
-  { id:"business-problem",   icon:"7",  short:"Business Problem",         group:"discovery" },
-  { id:"baseline-current",   icon:"8",  short:"Current State",            group:"discovery" },
-  { id:"cause-analysis",     icon:"9",  short:"Cause Analysis",           group:"discovery" },
-  { id:"negative-impact",    icon:"10", short:"Negative Impact",          group:"discovery" },
-  { id:"future-state",       icon:"11", short:"Future State",             group:"discovery" },
-  { id:"close-next-steps",   icon:"12", short:"Close + Next Steps",       group:"close" },
-];
-
-// Phase + timebox per stage (from the designed template)
-const STAGE_META = {
-  "rapport-opener":   { phase:"OPEN",            timebox:"3 min" },
-  "rules-engagement": { phase:"ALIGN",           timebox:"2 min" },
-  "context":          { phase:"CONTEXT",         timebox:"2 min" },
-  "orient":           { phase:"ORIENT",          timebox:"2 min" },
-  "value-drop":       { phase:"VALUE",           timebox:"12 min" },
-  "summary-buyin":    { phase:"BUY-IN",          timebox:"1 min" },
-  "business-problem": { phase:"BUSINESS PROBLEM",timebox:"5 min" },
-  "baseline-current": { phase:"CURRENT STATE",   timebox:"4 min" },
-  "cause-analysis":   { phase:"CAUSE ANALYSIS",  timebox:"4 min" },
-  "negative-impact":  { phase:"NEGATIVE IMPACT", timebox:"4 min" },
-  "future-state":     { phase:"FUTURE STATE",    timebox:"3 min" },
-  "close-next-steps": { phase:"CLOSE",           timebox:"3 min" },
-};
-
-// What to write down at each stage. These feed the [placeholders] in later summaries.
-const CAPTURE = {
-  "rapport-opener":   [{ key:"win", label:"What would make today a win", hint:"Each person's answer" },
-                       { key:"vibe", label:"Read on them", hint:"Pronouns, energy, anything they volunteered" }],
-  "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
-  "orient":           [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
-                       { key:"startWhy", label:"What they said", hint:"Fills \"It sounds like…\" in Business Problem" }],
-  "value-drop":       [{ key:"signOnView", label:"What they've seen with sign-ons" },
-                       { key:"contractAreas", label:"Where they use contract labor most" },
-                       { key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
-  "summary-buyin":    [{ key:"buyIn", label:"Buy-in score (1–10)" },
-                       { key:"toTen", label:"What would make it a 10" }],
-  "business-problem": [{ key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
-                       { key:"businessDriver", label:"Need behind the need", hint:"The business problem. Would a CFO fund it?" },
-                       { key:"trigger", label:"Trigger event", hint:"What set this in motion, in their words" },
-                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" },
-                       { key:"validated", label:"Confirmed as the anchor?", type:"choice", options:["Yes","Partly","No"] },
-                       { key:"competing", label:"Competing priorities" }],
-  "baseline-current": [{ key:"metric", label:"Metric", hint:"e.g. first-year turnover" },
-                       { key:"current", label:"Current", hint:"Their number and unit" },
-                       { key:"target", label:"Target", hint:"Where it should be" },
-                       { key:"why", label:"Why that target" },
-                       { key:"roles", label:"Roles they hire new grads in" },
-                       { key:"schools", label:"School relationships", hint:"Which programs, who owns them" },
-                       { key:"turnover", label:"First-year turnover", hint:"Number + department" },
-                       { key:"signOns", label:"Sign-on bonuses", hint:"Type and amount" },
-                       { key:"contract", label:"Contract labor", hint:"How much, where" }],
-  "cause-analysis":   [{ key:"rootCause", label:"Root cause", hint:"Their words" },
-                       { key:"suspected", label:"Your suspected root cause", hint:"Fills Q3" },
-                       { key:"blocker", label:"What's blocking them" }],
-  "negative-impact":  [{ key:"ripple", label:"Ripple effects" },
-                       { key:"whoElse", label:"Who else is affected" },
-                       { key:"cost", label:"Cost per month" }],
-  "future-state":     [{ key:"theirSolution", label:"What they think they need" },
-                       { key:"capability", label:"Capability to test", hint:"Fills Q3" },
-                       { key:"needle", label:"How much it moves the needle" }],
-  "close-next-steps": [{ key:"read", label:"Your honest read", hint:"Fills the close script" },
-                       { key:"nextStep", label:"Next step" },
-                       { key:"who", label:"Who attends" },
-                       { key:"date", label:"Date" }],
-};
-
-// Script items per stage.
-//   say: spoken beats. cue = what the beat does; check = stop and wait for a yes; then = what you say after the yes; list = numbered points.
-//   ask: a question. "\n\n" splits it into the main ask and follow-ups.
-//   **bold** marks the words to land; [placeholders] fill from the prep brief and the capture pane.
-const STAGE_DATA = {
-  "rapport-opener": {
-    rule:"Land the opener, get permission for the agenda, then intros — yours, your colleague's, then theirs.",
-    script:[
-      { kind:"say", beats:[
-        { cue:"Greet", text:"Hi [Names], I'm **glad we found the time** today. How's your **week** been?" },
-        { cue:"Ask permission", text:"Great, well mind if we talk about the **agenda**?\n\nPerfect. Quick intros before we dive in." },
-        { cue:"Your intro", text:"My name is **TJ Magar**, I'm a Director of Healthcare Partnerships here at Clasp." },
-        { cue:"Why you care", text:"I'm super passionate about the work we do here because **I'm an agitated borrower myself**, so I know how it feels to have that barrier to education. And I love that we are **breaking that down**, especially for the most important workforce and industry: **healthcare**." },
-        { cue:"Hand off", check:"answer", text:"I've brought my colleague **Altara** here as well — and then would love to hear about you both, maybe just **what would make today a win**. But Altara — mind sharing a quick intro first?" },
-      ]},
-    ],
-    tips:["Pronouns: I/me/my means personal stakes matter. We/us/our means team focus and consensus matter.","Energy: talkative, stay with it. Business, pivot. Don't force the wrong mode.","Write down what would make today a win for each person. It sets up the agenda."],
-    watch:["Thanking the prospect for their time — immediately positions you lower","Letting intros run long — keep yours to two sentences"],
-  },
-  "rules-engagement": {
-    rule:"Align on the objective, the agenda, and the decision to be made.",
-    script:[
-      { kind:"say", beats:[
-        { cue:"Bridge from intros", text:"Perfect, that leads into what I had in mind for today." },
-        { cue:"Propose the agenda", text:"Here's what I'm thinking in terms of **how we spend our time**. Let me know if you had something else in mind…" },
-        { cue:"Set the outcome", text:"But the outcome I recommend we shoot for is to **learn enough about each other** to decide whether or not it makes sense to have a **second meeting**." },
-        { cue:"Lower the stakes", text:"Obviously, I **don't expect us to do business** on this call. So let's just learn enough about each other to determine if another call makes sense." },
-        { cue:"Check", check:true, text:"Is that **fair so far**?", then:"Perfect." },
-        { cue:"Walk the agenda", text:"Now here's the agenda I'm thinking will help us get there.", list:[
-          "First, I'll share **a little about Clasp** upfront so you have the context for the rest of the call.",
-          "But I'd love to spend **most of our time** today getting clear on **what's important to [their company]** — maybe the different challenges or goals you might have as they relate to **workforce recruitment, development, or retention**.",
-          "Once we're clear on that — and if I think we can help — I'll **explain more about how it works** so you have an understanding.",
-          "Then we can **jointly decide** whether we set that next step. And I'll save some time at the end for that.",
-        ]},
-        { cue:"Check", check:true, text:"Does that all feel **reasonable and fair**?", then:"Great. Let's take a crack at it." },
-      ]},
-    ],
-    tips:["Align on the objective, the agenda, and the decision to be made.","Pause after each fairness check and let them answer."],
-    watch:["Rushing past the fairness checks without pausing","Skipping the agenda after they agree to the objective"],
-  },
-  "context": {
-    rule:"Brief context on who we are and what we do. Earn the right to ask questions, don't pitch.",
-    script:[
-      { kind:"say", title:"Who we are", beats:[
-        { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
-        { cue:"Who we are", text:"So at Clasp, we work **exclusively in healthcare** (full stop)… and within that, we exist to support HR and talent acquisition teams **attract and retain hard-to-fill clinical talent**." },
-        { cue:"Proof", text:"Our partners include major systems such as **Novant Health, Northwestern Medicine and Boston Children's**, as well as smaller systems like **Saint Alphonsus**. And even outpatient clinics like **Confluent Health**, specialty clinics, the whole gamut." },
-      ]},
-    ],
-    tips:["Keep it short. The point is to earn the right to ask questions, not to pitch."],
-    watch:["Turning the context into a full pitch"],
-  },
-  "orient": {
-    rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
-    script:[
-      { kind:"say", title:"Three outcomes", beats:[
-        { cue:"Who we talk to", text:"So we talk to a lot of HR leaders across the country — talent acquisition, L&D, workforce development, ops and business leaders — **a lot of smart folks**. And we talk to them about a lot of things, but **the three areas where we're able to drive the most value**, and where it often makes sense to work together, are here on your screen." },
-        { cue:"Three areas", text:"", list:[
-          { tag:"Pipeline", text:"Our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
-          { tag:"Labor cost", text:"Others are **bleeding money** on sign-on bonuses and contract labor, and recruitment costs just to fill and keep roles filled." },
-          { tag:"Retention", text:"And some are **losing good people** they already have to a competitor for more money — so they're motivating them to stay by offering **career pathways** and internal development opportunities — MAs into RNs, PTAs into PTs — instead of watching them walk out the door." },
-        ]},
-        { cue:"Hand it to them", check:"answer", text:"I have an idea where you might fit in given [what you spotted], and in general, the industry norm of **first-year nurse retention**. But given your current situation, **where would be the most relevant place for us to start** our conversation?" },
-      ]},
-    ],
-    tips:["Click the area they pick. The Value Drop and discovery follow it."],
-    watch:["Picking the area for them — let them choose"],
-  },
-  "value-drop": {
-    rule:"Follow their interest. Focus the conversation on the area they chose. All three: pipeline, then spend, then retention.",
-    screen:"Sharing the slides and examples for each talk track",
-    script:[
-      { kind:"say", beats:[
-        { cue:"Acknowledge + start", text:"Okay — if it's alright with you, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't apply** to you." },
-      ]},
-      { kind:"say", group:"Pipeline", title:"The outcome", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
-        { cue:"The outcome", text:"The biggest outcome we tend to drive for our partners is building them a **bigger pipeline of soon-to-graduate talent**. I'm not sure yet how much of this applies to you, so I'll keep it high level. We do this through a number of channels.", list:[
-          { tag:"Educate", text:"Channels that **educate the students** on the possibilities and benefits of this type of program." },
-          { tag:"Awareness", text:"Channels that **generate awareness** of this type of program as a reason to join your system after graduation." },
-          { tag:"Convert", text:"And channels to **convert them into applicants** — to get them to raise their hand and say, \"When I graduate, I want to come work for you!\"" },
-        ]},
-        { cue:"Check in", check:"answer", text:"Before I go further — I'm curious, **how are you building that early pipeline today?**" },
-      ]},
-      { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", proof:["Curated influencer network reaches 4.6M+ engaged followers"], beats:[
-        { cue:"Get the word out", text:"First we have to get the word out — if you're becoming a Nurse, an Imaging Tech, a Rehab Therapist, there are healthcare systems that will **help repay part of your student loans** so that you'll want to work with them." },
-        { cue:"Influencers", text:"One of the most effective ways we've found to do this is through **social media influencers**. We have a curated network of **TikTok influencers who are clinicians and techs**. I know it may sound a little funny — but for this generation, **it really seems to work**." },
-        { cue:"Where they talk", text:"From what we're seeing, this is where they go to talk to each other — and **their student loan debt is a lot of what they're talking about**." },
-        { cue:"Ask to show", check:"answer", text:"**Mind if I show you something quick?**" },
-        { cue:"Show the search", text:"I did a simple search for TikTok videos about nursing student loan debt / PT debt / Rad Tech debt, and look at the results. **Video after video** of nurses and nursing students talking about their debt — how they'll pay it off, whether they regret taking on that much. **This seems to be on their minds**, and they go to TikTok to ask each other about it." },
-        { cue:"Creative + compliance", text:"That's why we have a **creative team** working with influencers who are clinicians and techs to make content that lets these students know about these programs. And a **compliance team** that makes sure it's buttoned up — not boring, but buttoned up." },
-        { cue:"Show a video", text:"Videos like this one. You can see the **level of engagement** — the views, the comments, the reshares. It tends to get these students **thinking about what's possible**." },
-        { cue:"Check in", check:"answer", text:"I'm curious — **is that the kind of reach you're getting with students today, or is that pretty different?**" },
-      ]},
-      { kind:"say", group:"Pipeline", title:"Schools + campus", proof:["Active school partnerships: 70+ nursing, 90+ imaging, 70+ rehab therapy, 110+ RT","Ambassadors: we recruit, onboard, track referrals and pay out. Low lift for your team","Virtual career fair: 187 PT, OT and SLP students from 88 schools"], beats:[
-        { cue:"School network", text:"Social only gets you so far, though. To really engage with the students, we've built out a **nationwide network of school relationships** that drive applicants into the top of your funnel. We talk with **Program Directors and Career Services** to spread the word that there are healthcare systems, like yourself, that will help their students pay part of their loans when they come to work for you." },
-        { cue:"Why schools care", text:"From what program directors tell us, this message resonates with them in a way **a sign-on bonus usually doesn't**. It motivates them to share it with their students, and gets us **access to their students** in a way that many employers don't have." },
-        { cue:"Campus ambassadors", text:"We also have a network of **campus ambassadors**, boots on the ground, to engage the students on campus. They're talking to soon-to-graduate nurses, imaging techs, and rehab therapists about our partners who are offering these programs." },
-        { cue:"Wider reach", text:"These channels are what we use to **fill the top of your funnel** with applicants. And since we have relationships with schools across the country, this can **widen your talent pool** — pulling in students from beyond your immediate area, and campuses you might not have a relationship with right now." },
-        { cue:"Check in", check:"answer", text:"How does that compare to your school relationships today — **are there programs you'd love to recruit from but don't have a real way in?**" },
-      ]},
-      { kind:"say", group:"Pipeline", title:"Convert: your recruiters", proof:["One system hit >200% of its rad tech applicant goal, with applicants from 6 states","Northwestern Medicine: \"we did not ever have 32 RT applicants at a time prior to Clasp\"","Partners see applicants from 10+ states on average"], beats:[
-        { cue:"Support your TA", text:"And this isn't meant to replace what your TA team is already doing — **it's meant to support it**, with the local programs and residency programs. We have a team dedicated to **enabling your recruiters**. The landing pages and other materials we create help them **convert candidates they're already talking to** before the competition does." },
-        { cue:"Show landing pages", text:"Landing pages like these. We tailor it to **your message, your employer brand and value prop**. The goal is to send the message to students: 'We understand what you're looking for, and **we're the right fit for you**.'" },
-        { cue:"Check in", check:"answer", text:"**How do you think something like that would land with your recruiters?**" },
-      ]},
-      { kind:"say", group:"Labor cost", title:"Open", beats:[
-        { cue:"Bridge", text:"And this may or may not be relevant to you — but offering a Student Loan Repayment program can do more than build pipeline. It can also help you **spend less on sign-on bonuses and contract labor**." },
-        { cue:"Ask", check:"answer", text:"Do you currently spend money on either of these for **Nursing, Imaging Techs, or Rehab Therapists**? No wrong answer — some systems lean on them a lot, some hardly at all." },
-      ]},
-      { kind:"say", group:"Labor cost", title:"If they spend on sign-ons", proof:["Every $10k in sign-ons creates about $2,800 of value: −72% ROI (Laudio)","Upfront cash hit, nearly impossible to claw back, re-paid with every backfill"], beats:[
-        { cue:"The arms race", check:"answer", text:"Let me ask you a question — and feel free to push back if this doesn't match what you're seeing. What our partners tell us is that sign-on bonuses feel a bit like **an arms race**. You have to offer one because everyone else is, and they keep escalating every year. **What have you seen in that regard?**" },
-        { cue:"Acknowledge, then the story", text:"It's funny, I was talking to a TA leader at a hospital and she said that healthcare is **the only place where you can get a job with a sign-on**, work there 6 months, quit, walk across the street, and **get another sign-on bonus the next day**." },
-        { cue:"Why sign-ons fail", text:"In our experience, the sign-on tends to appeal to a **'right now' mentality**. Very often it goes towards other expenses, and the loans just accumulate interest. It's a big part of why they're often **not that effective at keeping people around**." },
-        { cue:"The cost", text:"And it's why systems end up spending so much on sign-ons — they **keep refilling the role** after the first year when 10, 15, 20% of new hires leave. I don't know what that number looks like for you. But when new hires leave anyway, you're often in a **clawback situation**." },
-        { cue:"The contrast", text:"It tends to be a real contrast to the person who's looking for help with their student loans. **They're thinking about the future.** They're looking for a place where they can stay and grow. So when you put that money toward Student Loan Repayment instead of a sign-on, you can **end up spending less** — because you're not refilling the role as often, or paying out another sign-on." },
-        { cue:"Paid over time", text:"The payment is also made **over time, monthly**, while they're employed with you. So **no costly clawbacks**, and no paying in advance for someone who leaves after year 1. Spreading the payments out — sometimes with a **ladder payment** approach — means **you're only spending to get and keep them**." },
-        { cue:"Check in", check:"answer", text:"**How does that compare to how you're thinking about sign-ons today?**" },
-      ]},
-      { kind:"say", group:"Labor cost", title:"If they spend on contract labor", proof:["Travelers cost ~2.2x","Weekly averages: RN $2,190 · Rad Tech $2,291 · PT $2,231 · RT $2,015 (about $8–9k a month each)"], beats:[
-        { cue:"Ask", check:"answer", text:"We can also help **reduce spend on contract labor**, especially in the locations, specialties, and shifts that are hard to fill with a full-time employee. I'm curious — **where do you find you're using contract labor the most?**" },
-        { cue:"Acknowledge + reframe", text:"That makes sense — areas like that are often tough to fill. Many of our partners use travelers to fill the gaps too. What they're finding is that this type of program gets the attention of candidates who want help with their student loans, and who are **willing to work at the location, in the specialty, or on the shift where you need it most**." },
-        { cue:"The payoff", text:"They're motivated by the Student Loan Repayment to come work for you, and you can **need fewer travelers**. Depending on your mix, that can mean **thousands of dollars a week** recouped." },
-        { cue:"Check in", check:"answer", text:"**Is that a gap you're feeling right now, or is contract labor pretty well under control?**" },
-      ]},
-      { kind:"say", group:"Retention", title:"Built to keep them", proof:["Partners' year-1 turnover is ~5% vs an industry average above 20%","Paid monthly once they're an employee; payments can step up in year 2"], beats:[
-        { cue:"Bridge", text:"Building pipeline and saving on spend are important — but there's another area where we tend to have an impact, and for a lot of partners it ends up mattering most. We're also helping them **retain and grow their employees**." },
-        { cue:"Built to stay", text:"The way your Student Loan Repayment program is structured **encourages people to stay 3, 4, or 5 years**. The amount is spread out monthly over that period and paid while they're employed. **It works a lot like a 401K match** — an incentive to stay to get the full amount." },
-        { cue:"Proof", text:"It's a big part of why our partners tend to see **single-digit turnover, sometimes as low as 5%**, with the clinicians and techs in the program." },
-        { cue:"Check in", check:"answer", text:"I'm curious — **how does that compare to what you're seeing with first-year turnover?**" },
-      ]},
-      { kind:"say", group:"Retention", title:"Nudges", proof:["Early affinity, testimonials, psychological nudges: \"Your employer had your back this month\""], beats:[
-        { cue:"Gamification", text:"We've also built in some **gamification, some psychological nudges**." },
-        { cue:"Sign-ons fade", text:"When someone gets a sign-on, they usually spend it faster than they planned — and then **it's gone from their mind**. Now they're looking for the next thing. So **we remind them** of the help you're giving them with their student loan debt." },
-        { cue:"Testimonials", text:"When they first join you, we have them **record a video** about how excited they are to work somewhere that has their back like this. And every year they're in the program, we collect these testimonials." },
-        { cue:"Monthly statement", text:"Every month we send them **a statement** — a reminder of 'Hey, look what you would have owed if your employer hadn't helped with this payment. **What would have been 10 years of payments is becoming 3.** All because you work here.' It really tends to bond them to you." },
-        { cue:"Financial wellness", text:"And they get access to **financial wellness and budgeting tools** that reinforce they have more in their budget **because of you**." },
-        { cue:"Check in", check:"answer", text:"**What are you doing today to keep that value top of mind once someone's hired — or is that tough to do?**" },
-      ]},
-      { kind:"say", group:"Retention", title:"Beyond new hires", proof:["Pathways: MAs and LPNs → RNs · PTAs → PTs · ICU nurses → CRNAs"], beats:[
-        { cue:"Existing staff", text:"And this doesn't have to be just for new hires — it can be part of your **retention strategy**. So many clinicians and techs carry student loan debt for years. When they see you extend this to them, it tends to deepen the relationship and reassure them they've found **their long-term home**." },
-        { cue:"Career pathing", text:"Some partners also use it for **career pathing** — motivating **Medical Assistants and LPNs into RNs, PTAs into PTs, ICU nurses into CRNAs** while they work for you." },
-        { cue:"The message", text:"You're telling them, 'Go get the next-level degree and come back here. We have a place for you, and **we'll help you pay** for the loans you take out to upskill.' Now you're filling these roles with people who already **fit your culture and your mission**. It builds a **stronger, more stable workforce**." },
-        { cue:"Check in", check:"answer", text:"**Are career pathways something you're investing in right now, or not so much?**" },
-      ]},
-    ],
-    tips:["Hedge, don't declare: 'tends to', 'from what we're seeing', 'not sure this applies to you'.","End every section with a check-in tied to their world — never 'Does that make sense?' or 'What questions do you have?'","Give them room to say no: 'or is that pretty different?', 'or not so much?'","If they said all three, run pipeline, then spend, then retention."],
-    watch:["Monologuing — stop at every check-in and let them talk","Running a cost track they told you doesn't apply","Stacking guarantees and 'no risk' language — a little goes a long way"],
-  },
-  "summary-buyin": {
-    rule:"Reframe the outcomes we drive and get them to buy into the value.",
-    screen:"Video on, no content shared",
-    script:[
-      { kind:"say", beats:[
-        { cue:"Thank them", text:"I really appreciate you letting me share a bit about how we work with healthcare systems on an **innovative Student Loan Repayment and recruitment program**." },
-        { cue:"Their words first", check:"answer", text:"Before I recap — let me make sure I've got this right. You mentioned [what they said]. **Did I get that right?**" },
-        { cue:"Recap the value", text:"Great. Just to bring it back together — here's how our partners **tend to use** the program:", list:[
-          { tag:"Pipeline", text:"Building a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs and Rehabilitation Therapists, through our **recruitment marketing and campus recruitment** machine." },
-          { tag:"Labor cost", text:"**Saving money** by not paying out sign-ons again and again, and filling roles with **full-time employees** that would otherwise be worked by contract labor." },
-          { tag:"Retention", text:"And **retaining their people** and motivating them down career pathways — a **stronger, more stable workforce**. All through the power of their Student Loan Repayment program." },
-        ]},
-        { cue:"Tie it to them", check:"answer", text:"I may be off here, so correct me — but it sounds like **[the area they chose]** is where this could matter most for you. **Does that sound right?**" },
-        { cue:"Step back", text:"At this point, I'd love to take a step back and **understand where your head is at**. The reason I ask is I'd rather not keep going if this isn't a fit for you — so I want your **honest read, not the polite one**." },
-        { cue:"Buy-in check", check:"answer", text:"How is this all feeling? On a **scale of 1 to 10**, with 10 being a heck yes — **where would you say you're at?** No wrong answer." },
-        { cue:"Read the reaction", text:"", list:[
-          { tag:"Hesitant or negative", text:"\"That's totally fair — and I appreciate the honesty. **What's giving you pause?**\" Then do discovery on why they feel that way." },
-          { tag:"Positive, with questions", text:"**Answer their questions.** Then: \"I'm curious — **what would need to be true for that to be a 10?**\"" },
-          { tag:"Positive, no questions", text:"\"I'm glad it's resonating. **Mind if I ask a few questions about how things work today?** The reason I ask is I don't want to assume anything.\" Then move into Business Problem." },
-        ]},
-      ]},
-    ],
-    tips:["Their words first, not yours. Parrot their exact language back before you recap.","Give a reason before the hard question ('The reason I ask is…').","Hedge the tie-back ('I may be off here') so they correct you rather than nod along.","Below a 10, get curious about the gap. Don't defend.","Save 'fair' for the agenda and the close."],
-    watch:["Skipping the 1–10 — it's your read on whether to keep going","Answering an objection before you understand it","Recapping all three areas at the same weight when they only care about one"],
-  },
-  "business-problem": {
-    rule:"Identify the business problem behind what they asked for, find out who cares, then validate it's the one to anchor on.",
-    script:[
-      { kind:"say", beats:[
-        { cue:"Reflect + permission", check:"answer", text:"It sounds like [what they said]. **Can we dig into that some more?**" },
-      ]},
-      { kind:"ask", label:"Origin", text:"What was going on in your business that made you **start exploring solutions** like ours in the first place?" },
-      { kind:"ask", label:"The moment", text:"Can you walk me back to **the moment this became a priority**?\n\nWhat happened?" },
-      { kind:"say", beats:[
-        { cue:"Acknowledge", text:"I understand why you would want [surface need]." },
-        { cue:"Dig", text:"**But what's actually going on?**" },
-      ]},
-      { kind:"ask", label:"Priority driver", text:"What's causing that to be **a priority**?" },
-      { kind:"ask", label:"Energy", text:"What's driving you to **prioritize that**?" },
-      { kind:"ask", label:"Business driver", text:"What is going on **in your business** that's driving you to put the focus and energy on that?" },
-      { kind:"ask", group:"Retention", label:"Priority", text:"How often have you **spoken internally** about reducing that turnover number?\n\nWho **cares the most** about the turnover number?" },
-      { kind:"ask", group:"Labor cost", label:"Sign-on priority", text:"How often have you **spoken internally** about reducing the amount you spend on sign-ons?\n\nWho **cares the most** about how much you spend on sign-ons?" },
-      { kind:"ask", group:"Labor cost", label:"Contract priority", text:"How often have you **spoken internally** about reducing the amount of contract labor you use in these departments?\n\nWho **cares the most** about what you spend on contract labor?" },
-      { kind:"say", beats:[{ cue:"Pause the flow", text:"Before we go too much further — I want to make sure we're **anchoring this conversation to the right thing**." }] },
-      { kind:"ask", label:"Anchor check", text:"Is this **the challenge we should be focused on** solving together?\n\nOr are there other things that are going to overpower this?" },
-      { kind:"ask", label:"Priority test", text:"Is this going to make its way onto your **priorities slide**?\n\nOr is this a **shiny object**?" },
-    ],
-    tips:["Keep peeling only while the answer is still a symptom. Stop when a CFO would fund it.","\"Who cares the most\" is your multithreading list.","Get explicit agreement that this is the problem worth solving now."],
-    watch:["Stopping at the symptom and moving on","Happy ears — getting excited before validating it is a raging fire","Skipping the anchor check because it feels confrontational"],
-  },
-  "baseline-current": {
-    rule:"Map where they are today. Capture their exact words, numbers and units.",
-    script:[
-      { kind:"say", beats:[{ cue:"Frame why you ask", text:"I'm asking because — if we end up doing business together, **your CFO is probably going to care** about this." }] },
-      { kind:"ask", label:"Metric", text:"What **metric** do you think would improve the most if we solved this challenge?" },
-      { kind:"ask", label:"Current state", text:"What's the **current state** of that metric?" },
-      { kind:"ask", label:"Target", text:"Where **should it be**?\n\nAnd **why** should it be there?" },
-      { kind:"ask", group:"Pipeline", label:"Roles", text:"What **clinical and allied health roles** do you hire new grads in the most?" },
-      { kind:"ask", group:"Pipeline", label:"Department heads", text:"Which **department heads** do you work with the most to fill their new grad needs?" },
-      { kind:"ask", group:"Pipeline", label:"School relationships", text:"What existing relationships do you have with the **local college programs** to funnel students in these fields your way?\n\nWho works on those relationships?" },
-      { kind:"ask", group:"Pipeline", label:"Loan debt", text:"How often have you had these students **ask about help with their student loan debt**?" },
-      { kind:"ask", group:"Retention", label:"Replacement hires", text:"How many **replacement hires** do you make in these departments?" },
-      { kind:"ask", group:"Retention", label:"First-year turnover", text:"What is the **first-year turnover** there?" },
-      { kind:"ask", group:"Labor cost", label:"Sign-ons", text:"What type of **sign-on bonuses** are you offering for these roles?" },
-      { kind:"ask", group:"Labor cost", label:"Contract labor", text:"How much **contract labor** do you use to fill the gaps for these roles?" },
-    ],
-    tips:["Capture their exact words and units.","Do not invent a number if they do not know it yet."],
-    watch:["Moving on without a number for turnover, sign-ons or contract labor","Paraphrasing their numbers instead of using their exact words"],
-  },
-  "cause-analysis": {
-    rule:"Mutually identify the true root cause. Their perceived cause sets the buying criteria.",
-    script:[
-      { kind:"say", beats:[
-        { cue:"Summarize", text:"Let me summarize what I've heard so far." },
-        { cue:"Play it back", text:"[business problem and current state]" },
-        { cue:"Confirm", check:true, text:"**Did I get that right?**" },
-      ]},
-      { kind:"ask", label:"Open diagnostic", text:"**Why** do you think this challenge is happening?" },
-      { kind:"ask", label:"Blocker", text:"What's **preventing you** from improving it?" },
-      { kind:"ask", group:"Pipeline", label:"School fit", text:"**How well** are those school relationships meeting your needs?" },
-      { kind:"ask", group:"Labor cost", label:"Sign-on reliance", text:"How important do you find sign-ons to be in **getting a commitment**?" },
-      { kind:"ask", label:"Suspected cause", text:"To what extent do you think [suspected root cause] is **contributing to the challenge**?" },
-    ],
-    tips:["Ask the open diagnostic first, then one or two targeted questions.","Their perceived cause sets the buying criteria."],
-    watch:["Accepting the first answer as the root cause","Leading them to your conclusion instead of letting them arrive at it"],
-  },
-  "negative-impact": {
-    rule:"Explore cost, consequences, and ripple effects. One or two negative ramifications is enough on a first call.",
-    script:[
-      { kind:"say", beats:[
-        { cue:"Summarize", text:"All right. One more time, let me summarize what I've heard." },
-        { cue:"Play it back", text:"[business problem + root causes]" },
-        { cue:"Confirm", check:true, text:"**Did I get that right?**" },
-      ]},
-      { kind:"ask", label:"Ripple effects", text:"What **ripple effects** are you seeing this challenge have on the rest of the business?" },
-      { kind:"ask", label:"Derailed", text:"What would **get derailed** if you didn't make progress in solving these challenges?" },
-      { kind:"ask", label:"Who else", text:"**Who else** does this challenge impact within the business?\n\nAnd how?" },
-      { kind:"ask", label:"Cost", text:"What's the **financial cost** of not closing that gap **per month**?" },
-    ],
-    tips:["After they confirm the summary, explore cost, consequences, and ripple effects.","One or two negative ramifications is enough on a first call."],
-    watch:["More than 3 impact questions — diminishing returns fast","Asking about cost before they confirm the summary"],
-  },
-  "future-state": {
-    rule:"Contrast painful present with compelling future. Ask the open question first.",
-    script:[
-      { kind:"say", beats:[
-        { cue:"Summarize", text:"Let me summarize what I've heard about the challenges so far." },
-        { cue:"Play it back", text:"[brief summary]" },
-        { cue:"Confirm", check:true, text:"**Did I get that right?**" },
-      ]},
-      { kind:"ask", label:"Open", text:"What do **you** think you need to solve this challenge?" },
-      { kind:"ask", label:"Ideas", text:"Can I try **a few additional ideas** on you?" },
-      { kind:"ask", label:"Capability test", text:"Imagine being able to [capability].\n\nTo what degree would that **move the needle** on the problem we're talking about?" },
-    ],
-    tips:["Ask the open question first.","Only then test targeted capabilities tied to the root causes they named."],
-    watch:["Pitching capabilities before asking what they think they need","Skipping the summary — the contrast is where the feeling of value lives"],
-  },
-  "close-next-steps": {
-    rule:"Call back the ROE. Leave with a concrete decision — a next step is not real until it has an owner and a date.",
-    script:[
-      { kind:"say", beats:[
-        { cue:"Call back the agenda", text:"At the beginning of this call, we agreed we'd decide whether it makes sense to schedule a **next logical step** — or go our separate ways so we don't waste each other's time." },
-        { cue:"Give your read", text:"The sense I'm getting is [your honest read]." },
-      ]},
-      { kind:"ask", label:"Fairness check", text:"Does that **feel fair** to you?" },
-      { kind:"ask", label:"Next step", text:"What should the **next logical step** look like?\n\nAnd **who needs to be there**?" },
-      { kind:"ask", label:"Date", text:"Can we put **a specific date** on the calendar now?" },
-    ],
-    tips:["Leave with a concrete decision.","A next step is not real until it has an owner and a date."],
-    watch:["Leaving without a booked meeting — 'I'll send some times' is not a next step","Skipping the ROE callback — the ask lands cold without it"],
-  },
-};
-
 // Script items to show. Items tagged with an area (Pipeline / Labor cost / Retention)
 // show only for the area they picked, unless "all areas" is on.
 function visibleScript(stageId, area, showAll) {
@@ -446,87 +92,6 @@ function flattenScript(script) {
   });
   return out;
 }
-
-const SPICED_QUESTIONS = [
-  {
-    key:"situation",
-    label:"S — Situation",
-    color:"#2563eb",
-    bg:"#eef3ff",
-    border:"#bccdf5",
-    questions:[
-      "How many people are involved in this process day to day?",
-      "What kind of volume are we talking about — monthly or annually?",
-      "Which departments or teams would be affected by a change here?",
-      "Walk me through the process end to end — what happens first, and what happens last?",
-      "What are you using today to handle this, if anything?",
-      "What systems would a solution need to work with?",
-      "Are there any security or compliance requirements we need to account for?",
-    ]
-  },
-  {
-    key:"pain",
-    label:"P — Pain",
-    color:C.emerald,
-    bg:C.emeraldLight,
-    border:C.emeraldMid,
-    questions:[
-      "What is going on in your business that's driving this to be a priority?",
-      "Aside from [what they said] — is there something going on behind the scenes driving you to prioritize fixing this?",
-      "What's your take on why this is happening?",
-      "Could you tell me about the moment when you realized this was actually a problem?",
-      "What have you tried to do about it? Did it work?",
-      "Is a solution like this a nice to have or a need to have?",
-      "Out of everything you could have chosen to solve for — why this?",
-    ]
-  },
-  {
-    key:"impact",
-    label:"I — Impact",
-    color:"#a07820",
-    bg:"#fdf7e6",
-    border:"#c09818",
-    questions:[
-      "What metric is below expectations as a result of the challenges you've shared with me?",
-      "What are the ripple effects this challenge is having across the business?",
-      "How much time are you spending each day dealing with this problem?",
-      "How much do you think this has cost you?",
-      "What is the potential impact on revenue if this isn't solved?",
-      "Who else in your organization is aware of and affected by this issue?",
-      "Have you lost clients because of these issues?",
-    ]
-  },
-  {
-    key:"critical_event",
-    label:"C — Critical Event",
-    color:"#2563eb",
-    bg:"#eef3ff",
-    border:"#7ba3f0",
-    questions:[
-      "When do you need this implemented by? What happens if we can't hit that timeline?",
-      "Why now — not two months ago or two months from now?",
-      "Would anything prevent your team from moving forward this month if you saw everything you needed?",
-      "Is there a renewal, contract expiration, or hiring deadline driving the timing?",
-      "I'm getting the sense this might not be the top priority right now — am I off on that?",
-    ]
-  },
-  {
-    key:"decision",
-    label:"D — Decision",
-    color:"#2563eb",
-    bg:"#eef3ff",
-    border:"#7ba3f0",
-    questions:[
-      "What steps do you and your company need to take to make a go or no-go decision on this?",
-      "Who would be involved in each of those steps — and who ultimately signs off?",
-      "Who else cares about this besides you?",
-      "How does your company typically purchase software?",
-      "Whose budget would this come from?",
-      "What are the possible hurdles you've had in the past getting a solution like this approved?",
-      "What specific steps do we need to take to get your legal team to sign off?",
-    ]
-  },
-];
 
 const TREES = [
   // Pain trees live here. Add one object per pain:
@@ -675,6 +240,8 @@ export default function App() {
       case "their company": return v(b.company);
       case "the area they chose": return { "Pipeline":"build a bigger pipeline of soon-to-graduate talent", "Labor cost":"spend less on sign-ons and contract labor", "Retention":"retain and grow their people", "All three":"build a bigger pipeline of soon-to-graduate talent" }[c.startArea] || "";
       case "what you spotted": return v(b.signals);
+      case "recommended next step": return v(c.nextStep);
+      case "who should join": return v(c.who);
 
       case "surface need": return v(c.surfaceNeed);
       case "what they said": return v(c.startWhy) || v(c.surfaceNeed);
@@ -1204,7 +771,6 @@ ${combinedText}` }]
   function renderStageScript(stageId, handoff = true) {
     let line = -1;
     let lastGroup = null;
-    const hasGroups = script.some(it => it.group);
     const groupHeader = item => {
       if (!item.group || item.group === lastGroup) return null;
       lastGroup = item.group;
@@ -1220,34 +786,18 @@ ${combinedText}` }]
     const lineState = i => i === focusIdx ? "now" : i < focusIdx ? "done" : "next";
     return (
       <div>
-        {hasGroups && (
-          <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap", marginBottom:14 }}>
-            <span style={{ fontSize:11, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:C.textMuted }}>Area</span>
-            {["Pipeline","Labor cost","Retention","All three"].map(a => {
-              const on = captures.startArea === a;
-              return <button key={a} onClick={() => { setCapture("startArea", on ? "" : a); setShowAllAreas(false); }} style={{ ...B, fontSize:12, fontWeight:600, padding:"5px 12px", borderRadius:99, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textSecondary }}>{a}</button>;
-            })}
-            {captures.startArea && captures.startArea !== "All three" && <button onClick={() => setShowAllAreas(v => !v)} style={{ ...B, fontSize:12, color:C.textMuted, background:"none", border:"none", textDecoration:"underline" }}>{showAllAreas ? "Only their pick" : "Show all areas"}</button>}
-          </div>
-        )}
         {script.map((item, i) => {
           if (item.kind === "say") return (
             <div key={i}>
             {groupHeader(item)}
             <div style={{ background:C.yellow, border:`1px solid ${C.yellowBorder}`, borderRadius:14, overflow:"hidden", marginBottom:14 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px 8px", flexWrap:"wrap" }}>
-                <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.14em", color:C.yellowText }}>SAY</span>
-                {item.title && <span style={{ fontSize:13, fontWeight:700, color:C.yellowText }}>{item.title}</span>}
-                {!item.title && item.beats.length > 1 && <span style={{ fontSize:11, color:C.yellowText, opacity:0.7, fontWeight:600 }}>{item.beats.length} beats</span>}
-                <div style={{ flex:1 }} />
-              </div>
+              {item.title && (
+                <div style={{ padding:"11px 18px 9px", fontSize:13, fontWeight:700, color:C.yellowText }}>{item.title}</div>
+              )}
               {item.proof && (
-                <div style={{ margin:"0 18px 10px", padding:"8px 12px", borderRadius:8, background:"rgba(255,255,255,0.65)", display:"flex", flexDirection:"column", gap:4 }}>
+                <div style={{ margin:"-2px 18px 10px", display:"flex", flexDirection:"column", gap:2 }}>
                   {item.proof.map((pf, k) => (
-                    <div key={k} style={{ display:"flex", gap:8, fontSize:13, lineHeight:1.45, color:C.textSecondary }}>
-                      {k === 0 ? <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.1em", color:C.emerald, flexShrink:0, paddingTop:2, width:42 }}>PROOF</span> : <span style={{ width:42, flexShrink:0 }} />}
-                      <span>{pf}</span>
-                    </div>
+                    <div key={k} style={{ fontSize:12, lineHeight:1.45, color:C.textMuted }}>· {pf}</div>
                   ))}
                 </div>
               )}
@@ -1256,7 +806,7 @@ ${combinedText}` }]
                 const idx = line, st = lineState(idx);
                 return (
                   <div key={b} data-line={`${stageId}-${idx}`} onClick={() => setFocusIdx(idx)}
-                    style={{ cursor:"pointer", display:"grid", gridTemplateColumns:"124px minmax(0,1fr)", gap:18, padding:"14px 20px 14px 18px", borderTop:`1px solid ${C.yellowRule}`,
+                    style={{ cursor:"pointer", display:"grid", gridTemplateColumns:"116px minmax(0,1fr)", gap:18, padding:"14px 20px 14px 18px", borderTop:(b === 0 && !item.title && !item.proof) ? "none" : `1px solid ${C.yellowRule}`,
                       background: st === "now" ? C.white : "transparent", boxShadow: st === "now" ? `inset 4px 0 0 ${C.emerald}` : "none",
                       opacity: st === "done" ? 0.42 : 1, transition:"opacity 0.15s, background 0.15s" }}>
                     <div style={{ paddingTop:5 }}>
@@ -1518,7 +1068,7 @@ const sd = STAGE_DATA[activeStage];
   const overTime = timeboxMs && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
   const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Clasp Context","orient":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Identify + Validate the Business Problem","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
-  const stageSub = {"prep":"Paste your prep brief. Everything downstream personalizes from this.","outputs":"Generate your end-of-call outputs."}[activeStage];
+  const stageSub = {"prep":"Who's on the call, and anything you spotted.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
   return (
@@ -1629,123 +1179,86 @@ const sd = STAGE_DATA[activeStage];
           <div style={{ maxWidth:860, margin:"0 auto" }}>
 
             {/* PREP */}
-            {activeStage === "prep" && (
-              <div style={{ marginBottom:28 }}>
-                <div style={{ background:C.emeraldLight, border:`2px solid ${C.emeraldMid}`, borderRadius:14, marginBottom:20, overflow:"hidden" }}>
-                  <button onClick={()=>setPrepOpen(o=>!o)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 26px", background:"none", border:"none", cursor:"pointer" }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                      <span style={{ fontSize:13, fontWeight:700, color:C.emerald, letterSpacing:"0.08em", textTransform:"uppercase" }}>★ Discovery Prep Brief</span>
-                      {prepBrief && !prepOpen && <span style={{ fontSize:12, color:C.emerald, fontWeight:600 }}>✓ Loaded</span>}
-                    </div>
-                    <span style={{ fontSize:18, color:C.emerald, transform: prepOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s" }}>▾</span>
-                  </button>
-                  {prepOpen && (
-                    <div style={{ padding:"0 26px 26px" }}>
-                      <div style={{ fontSize:15, color:C.textSecondary, marginBottom:16, lineHeight:1.7 }}>Paste the output from your pre-call research. The coach and all outputs will use this to personalize every response.</div>
-                      <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Organization] — [Date]\n\nContacts: [Names], [Titles] | Tenure\nCall source: Inbound / Outbound\n\nSystem: hospitals, clinics, size, new sites coming online\nHard-to-fill roles: ...\nSign-ons on careers page: ...\nTurnover / contract labor signals: ...\nTuition or loan benefits today: ...\nSchool partnerships: ...\nOpen questions: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#f7f8fa", color:C.textPrimary, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
-                      {prepBrief && <div style={{ marginTop:12, fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>}
-                    </div>
-                  )}
+            {activeStage === "prep" && (() => {
+              const field = f => (
+                <div key={f.key} style={f.wide ? { gridColumn:"1 / -1" } : {}}>
+                  <label htmlFor={`brief-${f.key}`} style={{ display:"block", fontSize:11, color:C.textMuted, fontWeight:700, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.08em" }}>{f.label}</label>
+                  <input id={`brief-${f.key}`} value={briefFields[f.key] || ""} onChange={e => setBriefFields(s => ({ ...s, [f.key]: e.target.value }))} placeholder={f.placeholder}
+                    style={{ width:"100%", fontSize:15, padding:"9px 12px", border:`1px solid ${C.border}`, borderRadius:8, background:C.white, color:C.textPrimary, outline:"none", fontFamily:"inherit" }} />
                 </div>
-                {/* PRE-CALL INTEL */}
-                <div style={{ background:"#eef3ff", border:"1.5px solid #7ba3f0", borderRadius:12, padding:20, marginBottom:16 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#2563eb", marginBottom:12 }}>Pre-Call Intel</div>
-                  <div style={{ marginBottom:12 }}>
-                    <div style={{ fontSize:10, color:"#2b4fa3", fontWeight:700, marginBottom:6, textTransform:"uppercase", letterSpacing:"0.07em" }}>Paste questionnaire answers (brief goes above ↑) → auto-fill fields</div>
-                    <div style={{ display:"flex", gap:8 }}>
-                      <textarea
-                        value={questionnaireText}
-                        onChange={e => setQuestionnaireText(e.target.value)}
-                        placeholder="Paste questionnaire answers or additional context here..."
-                        rows={3}
-                        style={{ flex:1, fontSize:12, padding:"8px 12px", border:"1.5px solid #7ba3f0", borderRadius:7, background:"#f7f8fa", color:C.textPrimary, resize:"none", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
-                      />
-                      <button onClick={parseBrief} disabled={briefParsing || (!prepBrief.trim() && !questionnaireText.trim())} style={{ ...B, fontSize:12, padding:"0 16px", borderRadius:7, border:"none", background: briefParsing ? "#c0dac8" : (!prepBrief.trim() && !questionnaireText.trim()) ? "#e8edf7" : C.emerald, color: (!prepBrief.trim() && !questionnaireText.trim()) ? "#9080c8" : "#fff", fontWeight:700, whiteSpace:"nowrap", alignSelf:"stretch" }}>
-                        {briefParsing ? "Parsing..." : "⚡ Auto-fill"}
-                      </button>
+              );
+              const card = { background:C.white, border:`1px solid ${C.border}`, borderRadius:14, marginBottom:12 };
+              const toggle = (open, set, title, sub) => (
+                <button onClick={() => set(v => !v)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 20px", background:"none", border:"none", textAlign:"left" }}>
+                  <span><span style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{title}</span>{sub && <span style={{ fontSize:13, color:C.textMuted, marginLeft:10 }}>{sub}</span>}</span>
+                  <span style={{ fontSize:16, color:C.textMuted, transform: open ? "rotate(180deg)" : "none", transition:"transform 0.2s" }}>▾</span>
+                </button>
+              );
+              return (
+                <div style={{ marginBottom:28 }}>
+                  <div style={{ ...card, padding:"18px 20px 20px" }}>
+                    <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Who's on the call</div>
+                    <div style={{ fontSize:13, color:C.textMuted, marginBottom:16 }}>These three fill the script.</div>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                      {[
+                        { key:"prospect", label:"Prospect name(s)", placeholder:"e.g. Jane, Sam" },
+                        { key:"company",  label:"Their organization", placeholder:"e.g. Acme Health" },
+                        { key:"signals",  label:"What you spotted", placeholder:"e.g. a new rehab site opening and sign-ons on their careers page", wide:true },
+                      ].map(field)}
                     </div>
                   </div>
-                  <div style={{ fontSize:11, color:"#9080c8", marginBottom:16 }}>Or fill in manually below:</div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                    {[
-                      { key:"prospect",    label:"Prospect name(s)",     placeholder:"Fills [Names], e.g. Jane, Sam" },
-                      { key:"company",     label:"Their organization",   placeholder:"Fills [their company]" },
-                      { key:"signals",     label:"What you spotted",     placeholder:"Fills [what you spotted], e.g. a new site opening, sign-ons on their careers page" },
-                      { key:"role",        label:"Their roles",          placeholder:"e.g. VP Talent Acquisition, Dir. of Nursing" },
-                      { key:"systemSize",  label:"System size",          placeholder:"e.g. 6 hospitals, 12k employees" },
-                      { key:"roles",       label:"Hard-to-fill roles",   placeholder:"e.g. new-grad RNs, imaging techs, PT/OT" },
-                      { key:"turnover",    label:"First-year turnover",  placeholder:"e.g. ~25% for new-grad RNs" },
-                      { key:"signOns",     label:"Sign-on bonuses",      placeholder:"e.g. $15k RN sign-on on careers page" },
-                      { key:"contract",    label:"Contract labor",       placeholder:"e.g. heavy traveler use in ICU nights" },
-                      { key:"benefits",    label:"Tuition / loan benefits today", placeholder:"e.g. tuition reimbursement, no loan repayment" },
-                      { key:"schools",     label:"School partnerships",  placeholder:"e.g. clinical rotations with local BSN program" },
-                      { key:"decision",    label:"Decision process",     placeholder:"e.g. CHRO and CFO sign off" },
-                      { key:"pain",        label:"Known pain",           placeholder:"e.g. losing new-grad nurses in year one" },
-                    ].map(f => (
-                      <div key={f.key} style={f.key === "pain" || f.key === "signals" ? { gridColumn:"1 / -1" } : {}}>
-                        <div style={{ fontSize:10, color:"#2b4fa3", fontWeight:700, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.07em" }}>{f.label}</div>
-                        <input
-                          value={briefFields[f.key]}
-                          onChange={e => setBriefFields(s => ({ ...s, [f.key]: e.target.value }))}
-                          placeholder={f.placeholder}
-                          style={{ width:"100%", fontSize:13, padding:"7px 11px", border:"1.5px solid #7ba3f0", borderRadius:7, background:"#f7f8fa", color:C.textPrimary, outline:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif" }}
-                        />
+
+                  <div style={card}>
+                    {toggle(prepOpen, setPrepOpen, "More intel", "Brief, auto-fill, and account details")}
+                    {prepOpen && (
+                      <div style={{ padding:"0 20px 20px", display:"flex", flexDirection:"column", gap:16 }}>
+                        <div>
+                          <label htmlFor="prep-brief" style={{ display:"block", fontSize:11, color:C.textMuted, fontWeight:700, marginBottom:5, textTransform:"uppercase", letterSpacing:"0.08em" }}>Prep brief or questionnaire answers</label>
+                          <textarea id="prep-brief" value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} rows={6}
+                            placeholder={"CALL BRIEF: [Organization] — [Date]\nContacts, titles, inbound / outbound\nSystem size, new sites, hard-to-fill roles\nSign-ons, turnover, contract labor signals\nTuition / loan benefits, school partnerships"}
+                            style={{ width:"100%", fontSize:14, lineHeight:1.6, padding:"10px 12px", border:`1px solid ${C.border}`, borderRadius:8, background:C.sand, color:C.textPrimary, resize:"vertical", fontFamily:"inherit", outline:"none" }} />
+                          <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:8 }}>
+                            <button onClick={parseBrief} disabled={briefParsing || !prepBrief.trim()} style={{ ...B, fontSize:13, padding:"8px 14px", borderRadius:8, border:"none", background: !prepBrief.trim() ? C.sand : C.emerald, color: !prepBrief.trim() ? C.textMuted : "#fff", fontWeight:700 }}>
+                              {briefParsing ? "Reading…" : "Auto-fill fields from brief"}
+                            </button>
+                            {briefParseStatus === "ok" && <span style={{ fontSize:13, color:C.filledText, fontWeight:600 }}>✓ Fields filled</span>}
+                            {briefParseStatus.startsWith("error") && <span style={{ fontSize:12, color:C.coralText }}>Couldn't read the brief. Fill the fields by hand.</span>}
+                          </div>
+                        </div>
+                        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                          {[
+                            { key:"role",       label:"Their roles",          placeholder:"e.g. VP Talent Acquisition, Dir. of Nursing" },
+                            { key:"systemSize", label:"System size",          placeholder:"e.g. 6 hospitals, 12k employees" },
+                            { key:"roles",      label:"Hard-to-fill roles",   placeholder:"e.g. new-grad RNs, imaging techs, PT/OT" },
+                            { key:"turnover",   label:"First-year turnover",  placeholder:"e.g. ~25% for new-grad RNs" },
+                            { key:"signOns",    label:"Sign-on bonuses",      placeholder:"e.g. $15k RN sign-on" },
+                            { key:"contract",   label:"Contract labor",       placeholder:"e.g. travelers in ICU nights" },
+                            { key:"benefits",   label:"Tuition / loan benefits", placeholder:"e.g. tuition reimbursement only" },
+                            { key:"schools",    label:"School partnerships",  placeholder:"e.g. rotations with local BSN program" },
+                            { key:"decision",   label:"Decision process",     placeholder:"e.g. CHRO and CFO sign off" },
+                            { key:"pain",       label:"Known pain",           placeholder:"e.g. losing new-grad nurses in year one" },
+                          ].map(field)}
+                        </div>
                       </div>
-                    ))}
+                    )}
                   </div>
-                  {briefParseStatus === "ok" && <div style={{ marginTop:12, padding:"7px 14px", background:"#e9effe", borderRadius:8, border:"1px solid #2563eb", fontSize:12, color:"#2563eb", fontWeight:600 }}>✓ Fields populated from brief</div>}
-                  {briefParseStatus.startsWith("error") && <div style={{ marginTop:12, padding:"7px 14px", background:"#fdf2f2", borderRadius:8, border:"1px solid #e05c5c", fontSize:11, color:"#e05c5c", fontWeight:500, wordBreak:"break-all" }}>{briefParseStatus}</div>}
-                  {Object.values(briefFields).some(v => v) && briefParseStatus !== "ok" && (
-                    <div style={{ marginTop:14, padding:"8px 14px", background:"#e9effe", borderRadius:8, border:"1px solid #2563eb", fontSize:12, color:"#2563eb", fontWeight:600 }}>
-                      ✓ Intel saved — names, organization and what you spotted fill the script
-                    </div>
-                  )}
-                </div>
 
-                <div style={{ background:"#eef3ff", border:"1.5px solid #bccdf5", borderRadius:12, padding:20, marginBottom:16 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#2563eb", marginBottom:14 }}>Pre-call behavioral read — Hughes Six-Minute X-Ray</div>
-                  <div style={{ fontSize:13, color:"#1d4ed8", lineHeight:1.7, marginBottom:12 }}>Based on their email, LinkedIn, or context — profile before you dial. You're looking for three things:</div>
-                  {[
-                    { label:"Primary Social Need", detail:"What makes them feel significant? Approval (they want validation), Power (they want control), Intelligence (they want to be seen as sharp), Acceptance (they want to belong). Tailor your opener to meet that need." },
-                    { label:"Decision Style", detail:"Novelty seeker (show them something new), Social conformist (show them who else uses it), Necessity driven (show them the cost of not acting), Investment driven (show them the ROI math)." },
-                    { label:"Sensory preference", detail:"Scan their writing. Visual = 'I see,' 'looks like,' 'picture this.' Auditory = 'sounds right,' 'rings true.' Kinesthetic = 'feels like,' 'get a sense.' Mirror their language in the call." },
-                  ].map((s,i)=>(
-                    <div key={i} style={{ marginBottom:i<2?12:0, paddingBottom:i<2?12:0, borderBottom:i<2?`1px solid #d5e2fa`:"none" }}>
-                      <div style={{ fontSize:12, fontWeight:700, color:"#2563eb", marginBottom:4 }}>{s.label}</div>
-                      <div style={{ fontSize:13, color:"#1d4ed8", lineHeight:1.65 }}>{s.detail}</div>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ background:"#fdf7e6", border:"1.5px solid #c09818", borderRadius:12, padding:20, marginBottom:16 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#a07820", marginBottom:14 }}>PCP Model — Hughes. Set this before every call.</div>
-                  <div style={{ fontSize:13, color:"#7a5a10", lineHeight:1.7, marginBottom:14 }}>Every human decision flows through 3 steps. Control the frame, control the outcome.</div>
-                  {[
-                    { letter:"P", label:"Perception", desc:"Change how they see the situation before discovery starts. Your opener sets what this meeting means. 'A lot of vendors jump to a demo before understanding anything about you. That's not how I want to spend our time.'" },
-                    { letter:"C", label:"Context", desc:"Context dictates what behavior is permissible. The ROE sets the context — mutual discovery, not a pitch. Once the context is set, the prospect knows what's expected of them." },
-                    { letter:"P", label:"Permission", desc:"Context gives permission. When you say 'does that feel fair?' — you're granting them permission to engage as a peer. When you summarize and ask 'did I get that right?' — you're giving them permission to correct and go deeper." },
-                  ].map((s,i)=>(
-                    <div key={i} style={{ display:"flex", gap:12, marginBottom:i<2?12:0, paddingBottom:i<2?12:0, borderBottom:i<2?"1px solid #f0d870":"none" }}>
-                      <span style={{ fontSize:18, fontWeight:800, color:"#a07820", flexShrink:0, minWidth:22 }}>{s.letter}</span>
-                      <div>
-                        <div style={{ fontSize:12, fontWeight:700, color:"#a07820", marginBottom:3 }}>{s.label}</div>
-                        <div style={{ fontSize:13, color:"#7a5a10", lineHeight:1.65 }}>{s.desc}</div>
+                  <div style={card}>
+                    {toggle(tipsOpen, setTipsOpen, "Pre-call reminders", "Read them before you dial")}
+                    {tipsOpen && (
+                      <div style={{ padding:"0 20px 20px", display:"flex", flexDirection:"column", gap:14, fontSize:14, color:C.textSecondary, lineHeight:1.55 }}>
+                        <div><b style={{ color:C.textPrimary }}>Say "glad we found the time" — then stop.</b> Their response tells you whether to linger on small talk or get to business. Don't thank them for their time.</div>
+                        <div><b style={{ color:C.textPrimary }}>Strong suggestion, loosely held.</b> Propose the agenda and the next step, and give them room to change it.</div>
+                        <div><b style={{ color:C.textPrimary }}>Their words, not yours.</b> Summarize every few questions using their exact language, then ask "Did I get that right?"</div>
+                        <div><b style={{ color:C.textPrimary }}>Give a reason before a hard question.</b> "The reason I ask is…" makes the uncomfortable ones land.</div>
+                        <div><b style={{ color:C.textPrimary }}>Read them in the first minute.</b> I/me/my means personal stakes; we/us/our means consensus. If they volunteer a frustration, that's the center.</div>
+                        <div><b style={{ color:C.textPrimary }}>Value = three things.</b> A painful, measurable current state; a compelling, measurable future state; Clasp as the bridge.</div>
                       </div>
-                    </div>
-                  ))}
+                    )}
+                  </div>
                 </div>
-                <div style={{ background:C.white, border:`1.5px solid ${C.border}`, borderRadius:12, padding:20 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:14 }}>Value selling = 3 things. Only 3.</div>
-                  {["Painful, measurable current state","Compelling, measurable future state","Your product as the bridge between the two"].map((t,i)=>(
-                    <div key={i} style={{ display:"flex", gap:12, marginBottom:i<2?10:0 }}>
-                      <span style={{ background:C.emerald, color:C.white, fontSize:12, fontWeight:700, width:22, height:22, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{i+1}</span>
-                      <span style={{ fontSize:15, color:C.textSecondary, lineHeight:1.6 }}>{t}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-
+              );
+            })()}
 
             {/* LIVE SCRIPT */}
             {sd && (
@@ -1753,12 +1266,7 @@ const sd = STAGE_DATA[activeStage];
                 {renderStageScript(activeStage, activeStage !== "business-problem")}
               </div>
             )}
-            {activeStage === "business-problem" && <>
-              <Collapsible label="Buyer path playbook — inbound / outbound, evaluating / active / latent" isOpen={moreOpen} onToggle={()=>setMoreOpen(v=>!v)} accent={C.textSecondary}>
-                {renderBuyerType()}
-              </Collapsible>
-              {renderHandoff(activeStage)}
-            </>}
+            {activeStage === "business-problem" && renderHandoff(activeStage)}
 
 
             {/* OUTPUTS */}
@@ -1855,9 +1363,7 @@ const sd = STAGE_DATA[activeStage];
             <div style={{ display:"flex", alignItems:"stretch", borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
               {[
                 { id:"capture",    label:"Capture" },
-                { id:"spiced",     label:"Bank" },
-                { id:"roi",        label:"ROI" },
-                { id:"enterprise", label:"Qualify" },
+                { id:"spiced",     label:"Backup questions" },
               ].map(t => (
                 <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"13px 4px 11px", fontSize:12, fontWeight:700, letterSpacing:"0.04em", border:"none", borderBottom: rightTab===t.id ? `2px solid ${C.emerald}` : "2px solid transparent", background:"transparent", color: rightTab===t.id ? C.emerald : C.textMuted, marginBottom:-1 }}>
                   {t.label}
@@ -1930,23 +1436,22 @@ const sd = STAGE_DATA[activeStage];
             {/* QUESTION BANK TAB */}
             {rightTab === "spiced" && (
               <div style={{ overflowY:"auto", flex:1 }}>
-                <div style={{ padding:"18px 20px 10px", fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase" }}>Question Bank</div>
-                <div style={{ padding:"0 20px 8px", fontSize:12, color:C.textMuted, lineHeight:1.6 }}>If you're stuck uncovering any SPICED element — open it for questions to ask.</div>
-                {SPICED_QUESTIONS.map(s=>{
+                <div style={{ padding:"16px 20px 10px", fontSize:13, color:C.textMuted, lineHeight:1.5 }}>If you get stuck, open a group for a question to try.</div>
+                {QUESTION_BANK.map(s=>{
                   const isOpen = openSpiced === s.key;
                   return (
                     <div key={s.key} style={{ borderTop:`1px solid ${C.border}` }}>
-                      <button onClick={()=>setOpenSpiced(isOpen?null:s.key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?s.bg:"transparent", border:"none", textAlign:"left" }}>
-                        <span style={{ fontSize:13, fontWeight:700, color:isOpen?s.color:C.textPrimary }}>{s.label}</span>
-                        <span style={{ fontSize:14, color:isOpen?s.color:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
+                      <button onClick={()=>setOpenSpiced(isOpen?null:s.key)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?C.sand:"transparent", border:"none", textAlign:"left" }}>
+                        <span style={{ fontSize:13, fontWeight:700, color:isOpen?C.emerald:C.textPrimary }}>{s.label}</span>
+                        <span style={{ fontSize:14, color:isOpen?C.emerald:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
                       </button>
                       {isOpen && (
-                        <div style={{ padding:"4px 20px 16px", background:s.bg, borderTop:`1px solid ${s.border}` }}>
+                        <div style={{ padding:"4px 20px 16px", background:C.sand, borderTop:`1px solid ${C.border}` }}>
                           {s.questions.map((q,i)=>(
                             <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:i<s.questions.length-1?12:0 }}>
-                              <span style={{ fontSize:11, fontWeight:700, color:s.color, marginTop:3, flexShrink:0 }}>→</span>
+                              <span style={{ fontSize:11, fontWeight:700, color:C.emerald, marginTop:4, flexShrink:0 }}>→</span>
                               <div style={{ flex:1 }}>
-                                <div style={{ fontSize:13, color:C.textPrimary, lineHeight:1.7 }}>{q}</div>
+                                <div style={{ fontSize:14, color:C.textPrimary, lineHeight:1.55 }}>{q}</div>
                               </div>
                             </div>
                           ))}
@@ -1955,78 +1460,6 @@ const sd = STAGE_DATA[activeStage];
                     </div>
                   );
                 })}
-              </div>
-            )}
-            {/* ENTERPRISE TAB */}
-            {rightTab === "enterprise" && (
-              <div style={{ overflowY:"auto", flex:1 }}>
-                <div style={{ padding:"18px 20px 6px", fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase" }}>Enterprise Qualification</div>
-                <div style={{ padding:"0 20px 12px", fontSize:12, color:C.textMuted, lineHeight:1.6 }}>Buying-committee and qualification questions live here.</div>
-                <div style={{ margin:"0 20px", padding:"28px 20px", borderRadius:12, border:`1.5px dashed ${C.border}`, background:C.sand, textAlign:"center" }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:C.textSecondary, marginBottom:8 }}>No qualification questions yet</div>
-                  <div style={{ fontSize:12, color:C.textMuted, lineHeight:1.7 }}>Add your enterprise qualification sets in <span style={{ fontFamily:"monospace", background:"#eef0f3", padding:"1px 6px", borderRadius:4 }}>src/App.jsx</span> — same accordion pattern as the Questions tab.</div>
-                </div>
-              </div>
-            )}
-
-            {/* ROI TAB */}
-            {rightTab === "roi" && (
-              <div style={{ padding:24, overflowY:"auto", flex:1 }}>
-                <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:4 }}>ROI Calculator</div>
-                <div style={{ fontSize:13, color:C.textMuted, marginBottom:20, lineHeight:1.6 }}>Fill in as they answer. Business case builds itself.</div>
-                <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:20 }}>
-                  {[
-                    { key:"unitsPerMonth", label:"Units / month",             placeholder:"e.g. 200" },
-                    { key:"minsPerUnit",   label:"Avg time per unit (min)",   placeholder:"e.g. 45" },
-                    { key:"teamSize",      label:"Team size",                 placeholder:"e.g. 40" },
-                    { key:"hourlyRate",    label:"Avg hourly cost ($)",       placeholder:"e.g. 75" },
-                    { key:"targetTimeMins",label:"Target time per unit (min)",placeholder:"e.g. 15" },
-                  ].map(f => (
-                    <div key={f.key}>
-                      <div style={{ fontSize:12, fontWeight:600, color:C.textSecondary, marginBottom:6 }}>{f.label}</div>
-                      <input type="number" value={roi[f.key]} onChange={e=>setRoi(r=>({...r,[f.key]:e.target.value}))} placeholder={f.placeholder} style={{ width:"100%", fontSize:15, fontWeight:600, padding:"10px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, background:"#f7f8fa", color:C.textPrimary, boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
-                    </div>
-                  ))}
-                </div>
-                {(() => {
-                  const upm = parseFloat(roi.unitsPerMonth);
-                  const mpu = parseFloat(roi.minsPerUnit);
-                  const ts  = parseFloat(roi.teamSize);
-                  const hr  = parseFloat(roi.hourlyRate);
-                  const tm  = parseFloat(roi.targetTimeMins) || 15;
-                  if (!upm || !mpu || !ts || !hr) return (
-                    <div style={{ fontSize:13, color:C.textMuted, fontStyle:"italic", textAlign:"center", padding:"20px 0" }}>Fill in the fields above to see the business case</div>
-                  );
-                  const hoursNowYear  = (upm * mpu / 60) * 12;
-                  const costNowYear   = hoursNowYear * hr;
-                  const hoursTgtYear  = (upm * tm / 60) * 12;
-                  const costTgtYear   = hoursTgtYear * hr;
-                  const savedHours    = hoursNowYear - hoursTgtYear;
-                  const savedDollars  = costNowYear - costTgtYear;
-                  const savePct       = Math.round((1 - tm / mpu) * 100);
-                  const fmt  = n => n >= 1000 ? `$${(n/1000).toFixed(1)}k` : `$${Math.round(n)}`;
-                  const fmtH = n => n >= 1000 ? `${(n/1000).toFixed(1)}k hrs` : `${Math.round(n)} hrs`;
-                  const cfoCopy = `Your team of ${Math.round(ts)} is spending ${fmtH(hoursNowYear)} a year — ${fmt(costNowYear)} in labor — just on this process. With the right solution that drops to ${fmtH(hoursTgtYear)}. That's ${fmtH(savedHours)} and ${fmt(savedDollars)} back to the business every year.`;
-                  return (
-                    <div>
-                      {[
-                        { label:"Current cost / yr",    value:fmt(costNowYear),   sub:`${fmtH(hoursNowYear)} on the process today`,        color:C.coral,    bg:"#fdf2f2",    border:`${C.coral}50` },
-                        { label:"With solution / yr",   value:fmt(costTgtYear),   sub:`${fmtH(hoursTgtYear)} at ${tm} min/unit`,    color:C.emerald,  bg:C.emeraldLight, border:C.emeraldMid },
-                        { label:"Annual value delta",   value:fmt(savedDollars),  sub:`${fmtH(savedHours)} reclaimed — ${savePct}% saved`, color:"#2563eb", bg:"#eef3ff", border:"#bccdf5" },
-                      ].map((m,i)=>(
-                        <div key={i} style={{ background:m.bg, border:`1.5px solid ${m.border}`, borderRadius:10, padding:"14px 16px", marginBottom:10 }}>
-                          <div style={{ fontSize:11, fontWeight:700, color:m.color, letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:4 }}>{m.label}</div>
-                          <div style={{ fontSize:26, fontWeight:800, color:m.color, letterSpacing:"-0.02em", marginBottom:3 }}>{m.value}</div>
-                          <div style={{ fontSize:12, color:C.textMuted, lineHeight:1.5 }}>{m.sub}</div>
-                        </div>
-                      ))}
-                      <div style={{ background:C.sand, border:`1.5px solid ${C.border}`, borderRadius:10, padding:"14px 16px", marginTop:4 }}>
-                        <div style={{ fontSize:12, fontWeight:700, color:C.textPrimary, marginBottom:8 }}>CFO-worthy framing</div>
-                        <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.75, marginBottom:10 }}>"{cfoCopy}"</div>
-                      </div>
-                    </div>
-                  );
-                })()}
               </div>
             )}
             </>}
