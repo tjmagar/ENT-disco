@@ -169,8 +169,8 @@ const STAGE_DATA = {
     rule:"Align on the objective, the agenda, and the decision to be made.",
     script:[
       { kind:"say", beats:[
-        { cue:"Bridge from intros", text:"Perfect, that leads into what I was thinking." },
-        { cue:"Propose the agenda", text:"Here's what I'm thinking in terms of an **agenda**. Let me know if you had something else in mind…" },
+        { cue:"Bridge from intros", text:"Perfect, that leads into what I had in mind for today." },
+        { cue:"Propose the agenda", text:"Here's what I'm thinking in terms of **how we spend our time**. Let me know if you had something else in mind…" },
         { cue:"Set the outcome", text:"But the outcome I recommend we shoot for is to **learn enough about each other** to decide whether or not it makes sense to have a **second meeting**." },
         { cue:"Lower the stakes", text:"Obviously, I **don't expect us to do business** on this call. So let's just learn enough about each other to determine if another call makes sense." },
         { cue:"Check", check:true, text:"Is that **fair so far**?", then:"Perfect." },
