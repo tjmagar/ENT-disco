@@ -156,7 +156,7 @@ const STAGE_DATA = {
     script:[
       { kind:"say", beats:[
         { cue:"Greet", text:"Hi [Names], I'm **glad we found the time** today. How's your **week** been?" },
-        { cue:"Ask permission", check:true, text:"Great, well mind if we talk about the **agenda**?", then:"Perfect. Quick intros before we dive in." },
+        { cue:"Ask permission", text:"Great, well mind if we talk about the **agenda**?\n\nPerfect. Quick intros before we dive in." },
         { cue:"Your intro", text:"My name is **TJ Magar**, I'm a Director of Healthcare Partnerships here at Clasp." },
         { cue:"Why you care", text:"I'm super passionate about the work we do here because **I'm an agitated borrower myself**, so I know how it feels to have that barrier to education. And I love that we are **breaking that down**, especially for the most important workforce and industry: **healthcare**." },
         { cue:"Hand off", check:"answer", text:"I've brought my colleague **Altara** here as well — and then would love to hear about you both, maybe just **what would make today a win**. But Altara — mind sharing a quick intro first?" },
@@ -559,7 +559,7 @@ const SESSION_KEY = "discovery-session-v1";
 function loadSession() {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "{}") || {}; } catch { return {}; }
 }
-const EMPTY_BRIEF = { prospect:"", company:"", signals:"", role:"", tool:"", reps:"", volume:"", timePerDoc:"", metric:"", pain:"", integrations:"", approval:"" };
+const EMPTY_BRIEF = { prospect:"", company:"", signals:"", role:"", systemSize:"", roles:"", turnover:"", signOns:"", contract:"", benefits:"", schools:"", decision:"", pain:"" };
 
 export default function App() {
   const saved = useRef(loadSession()).current;
@@ -661,7 +661,7 @@ export default function App() {
       case "suspected root cause": return v(c.suspected);
       case "capability": return v(c.capability);
       case "your honest read": return v(c.read);
-      case "metric they named": return v(c.metric) || v(b.metric);
+      case "metric they named": return v(c.metric);
       case "business problem and current state": return join([c.businessDriver, current]);
       case "business problem + root causes": return join([c.businessDriver, cause]);
       case "brief summary": return join([c.businessDriver, current, cause, v(c.ripple) && `it's causing ${v(c.ripple)}`, v(c.cost) && `and it's costing about ${v(c.cost)} a month`]);
@@ -922,16 +922,18 @@ If nothing is covered yet, return [].` }]
           messages:[{ role:"user", content:`Extract ONLY explicitly stated fields from the text below (may include a prep brief and/or questionnaire answers separated by ---). If something is not clearly written, use "". Do not infer, guess, or calculate.
 
 Return a JSON object with these keys:
-- prospect: first name only (explicit)
-- company: company name (explicit)
-- role: their exact job title (explicit)
-- tool: current tools/state explicitly named
-- reps: team size — digits only e.g. "40", NOT words like "forty". Use "" if not a specific number
-- volume: volume per month — digits only. Use "" if not stated
-- timePerDoc: minutes per unit — digits only. Use "" if not stated
-- metric: business metric they explicitly care about (e.g. "win rate"). Use "" if not stated
-- integrations: tools explicitly mentioned for integration
-- approval: approval process if explicitly described
+- prospect: first names of the people on the call, comma-separated (explicit)
+- company: the health system or organization name (explicit)
+- role: their exact job titles (explicit)
+- signals: specific things noticed about them, e.g. a new site opening, sign-ons on their careers page
+- systemSize: hospitals, clinics, beds or employee count if stated
+- roles: hard-to-fill clinical or allied health roles named (e.g. RNs, imaging techs, PT/OT)
+- turnover: first-year or overall turnover numbers if stated
+- signOns: sign-on bonuses offered, with amounts if stated
+- contract: contract labor / traveler usage if stated
+- benefits: current tuition reimbursement or student loan benefits if stated
+- schools: school or clinical program partnerships if stated
+- decision: who decides and how, if explicitly described
 - pain: one sentence summary of their stated pain
 
 TEXT:
@@ -1458,11 +1460,11 @@ ${combinedText}` }]
           {[
             { type:"ask", label:"Set the agenda first — relieve their fatigue", text:'"Here\'s how I\'m thinking about the agenda. How about I spend the first few minutes walking you through the challenges we typically solve so you have some context for the rest of the conversation. And from there I\'ll pass the torch to you. Is that fair?"', note:"Many latent buyers come in expecting 20 bad discovery questions. This relieves them instantly. They hear 'I'll give you something before asking you anything' and relax. Now you've set up the Discovery Prompter." },
             { type:"ask", label:"Discovery Prompter — 6 steps (practice this 5-6 times first)", alts:[
-              "1 — PROBLEM: \"Most of our customers before working with us were struggling with [pain statement — e.g. sales teams spending 30-45 minutes building every proposal by hand, copy-pasting from Word, chasing signatures over email].\"",
-              "2 — AGITATE: \"They were dealing with [articulate pain better than they can — e.g. no visibility into whether prospects opened what they sent, deals going cold in the last mile, reps burning time on admin instead of selling].\"",
-              "3 — FAILED ATTEMPTS: \"Before partnering with us, they had tried [traditional solutions — e.g. better Word templates, DocuSign standalone, spreadsheets to track] but all of them fell short. So they gave up and assumed they'd have to live with it.\"",
+              "1 — PROBLEM: \"Most of our customers before working with us were struggling with [pain statement — e.g. losing new-grad nurses in their first year, paying bigger sign-ons every year, and leaning on travelers to fill the gaps].\"",
+              "2 — AGITATE: \"They were dealing with [articulate pain better than they can — e.g. paying a sign-on, then paying it again when the role turns over; competing with every system in town for the same graduating class].\"",
+              "3 — FAILED ATTEMPTS: \"Before partnering with us, they had tried [traditional solutions — e.g. bigger sign-ons, tuition reimbursement, more travelers] but all of them fell short. So they gave up and assumed they'd have to live with it.\"",
               "4 — NEW APPROACH: \"When they met us, they realized we have a unique approach that gets at the source of the problem — [tease it lightly, don't go into feature detail].\"",
-              "5 — POSITIVE OUTCOME: \"After rolling this out, most of our customers see [business outcome — e.g. proposals out in under 10 minutes, signatures back same day]. In fact, [short customer story with a metric].\"",
+              "5 — POSITIVE OUTCOME: \"After rolling this out, most of our customers see [business outcome — e.g. single-digit turnover for clinicians in the program, fewer sign-ons and travelers]. In fact, [short customer story with a metric].\"",
               "6 — PASS THE TORCH: \"Anyway — enough about our customers. Help me understand the challenges you might be having when it comes to [problem area] that you'd like to see resolved.\"",
             ], note:"This is a PAIN story — not a success story. Step 3 (failed attempts) is the step most people skip and it's often the most important one — latent buyers have usually tried to solve this before. When you name it, they identify with it. Practice this 5-6 times before going live. It needs to feel conversational, not recited." },
             { type:"ask", label:"If it doesn't land — diagnose why", text:"If they don't respond with anything useful: either they don't have pain (not qualified), your narrative needs work (not hitting the mark), or you misdiagnosed — they might be in the evaluating path. Don't double down. Pivot to a direct question.", note:"Ask: 'Help me understand what's going on in your world when it comes to [area].' If still nothing — they may not be qualified. Better to know now." },
@@ -1630,7 +1632,7 @@ const sd = STAGE_DATA[activeStage];
                   {prepOpen && (
                     <div style={{ padding:"0 26px 26px" }}>
                       <div style={{ fontSize:15, color:C.textSecondary, marginBottom:16, lineHeight:1.7 }}>Paste the output from your pre-call research. The coach and all outputs will use this to personalize every response.</div>
-                      <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Company] — [Date]\n\nContact: [Name], [Title] | Tenure: X years\nCall Source: Inbound/Outbound\n\nMoney Signals: ...\nTech Stack: ...\nCompelling Trigger: ...\nOpen Gaps: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#f7f8fa", color:C.textPrimary, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
+                      <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Organization] — [Date]\n\nContacts: [Names], [Titles] | Tenure\nCall source: Inbound / Outbound\n\nSystem: hospitals, clinics, size, new sites coming online\nHard-to-fill roles: ...\nSign-ons on careers page: ...\nTurnover / contract labor signals: ...\nTuition or loan benefits today: ...\nSchool partnerships: ...\nOpen questions: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#f7f8fa", color:C.textPrimary, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
                       {prepBrief && <div style={{ marginTop:12, fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>}
                     </div>
                   )}
@@ -1659,15 +1661,16 @@ const sd = STAGE_DATA[activeStage];
                       { key:"prospect",    label:"Prospect name(s)",     placeholder:"Fills [Names], e.g. Jane, Sam" },
                       { key:"company",     label:"Their organization",   placeholder:"Fills [their company]" },
                       { key:"signals",     label:"What you spotted",     placeholder:"Fills [what you spotted], e.g. a new site opening, sign-ons on their careers page" },
-                      { key:"role",        label:"Their role",           placeholder:"e.g. VP of Operations" },
-                      { key:"tool",        label:"Current state / tools", placeholder:"e.g. spreadsheets + email" },
-                      { key:"reps",        label:"Team size",            placeholder:"e.g. 40" },
-                      { key:"volume",      label:"Volume",               placeholder:"e.g. 200 / month" },
-                      { key:"timePerDoc",  label:"Time per unit (min)",  placeholder:"e.g. 45" },
-                      { key:"metric",      label:"Their metric / goal",  placeholder:"e.g. retention rate, time to fill" },
-                      { key:"integrations",label:"Integrations needed",  placeholder:"e.g. Salesforce, Workday" },
-                      { key:"approval",    label:"Approval process",     placeholder:"e.g. CFO signs off over $50k" },
-                      { key:"pain",        label:"Known pain",           placeholder:"e.g. losing new hires in year one" },
+                      { key:"role",        label:"Their roles",          placeholder:"e.g. VP Talent Acquisition, Dir. of Nursing" },
+                      { key:"systemSize",  label:"System size",          placeholder:"e.g. 6 hospitals, 12k employees" },
+                      { key:"roles",       label:"Hard-to-fill roles",   placeholder:"e.g. new-grad RNs, imaging techs, PT/OT" },
+                      { key:"turnover",    label:"First-year turnover",  placeholder:"e.g. ~25% for new-grad RNs" },
+                      { key:"signOns",     label:"Sign-on bonuses",      placeholder:"e.g. $15k RN sign-on on careers page" },
+                      { key:"contract",    label:"Contract labor",       placeholder:"e.g. heavy traveler use in ICU nights" },
+                      { key:"benefits",    label:"Tuition / loan benefits today", placeholder:"e.g. tuition reimbursement, no loan repayment" },
+                      { key:"schools",     label:"School partnerships",  placeholder:"e.g. clinical rotations with local BSN program" },
+                      { key:"decision",    label:"Decision process",     placeholder:"e.g. CHRO and CFO sign off" },
+                      { key:"pain",        label:"Known pain",           placeholder:"e.g. losing new-grad nurses in year one" },
                     ].map(f => (
                       <div key={f.key} style={f.key === "pain" || f.key === "signals" ? { gridColumn:"1 / -1" } : {}}>
                         <div style={{ fontSize:10, color:"#2b4fa3", fontWeight:700, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.07em" }}>{f.label}</div>
@@ -1684,7 +1687,7 @@ const sd = STAGE_DATA[activeStage];
                   {briefParseStatus.startsWith("error") && <div style={{ marginTop:12, padding:"7px 14px", background:"#fdf2f2", borderRadius:8, border:"1px solid #e05c5c", fontSize:11, color:"#e05c5c", fontWeight:500, wordBreak:"break-all" }}>{briefParseStatus}</div>}
                   {Object.values(briefFields).some(v => v) && briefParseStatus !== "ok" && (
                     <div style={{ marginTop:14, padding:"8px 14px", background:"#e9effe", borderRadius:8, border:"1px solid #2563eb", fontSize:12, color:"#2563eb", fontWeight:600 }}>
-                      ✓ Intel loaded — matching cards will show pre-answered during the call
+                      ✓ Intel saved — names, organization and what you spotted fill the script
                     </div>
                   )}
                 </div>
