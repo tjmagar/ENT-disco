@@ -41,25 +41,43 @@ export const STAGE_META = {
 // What to jot down at each stage — kept to what you can type live.
 // Several of these fill [placeholders] in later scripts.
 export const CAPTURE = {
-  "rapport-opener":   [{ key:"win", label:"What would make today a win", hint:"Each person's answer" }],
+  "rapport-opener":   [{ key:"win", label:"What would make today a win", hint:"Each person's answer" },
+                       { key:"vibe", label:"Read on them", hint:"Pronouns, energy, anything they volunteered" }],
+  "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
   "orient":           [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
-                       { key:"startWhy", label:"What they said", hint:"Their words. Fills \"You mentioned…\" and \"It sounds like…\"" }],
-  "value-drop":       [{ key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
-  "summary-buyin":    [{ key:"buyIn", label:"Buy-in score (1–10)", hint:"And what would make it a 10" }],
+                       { key:"startWhy", label:"What they said", hint:"Fills \"It sounds like…\" in Business Problem" }],
+  "value-drop":       [{ key:"signOnView", label:"What they've seen with sign-ons" },
+                       { key:"contractAreas", label:"Where they use contract labor most" },
+                       { key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
+  "summary-buyin":    [{ key:"buyIn", label:"Buy-in score (1–10)" },
+                       { key:"toTen", label:"What would make it a 10" }],
   "business-problem": [{ key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
                        { key:"businessDriver", label:"Need behind the need", hint:"The business problem. Would a CFO fund it?" },
-                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" }],
+                       { key:"trigger", label:"Trigger event", hint:"What set this in motion, in their words" },
+                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" },
+                       { key:"validated", label:"Confirmed as the anchor?", type:"choice", options:["Yes","Partly","No"] },
+                       { key:"competing", label:"Competing priorities" }],
   "baseline-current": [{ key:"metric", label:"Metric", hint:"e.g. first-year turnover" },
-                       { key:"current", label:"Today", hint:"Their number and unit" },
-                       { key:"target", label:"Target", hint:"Where it should be, and why" }],
+                       { key:"current", label:"Current", hint:"Their number and unit" },
+                       { key:"target", label:"Target", hint:"Where it should be" },
+                       { key:"why", label:"Why that target" },
+                       { key:"roles", label:"Roles they hire new grads in" },
+                       { key:"schools", label:"School relationships", hint:"Which programs, who owns them" },
+                       { key:"turnover", label:"First-year turnover", hint:"Number + department" },
+                       { key:"signOns", label:"Sign-on bonuses", hint:"Type and amount" },
+                       { key:"contract", label:"Contract labor", hint:"How much, where" }],
   "cause-analysis":   [{ key:"rootCause", label:"Root cause", hint:"Their words" },
-                       { key:"suspected", label:"Your suspected cause", hint:"Fills the last question" }],
+                       { key:"suspected", label:"Your suspected root cause", hint:"Fills Q3" },
+                       { key:"blocker", label:"What's blocking them" }],
   "negative-impact":  [{ key:"ripple", label:"Ripple effects" },
-                       { key:"cost", label:"Cost", hint:"Their rough estimate" }],
+                       { key:"whoElse", label:"Who else is affected" },
+                       { key:"cost", label:"Cost per month" }],
   "future-state":     [{ key:"theirSolution", label:"What they think they need" },
-                       { key:"capability", label:"Capability to test", hint:"Fills the last question" }],
-  "close-next-steps": [{ key:"nextStep", label:"Recommended next step", hint:"Fills your recommendation" },
-                       { key:"who", label:"Who should join", hint:"Fills \"It'd be helpful to include…\"" },
+                       { key:"capability", label:"Capability to test", hint:"Fills Q3" },
+                       { key:"needle", label:"How much it moves the needle" }],
+  "close-next-steps": [{ key:"read", label:"Your honest read", hint:"Fills the close script" },
+                       { key:"nextStep", label:"Next step" },
+                       { key:"who", label:"Who attends" },
                        { key:"date", label:"Date" }],
 };
 
@@ -70,19 +88,21 @@ export const CAPTURE = {
 //   ask:  a question card. group = only shown for that area.
 export const STAGE_DATA = {
   "rapport-opener": {
+    rule:"Land the opener, get permission for the agenda, then intros — yours, your colleague's, then theirs.",
     script:[
       { kind:"say", beats:[
-        { cue:"Greet, then pause", check:"answer", text:"Hi [Names], I'm **glad we found the time** today." },
-        { cue:"If they're chatty", text:"How's your **week** been?" },
+        { cue:"Greet", text:"Hi [Names], I'm **glad we found the time** today. How's your **week** been?" },
         { cue:"Ask permission", text:"Great, well mind if we talk about the **agenda**?\n\nPerfect. Quick intros before we dive in." },
         { cue:"Your intro", text:"My name is **TJ Magar**, I'm a Director of Healthcare Partnerships here at Clasp." },
-        { cue:"Why you care", text:"I'm super passionate about this work because **I'm an agitated borrower myself** — I know how it feels to have that barrier to education. And I love that we're **breaking it down** for the most important workforce there is: **healthcare**." },
-        { cue:"Hand off", check:"answer", text:"I've brought my colleague **Altara** as well — and then I'd love to hear from you both, maybe just **what would make today a win**. Altara, mind sharing a quick intro first?" },
+        { cue:"Why you care", text:"I'm super passionate about the work we do here because **I'm an agitated borrower myself**, so I know how it feels to have that barrier to education. And I love that we are **breaking that down**, especially for the most important workforce and industry: **healthcare**." },
+        { cue:"Hand off", check:"answer", text:"I've brought my colleague **Altara** here as well — and then would love to hear about you both, maybe just **what would make today a win**. But Altara — mind sharing a quick intro first?" },
       ]},
     ],
+    tips:["Pronouns: I/me/my means personal stakes matter. We/us/our means team focus and consensus matter.","Energy: talkative, stay with it. Business, pivot. Don't force the wrong mode.","Write down what would make today a win for each person. It sets up the agenda."],
+    watch:["Thanking the prospect for their time — immediately positions you lower","Letting intros run long — keep yours to two sentences"],
   },
-
   "rules-engagement": {
+    rule:"Align on the objective, the agenda, and the decision to be made.",
     script:[
       { kind:"say", beats:[
         { cue:"Bridge from intros", text:"Perfect, that leads into what I had in mind for today." },
@@ -99,9 +119,11 @@ export const STAGE_DATA = {
         { cue:"Check", check:true, text:"Does that all feel **reasonable and fair**?", then:"Great. Let's take a crack at it." },
       ]},
     ],
+    tips:["Align on the objective, the agenda, and the decision to be made.","Pause after each fairness check and let them answer."],
+    watch:["Rushing past the fairness checks without pausing","Skipping the agenda after they agree to the objective"],
   },
-
   "context": {
+    rule:"Brief context on who we are and what we do. Earn the right to ask questions, don't pitch.",
     script:[
       { kind:"say", title:"Who we are", beats:[
         { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
@@ -109,9 +131,11 @@ export const STAGE_DATA = {
         { cue:"Proof", text:"Our partners include major systems such as **Novant Health, Northwestern Medicine and Boston Children's**, as well as smaller systems like **Saint Alphonsus**. And even outpatient clinics like **Confluent Health**, specialty clinics, the whole gamut." },
       ]},
     ],
+    tips:["Keep it short. The point is to earn the right to ask questions, not to pitch."],
+    watch:["Turning the context into a full pitch"],
   },
-
   "orient": {
+    rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
     script:[
       { kind:"say", title:"Three outcomes", beats:[
         { cue:"Who we talk to", text:"So we talk to a lot of HR leaders across the country — talent acquisition, L&D, workforce development, ops and business leaders — **a lot of smart folks**. And we talk to them about a lot of things, but **the three areas where we're able to drive the most value**, and where it often makes sense to work together, are here on your screen." },
@@ -123,169 +147,219 @@ export const STAGE_DATA = {
         { cue:"Hand it to them", check:"answer", text:"I have a hunch where you might fit, given [what you spotted] and the industry norm on **first-year nurse retention**. But given your situation, **where would be the most relevant place for us to start?**" },
       ]},
     ],
+    tips:["Click the area they pick. The Value Drop and discovery follow it."],
+    watch:["Picking the area for them — let them choose"],
   },
-
   "value-drop": {
+    rule:"Follow their interest. Focus the conversation on the area they chose. All three: pipeline, then spend, then retention.",
+    screen:"Sharing the slides and examples for each talk track",
     script:[
       { kind:"say", beats:[
-        { cue:"Start", text:"Okay — let's start with how we help partners [the area they chose]. **Stop me anytime** if something doesn't apply to you." },
+        { cue:"Acknowledge + start", text:"Okay — if it's alright with you, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't apply** to you." },
       ]},
-
-      // ── Pipeline ───────────────────────────────────────────
-      { kind:"say", group:"Pipeline", title:"The outcome", proof:["Channels: schools, social + influencers, associations + conferences, campus ambassadors, virtual career fairs"], beats:[
-        { cue:"The outcome", text:"The biggest outcome we drive is a **bigger pipeline of soon-to-graduate talent**. We do it three ways:", list:[
-          { tag:"Educate", text:"**Educate students** on what a program like this makes possible." },
-          { tag:"Awareness", text:"Make it **a reason to join your system** after graduation." },
-          { tag:"Convert", text:"**Turn them into applicants** — so they raise their hand and say, \"When I graduate, I want to work for you.\"" },
+      { kind:"say", group:"Pipeline", title:"The outcome", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
+        { cue:"The outcome", text:"The biggest outcome we tend to drive for our partners is building them a **bigger pipeline of soon-to-graduate talent**. I'm not sure yet how much of this applies to you, so I'll keep it high level. We do this through a number of channels.", list:[
+          { tag:"Educate", text:"Channels that **educate the students** on the possibilities and benefits of this type of program." },
+          { tag:"Awareness", text:"Channels that **generate awareness** of this type of program as a reason to join your system after graduation." },
+          { tag:"Convert", text:"And channels to **convert them into applicants** — to get them to raise their hand and say, \"When I graduate, I want to come work for you!\"" },
         ]},
-        { cue:"Check in", check:"answer", text:"Before I go further — **how are you building that early pipeline today?**" },
+        { cue:"Check in", check:"answer", text:"Before I go further — I'm curious, **how are you building that early pipeline today?**" },
       ]},
-      { kind:"say", group:"Pipeline", title:"Get the word out", proof:["Curated influencer network reaches 4.6M+ engaged followers"], beats:[
-        { cue:"Influencers", text:"First, we get the word out. We work with a curated network of **TikTok creators who are clinicians and techs**. I know that can sound a little funny — but for this generation, **it works**." },
+      { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", proof:["Curated influencer network reaches 4.6M+ engaged followers"], beats:[
+        { cue:"Get the word out", text:"First we have to get the word out — if you're becoming a Nurse, an Imaging Tech, a Rehab Therapist, there are healthcare systems that will **help repay part of your student loans** so that you'll want to work with them." },
+        { cue:"Influencers", text:"One of the most effective ways we've found to do this is through **social media influencers**. We have a curated network of **TikTok influencers who are clinicians and techs**. I know it may sound a little funny — but for this generation, **it really seems to work**." },
+        { cue:"Where they talk", text:"From what we're seeing, this is where they go to talk to each other — and **their student loan debt is a lot of what they're talking about**." },
         { cue:"Ask to show", check:"answer", text:"**Mind if I show you something quick?**" },
-        { cue:"Show the search", text:"This is a simple search for nursing, PT and rad tech student loan debt. **Video after video** of students asking each other how they'll pay it off. **It's on their minds.**" },
-        { cue:"Show a video", text:"So our creative team builds content like this with those creators — and compliance keeps it **buttoned up, not boring**. You can see the **engagement**." },
-        { cue:"Check in", check:"answer", text:"**Is that the kind of reach you're getting with students today, or pretty different?**" },
+        { cue:"Show the search", text:"I did a simple search for TikTok videos about nursing student loan debt / PT debt / Rad Tech debt, and look at the results. **Video after video** of nurses and nursing students talking about their debt — how they'll pay it off, whether they regret taking on that much. **This seems to be on their minds**, and they go to TikTok to ask each other about it." },
+        { cue:"Creative + compliance", text:"That's why we have a **creative team** working with influencers who are clinicians and techs to make content that lets these students know about these programs. And a **compliance team** that makes sure it's buttoned up — not boring, but buttoned up." },
+        { cue:"Show a video", text:"Videos like this one. You can see the **level of engagement** — the views, the comments, the reshares. It tends to get these students **thinking about what's possible**." },
+        { cue:"Check in", check:"answer", text:"I'm curious — **is that the kind of reach you're getting with students today, or is that pretty different?**" },
       ]},
-      { kind:"say", group:"Pipeline", title:"Schools + campus", proof:["Active school partnerships: 70+ nursing, 90+ imaging, 70+ rehab therapy, 110+ RT","Virtual career fair: 187 PT, OT and SLP students from 88 schools"], beats:[
-        { cue:"Schools", text:"Then we go to campus. We have **partnerships with hundreds of programs**. When we tell program directors that systems like yours will help their students repay loans, it lands in a way **a sign-on bonus doesn't** — so they share it with their students." },
-        { cue:"Ambassadors", text:"We also have **campus ambassadors** — students and recent grads talking up your program **peer to peer**." },
-        { cue:"Wider reach", text:"And because it's national, it can **widen your pool** beyond the schools you already know." },
-        { cue:"Check in", check:"answer", text:"**Are there programs you'd love to recruit from but don't have a real way in?**" },
+      { kind:"say", group:"Pipeline", title:"Schools + campus", proof:["Active school partnerships: 70+ nursing, 90+ imaging, 70+ rehab therapy, 110+ RT","Ambassadors: we recruit, onboard, track referrals and pay out. Low lift for your team","Virtual career fair: 187 PT, OT and SLP students from 88 schools"], beats:[
+        { cue:"School network", text:"Social only gets you so far, though. To really engage with the students, we've built out a **nationwide network of school relationships** that drive applicants into the top of your funnel. We talk with **Program Directors and Career Services** to spread the word that there are healthcare systems, like yourself, that will help their students pay part of their loans when they come to work for you." },
+        { cue:"Why schools care", text:"From what program directors tell us, this message resonates with them in a way **a sign-on bonus usually doesn't**. It motivates them to share it with their students, and gets us **access to their students** in a way that many employers don't have." },
+        { cue:"Campus ambassadors", text:"We also have a network of **campus ambassadors**, boots on the ground, to engage the students on campus. They're talking to soon-to-graduate nurses, imaging techs, and rehab therapists about our partners who are offering these programs." },
+        { cue:"Wider reach", text:"These channels are what we use to **fill the top of your funnel** with applicants. And since we have relationships with schools across the country, this can **widen your talent pool** — pulling in students from beyond your immediate area, and campuses you might not have a relationship with right now." },
+        { cue:"Check in", check:"answer", text:"How does that compare to your school relationships today — **are there programs you'd love to recruit from but don't have a real way in?**" },
       ]},
-      { kind:"say", group:"Pipeline", title:"Convert", proof:["One system hit >200% of its rad tech applicant goal, with applicants from 6 states","Northwestern Medicine: \"we did not ever have 32 RT applicants at a time prior to Clasp\""], beats:[
-        { cue:"Support TA", text:"None of this replaces your TA team — it **supports** them. We build landing pages in **your brand and your message**, so recruiters can convert candidates they're already talking to **before the competition does**." },
-        { cue:"Check in", check:"answer", text:"**How do you think that would land with your recruiters?**" },
+      { kind:"say", group:"Pipeline", title:"Convert: your recruiters", proof:["One system hit >200% of its rad tech applicant goal, with applicants from 6 states","Northwestern Medicine: \"we did not ever have 32 RT applicants at a time prior to Clasp\"","Partners see applicants from 10+ states on average"], beats:[
+        { cue:"Support your TA", text:"And this isn't meant to replace what your TA team is already doing — **it's meant to support it**, with the local programs and residency programs. We have a team dedicated to **enabling your recruiters**. The landing pages and other materials we create help them **convert candidates they're already talking to** before the competition does." },
+        { cue:"Show landing pages", text:"Landing pages like these. We tailor it to **your message, your employer brand and value prop**. The goal is to send the message to students: 'We understand what you're looking for, and **we're the right fit for you**.'" },
+        { cue:"Check in", check:"answer", text:"**How do you think something like that would land with your recruiters?**" },
       ]},
-
-      // ── Labor cost ─────────────────────────────────────────
       { kind:"say", group:"Labor cost", title:"Open", beats:[
-        { cue:"Open", check:"answer", text:"A loan repayment program can also help you **spend less on sign-ons and contract labor**. Do you spend much on either for **nursing, imaging or rehab** today?" },
+        { cue:"Bridge", text:"And this may or may not be relevant to you — but offering a Student Loan Repayment program can do more than build pipeline. It can also help you **spend less on sign-on bonuses and contract labor**." },
+        { cue:"Ask", check:"answer", text:"Do you currently spend money on either of these for **Nursing, Imaging Techs, or Rehab Therapists**? No wrong answer — some systems lean on them a lot, some hardly at all." },
       ]},
-      { kind:"say", group:"Labor cost", title:"If they spend on sign-ons", proof:["Every $10k in sign-ons creates about $2,800 of value: −72% ROI (Laudio)"], beats:[
-        { cue:"The arms race", check:"answer", text:"What partners tell us is that sign-ons feel like **an arms race** — everyone offers one, and they keep going up every year. **What have you seen?**" },
-        { cue:"The story", text:"A TA leader told me healthcare is **the only place** you can take a sign-on, quit six months later, walk across the street — and **get another one the next day**." },
-        { cue:"Why they fail", text:"A sign-on appeals to a **'right now' mentality** — it gets spent. And when 10, 15, 20% of new hires leave in year one, you **pay it again** to backfill, and chase clawbacks." },
-        { cue:"The contrast", text:"Loan repayment attracts people **thinking about the future**. And it's **paid monthly while they're employed** — no clawbacks, nothing paid upfront for someone who leaves. You only spend to **get and keep them**." },
+      { kind:"say", group:"Labor cost", title:"If they spend on sign-ons", proof:["Every $10k in sign-ons creates about $2,800 of value: −72% ROI (Laudio)","Upfront cash hit, nearly impossible to claw back, re-paid with every backfill"], beats:[
+        { cue:"The arms race", check:"answer", text:"Let me ask you a question — and feel free to push back if this doesn't match what you're seeing. What our partners tell us is that sign-on bonuses feel a bit like **an arms race**. You have to offer one because everyone else is, and they keep escalating every year. **What have you seen in that regard?**" },
+        { cue:"Acknowledge, then the story", text:"It's funny, I was talking to a TA leader at a hospital and she said that healthcare is **the only place where you can get a job with a sign-on**, work there 6 months, quit, walk across the street, and **get another sign-on bonus the next day**." },
+        { cue:"Why sign-ons fail", text:"In our experience, the sign-on tends to appeal to a **'right now' mentality**. Very often it goes towards other expenses, and the loans just accumulate interest. It's a big part of why they're often **not that effective at keeping people around**." },
+        { cue:"The cost", text:"And it's why systems end up spending so much on sign-ons — they **keep refilling the role** after the first year when 10, 15, 20% of new hires leave. I don't know what that number looks like for you. But when new hires leave anyway, you're often in a **clawback situation**." },
+        { cue:"The contrast", text:"It tends to be a real contrast to the person who's looking for help with their student loans. **They're thinking about the future.** They're looking for a place where they can stay and grow. So when you put that money toward Student Loan Repayment instead of a sign-on, you can **end up spending less** — because you're not refilling the role as often, or paying out another sign-on." },
+        { cue:"Paid over time", text:"The payment is also made **over time, monthly**, while they're employed with you. So **no costly clawbacks**, and no paying in advance for someone who leaves after year 1. Spreading the payments out — sometimes with a **ladder payment** approach — means **you're only spending to get and keep them**." },
         { cue:"Check in", check:"answer", text:"**How does that compare to how you're thinking about sign-ons today?**" },
       ]},
-      { kind:"say", group:"Labor cost", title:"If they spend on contract labor", proof:["Travelers cost ~2.2x. Weekly: RN $2,190 · Rad Tech $2,291 · PT $2,231 · RT $2,015"], beats:[
-        { cue:"Ask", check:"answer", text:"**Where are you leaning on contract labor the most** — locations, specialties, shifts?" },
-        { cue:"Reframe", text:"Those are tough to fill. What partners find is that loan repayment gets the attention of candidates **willing to take the location, specialty or shift you need** — so you need **fewer travelers**, and that can be **thousands a week**." },
+      { kind:"say", group:"Labor cost", title:"If they spend on contract labor", proof:["Travelers cost ~2.2x","Weekly averages: RN $2,190 · Rad Tech $2,291 · PT $2,231 · RT $2,015 (about $8–9k a month each)"], beats:[
+        { cue:"Ask", check:"answer", text:"We can also help **reduce spend on contract labor**, especially in the locations, specialties, and shifts that are hard to fill with a full-time employee. I'm curious — **where do you find you're using contract labor the most?**" },
+        { cue:"Acknowledge + reframe", text:"That makes sense — areas like that are often tough to fill. Many of our partners use travelers to fill the gaps too. What they're finding is that this type of program gets the attention of candidates who want help with their student loans, and who are **willing to work at the location, in the specialty, or on the shift where you need it most**." },
+        { cue:"The payoff", text:"They're motivated by the Student Loan Repayment to come work for you, and you can **need fewer travelers**. Depending on your mix, that can mean **thousands of dollars a week** recouped." },
         { cue:"Check in", check:"answer", text:"**Is that a gap you're feeling right now, or is contract labor pretty well under control?**" },
       ]},
-
-      // ── Retention ──────────────────────────────────────────
-      { kind:"say", group:"Retention", title:"Built to keep them", proof:["Partners' year-1 turnover is ~5% vs an industry average above 20%"], beats:[
-        { cue:"Bridge", text:"For a lot of partners, the area that ends up mattering most is **keeping and growing the people you already have**." },
-        { cue:"How it works", text:"Payments are **spread over three to five years** and paid while they're employed — it works a lot like a **401K match**. Our partners see **year-one turnover around 5%** for people in the program." },
-        { cue:"Check in", check:"answer", text:"**How does that compare to your first-year turnover?**" },
+      { kind:"say", group:"Retention", title:"Built to keep them", proof:["Partners' year-1 turnover is ~5% vs an industry average above 20%","Paid monthly once they're an employee; payments can step up in year 2"], beats:[
+        { cue:"Bridge", text:"Building pipeline and saving on spend are important — but there's another area where we tend to have an impact, and for a lot of partners it ends up mattering most. We're also helping them **retain and grow their employees**." },
+        { cue:"Built to stay", text:"The way your Student Loan Repayment program is structured **encourages people to stay 3, 4, or 5 years**. The amount is spread out monthly over that period and paid while they're employed. **It works a lot like a 401K match** — an incentive to stay to get the full amount." },
+        { cue:"Proof", text:"It's a big part of why our partners tend to see **single-digit turnover, sometimes as low as 5%**, with the clinicians and techs in the program." },
+        { cue:"Check in", check:"answer", text:"I'm curious — **how does that compare to what you're seeing with first-year turnover?**" },
       ]},
-      { kind:"say", group:"Retention", title:"Keep it top of mind", beats:[
-        { cue:"Nudges", text:"Sign-ons get spent and forgotten. So we keep your support **top of mind** — we capture **testimonials**, and every month we send a **statement**: 'Here's what you would have owed. **Ten years of payments is becoming three** — because you work here.'" },
-        { cue:"Check in", check:"answer", text:"**How do you keep that value top of mind once someone's hired today — or is that tough?**" },
+      { kind:"say", group:"Retention", title:"Nudges", proof:["Early affinity, testimonials, psychological nudges: \"Your employer had your back this month\""], beats:[
+        { cue:"Gamification", text:"We've also built in some **gamification, some psychological nudges**." },
+        { cue:"Sign-ons fade", text:"When someone gets a sign-on, they usually spend it faster than they planned — and then **it's gone from their mind**. Now they're looking for the next thing. So **we remind them** of the help you're giving them with their student loan debt." },
+        { cue:"Testimonials", text:"When they first join you, we have them **record a video** about how excited they are to work somewhere that has their back like this. And every year they're in the program, we collect these testimonials." },
+        { cue:"Monthly statement", text:"Every month we send them **a statement** — a reminder of 'Hey, look what you would have owed if your employer hadn't helped with this payment. **What would have been 10 years of payments is becoming 3.** All because you work here.' It really tends to bond them to you." },
+        { cue:"Financial wellness", text:"And they get access to **financial wellness and budgeting tools** that reinforce they have more in their budget **because of you**." },
+        { cue:"Check in", check:"answer", text:"**What are you doing today to keep that value top of mind once someone's hired — or is that tough to do?**" },
       ]},
-      { kind:"say", group:"Retention", title:"Career pathways", proof:["Pathways: MAs and LPNs → RNs · PTAs → PTs · ICU nurses → CRNAs"], beats:[
-        { cue:"Pathways", text:"It's not just for new hires. Partners use it for **career pathways** — telling their people, '**Go get the next degree and come back.** We have a place for you, and we'll help you pay for it.'" },
+      { kind:"say", group:"Retention", title:"Beyond new hires", proof:["Pathways: MAs and LPNs → RNs · PTAs → PTs · ICU nurses → CRNAs"], beats:[
+        { cue:"Existing staff", text:"And this doesn't have to be just for new hires — it can be part of your **retention strategy**. So many clinicians and techs carry student loan debt for years. When they see you extend this to them, it tends to deepen the relationship and reassure them they've found **their long-term home**." },
+        { cue:"Career pathing", text:"Some partners also use it for **career pathing** — motivating **Medical Assistants and LPNs into RNs, PTAs into PTs, ICU nurses into CRNAs** while they work for you." },
+        { cue:"The message", text:"You're telling them, 'Go get the next-level degree and come back here. We have a place for you, and **we'll help you pay** for the loans you take out to upskill.' Now you're filling these roles with people who already **fit your culture and your mission**. It builds a **stronger, more stable workforce**." },
         { cue:"Check in", check:"answer", text:"**Are career pathways something you're investing in right now, or not so much?**" },
       ]},
     ],
+    tips:["Hedge, don't declare: 'tends to', 'from what we're seeing', 'not sure this applies to you'.","End every section with a check-in tied to their world — never 'Does that make sense?' or 'What questions do you have?'","Give them room to say no: 'or is that pretty different?', 'or not so much?'","If they said all three, run pipeline, then spend, then retention."],
+    watch:["Monologuing — stop at every check-in and let them talk","Running a cost track they told you doesn't apply","Stacking guarantees and 'no risk' language — a little goes a long way"],
   },
-
   "summary-buyin": {
+    rule:"Reframe the outcomes we drive and get them to buy into the value.",
+    screen:"Video on, no content shared",
     script:[
       { kind:"say", beats:[
-        { cue:"Wrap", text:"So that's a quick look at how we work with systems like yours — **pipeline, spend, and retention**, all through a student loan repayment program." },
-        { cue:"Tie it to them", check:"answer", text:"You mentioned [what they said]. My read is **[the area they chose]** is where this could matter most for you — **but correct me if I'm off.**" },
-        { cue:"Buy-in check", check:"answer", text:"I'd love your **honest read, not the polite one**. On a scale of 1 to 10, with 10 being a heck yes — **where are you at?**" },
-        { cue:"Read the number", text:"", list:[
-          { tag:"Hesitant", text:"\"That's fair — I appreciate the honesty. **What's giving you pause?**\"" },
-          { tag:"Positive, with questions", text:"Answer them. Then: \"**What would need to be true for that to be a 10?**\"" },
-          { tag:"Positive, no questions", text:"\"**Mind if I ask a few questions about how things work today?** I don't want to assume anything.\"" },
+        { cue:"Thank them", text:"I really appreciate you letting me share a bit about how we work with healthcare systems on an **innovative Student Loan Repayment and recruitment program**." },
+        { cue:"Their words first", check:"answer", text:"Before I recap — let me make sure I've got this right. You mentioned [what they said]. **Did I get that right?**" },
+        { cue:"Recap the value", text:"Great. Just to bring it back together — here's how our partners **tend to use** the program:", list:[
+          { tag:"Pipeline", text:"Building a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs and Rehabilitation Therapists, through our **recruitment marketing and campus recruitment** machine." },
+          { tag:"Labor cost", text:"**Saving money** by not paying out sign-ons again and again, and filling roles with **full-time employees** that would otherwise be worked by contract labor." },
+          { tag:"Retention", text:"And **retaining their people** and motivating them down career pathways — a **stronger, more stable workforce**. All through the power of their Student Loan Repayment program." },
+        ]},
+        { cue:"Tie it to them", check:"answer", text:"I may be off here, so correct me — but it sounds like **[the area they chose]** is where this could matter most for you. **Does that sound right?**" },
+        { cue:"Step back", text:"At this point, I'd love to take a step back and **understand where your head is at**. The reason I ask is I'd rather not keep going if this isn't a fit for you — so I want your **honest read, not the polite one**." },
+        { cue:"Buy-in check", check:"answer", text:"How is this all feeling? On a **scale of 1 to 10**, with 10 being a heck yes — **where would you say you're at?** No wrong answer." },
+        { cue:"Read the reaction", text:"", list:[
+          { tag:"Hesitant or negative", text:"\"That's totally fair — and I appreciate the honesty. **What's giving you pause?**\" Then do discovery on why they feel that way." },
+          { tag:"Positive, with questions", text:"**Answer their questions.** Then: \"I'm curious — **what would need to be true for that to be a 10?**\"" },
+          { tag:"Positive, no questions", text:"\"I'm glad it's resonating. **Mind if I ask a few questions about how things work today?** The reason I ask is I don't want to assume anything.\" Then move into Business Problem." },
         ]},
       ]},
     ],
+    tips:["Their words first, not yours. Parrot their exact language back before you recap.","Give a reason before the hard question ('The reason I ask is…').","Hedge the tie-back ('I may be off here') so they correct you rather than nod along.","Below a 10, get curious about the gap. Don't defend.","Save 'fair' for the agenda and the close."],
+    watch:["Skipping the 1–10 — it's your read on whether to keep going","Answering an objection before you understand it","Recapping all three areas at the same weight when they only care about one"],
   },
-
   "business-problem": {
+    rule:"Identify the business problem behind what they asked for, find out who cares, then validate it's the one to anchor on.",
     script:[
       { kind:"say", beats:[
-        { cue:"Reflect", check:"answer", text:"It sounds like [what they said]. **Can we dig into that some more?**" },
+        { cue:"Reflect + permission", check:"answer", text:"It sounds like [what they said]. **Can we dig into that some more?**" },
       ]},
-      { kind:"ask", label:"Go back in time", text:"Can you walk me back to **the moment this became a priority**?\n\nWhat happened?" },
+      { kind:"ask", label:"Origin", text:"What was going on in your business that made you **start exploring solutions** like ours in the first place?" },
+      { kind:"ask", label:"The moment", text:"Can you walk me back to **the moment this became a priority**?\n\nWhat happened?" },
       { kind:"say", beats:[
-        { cue:"Acknowledge, then dig", text:"I understand why you'd want [surface need]. **But what's actually going on?**" },
+        { cue:"Acknowledge", text:"I understand why you would want [surface need]." },
+        { cue:"Dig", text:"**But what's actually going on?**" },
       ]},
-      { kind:"ask", label:"Need behind the need", text:"What's going on **in your business** that's driving this to be a priority?\n\nAside from that — is there **something going on behind the scenes**?" },
-      { kind:"ask", group:"Retention", label:"Who cares", text:"How often have you **spoken internally** about reducing first-year turnover?\n\nWho **cares the most** about that number?" },
-      { kind:"ask", group:"Labor cost", label:"Who cares", text:"How often have you **spoken internally** about cutting sign-on or contract labor spend?\n\nWho **cares the most** about it?" },
-      { kind:"ask", label:"Validate", text:"Before we go further — **is this the challenge we should zero in on**, or are there others that matter even more right now?" },
+      { kind:"ask", label:"Priority driver", text:"What's causing that to be **a priority**?" },
+      { kind:"ask", label:"Energy", text:"What's driving you to **prioritize that**?" },
+      { kind:"ask", label:"Business driver", text:"What is going on **in your business** that's driving you to put the focus and energy on that?" },
+      { kind:"ask", group:"Retention", label:"Priority", text:"How often have you **spoken internally** about reducing that turnover number?\n\nWho **cares the most** about the turnover number?" },
+      { kind:"ask", group:"Labor cost", label:"Sign-on priority", text:"How often have you **spoken internally** about reducing the amount you spend on sign-ons?\n\nWho **cares the most** about how much you spend on sign-ons?" },
+      { kind:"ask", group:"Labor cost", label:"Contract priority", text:"How often have you **spoken internally** about reducing the amount of contract labor you use in these departments?\n\nWho **cares the most** about what you spend on contract labor?" },
+      { kind:"say", beats:[{ cue:"Pause the flow", text:"Before we go too much further — I want to make sure we're **anchoring this conversation to the right thing**." }] },
+      { kind:"ask", label:"Anchor check", text:"Is this **the challenge we should be focused on** solving together?\n\nOr are there other things that are going to overpower this?" },
+      { kind:"ask", label:"Priority test", text:"Is this going to make its way onto your **priorities slide**?\n\nOr is this a **shiny object**?" },
     ],
+    tips:["Keep peeling only while the answer is still a symptom. Stop when a CFO would fund it.","\"Who cares the most\" is your multithreading list.","Get explicit agreement that this is the problem worth solving now."],
+    watch:["Stopping at the symptom and moving on","Happy ears — getting excited before validating it is a raging fire","Skipping the anchor check because it feels confrontational"],
   },
-
   "baseline-current": {
+    rule:"Map where they are today. Capture their exact words, numbers and units.",
     script:[
-      { kind:"ask", group:"Pipeline", label:"Roles", text:"What **clinical and allied health roles** do you hire new grads into the most?\n\nWhich **department heads** do you work with most on those?" },
-      { kind:"ask", group:"Pipeline", label:"Schools", text:"What relationships do you have with **local programs** to funnel students your way?\n\nWho works on those?" },
-      { kind:"ask", group:"Pipeline", label:"Loan debt", text:"How often do these students **ask about help with their student loans**?" },
-      { kind:"ask", group:"Retention", label:"Turnover", text:"How many **replacement hires** do you make in these departments?\n\nWhat's the **first-year turnover** there?" },
-      { kind:"ask", group:"Labor cost", label:"Spend", text:"What **sign-on bonuses** are you offering for these roles?\n\nAnd how much **contract labor** fills the gaps?" },
-      { kind:"say", beats:[
-        { cue:"Give a reason", text:"I'm asking this next one because — if we end up working together, **your CFO is probably going to care**." },
-      ]},
-      { kind:"ask", label:"Metric", text:"What **metric** is suffering most because of this?" },
-      { kind:"ask", label:"Today vs target", text:"Where's that number **today**?\n\nAnd where should it be — and **why** there?" },
+      { kind:"say", beats:[{ cue:"Frame why you ask", text:"I'm asking because — if we end up doing business together, **your CFO is probably going to care** about this." }] },
+      { kind:"ask", label:"Metric", text:"What **metric** do you think would improve the most if we solved this challenge?" },
+      { kind:"ask", label:"Current state", text:"What's the **current state** of that metric?" },
+      { kind:"ask", label:"Target", text:"Where **should it be**?\n\nAnd **why** should it be there?" },
+      { kind:"ask", group:"Pipeline", label:"Roles", text:"What **clinical and allied health roles** do you hire new grads in the most?" },
+      { kind:"ask", group:"Pipeline", label:"Department heads", text:"Which **department heads** do you work with the most to fill their new grad needs?" },
+      { kind:"ask", group:"Pipeline", label:"School relationships", text:"What existing relationships do you have with the **local college programs** to funnel students in these fields your way?\n\nWho works on those relationships?" },
+      { kind:"ask", group:"Pipeline", label:"Loan debt", text:"How often have you had these students **ask about help with their student loan debt**?" },
+      { kind:"ask", group:"Retention", label:"Replacement hires", text:"How many **replacement hires** do you make in these departments?" },
+      { kind:"ask", group:"Retention", label:"First-year turnover", text:"What is the **first-year turnover** there?" },
+      { kind:"ask", group:"Labor cost", label:"Sign-ons", text:"What type of **sign-on bonuses** are you offering for these roles?" },
+      { kind:"ask", group:"Labor cost", label:"Contract labor", text:"How much **contract labor** do you use to fill the gaps for these roles?" },
     ],
+    tips:["Capture their exact words and units.","Do not invent a number if they do not know it yet."],
+    watch:["Moving on without a number for turnover, sign-ons or contract labor","Paraphrasing their numbers instead of using their exact words"],
   },
-
   "cause-analysis": {
+    rule:"Mutually identify the true root cause. Their perceived cause sets the buying criteria.",
     script:[
       { kind:"say", beats:[
-        { cue:"Summarize", check:true, text:"Let me summarize what I've heard so far — [business problem and current state]. **Did I get that right?**" },
+        { cue:"Summarize", text:"Let me summarize what I've heard so far." },
+        { cue:"Play it back", text:"[business problem and current state]" },
+        { cue:"Confirm", check:true, text:"**Did I get that right?**" },
       ]},
-      { kind:"ask", label:"Their opinion", text:"What's your **opinion on why** this is happening?" },
-      { kind:"ask", label:"Blocker", text:"What's **getting in the way** of improving it?" },
+      { kind:"ask", label:"Open diagnostic", text:"**Why** do you think this challenge is happening?" },
+      { kind:"ask", label:"Blocker", text:"What's **preventing you** from improving it?" },
       { kind:"ask", group:"Pipeline", label:"School fit", text:"**How well** are those school relationships meeting your needs?" },
-      { kind:"ask", group:"Labor cost", label:"Sign-on reliance", text:"How important are sign-ons in **getting a commitment** today?" },
-      { kind:"ask", label:"Test your hunch", text:"To what extent do you think [suspected root cause] is **contributing to this**?" },
+      { kind:"ask", group:"Labor cost", label:"Sign-on reliance", text:"How important do you find sign-ons to be in **getting a commitment**?" },
+      { kind:"ask", label:"Suspected cause", text:"To what extent do you think [suspected root cause] is **contributing to the challenge**?" },
     ],
+    tips:["Ask the open diagnostic first, then one or two targeted questions.","Their perceived cause sets the buying criteria."],
+    watch:["Accepting the first answer as the root cause","Leading them to your conclusion instead of letting them arrive at it"],
   },
-
   "negative-impact": {
+    rule:"Explore cost, consequences, and ripple effects. One or two negative ramifications is enough on a first call.",
     script:[
       { kind:"say", beats:[
-        { cue:"Summarize", check:true, text:"One more time — [business problem + root causes]. **Did I get that right?**" },
+        { cue:"Summarize", text:"All right. One more time, let me summarize what I've heard." },
+        { cue:"Play it back", text:"[business problem + root causes]" },
+        { cue:"Confirm", check:true, text:"**Did I get that right?**" },
       ]},
-      { kind:"ask", label:"Ripple effects", text:"What are the **ripple effects** this is having across the business?" },
-      { kind:"ask", label:"Who else", text:"**Who else** is feeling it — and how?" },
-      { kind:"say", beats:[
-        { cue:"Give a reason", text:"Somewhat obvious question — the reason I ask is, if we get far enough down the road, **your CFO is going to want this answer**." },
-      ]},
-      { kind:"ask", label:"Cost", text:"What's your **rough estimate of what this is costing** the business?" },
+      { kind:"ask", label:"Ripple effects", text:"What **ripple effects** are you seeing this challenge have on the rest of the business?" },
+      { kind:"ask", label:"Derailed", text:"What would **get derailed** if you didn't make progress in solving these challenges?" },
+      { kind:"ask", label:"Who else", text:"**Who else** does this challenge impact within the business?\n\nAnd how?" },
+      { kind:"ask", label:"Cost", text:"What's the **financial cost** of not closing that gap **per month**?" },
     ],
+    tips:["After they confirm the summary, explore cost, consequences, and ripple effects.","One or two negative ramifications is enough on a first call."],
+    watch:["More than 3 impact questions — diminishing returns fast","Asking about cost before they confirm the summary"],
   },
-
   "future-state": {
+    rule:"Contrast painful present with compelling future. Ask the open question first.",
     script:[
       { kind:"say", beats:[
-        { cue:"Summarize", check:true, text:"Let me make sure I've got the full picture — [brief summary]. **Did I get that right?**" },
+        { cue:"Summarize", text:"Let me summarize what I've heard about the challenges so far." },
+        { cue:"Play it back", text:"[brief summary]" },
+        { cue:"Confirm", check:true, text:"**Did I get that right?**" },
       ]},
-      { kind:"ask", label:"Their view", text:"What do **you** think you need in a solution to solve this?" },
-      { kind:"ask", label:"Test a capability", text:"Can I try an idea on you? Imagine being able to [capability].\n\nTo what degree would that **move the needle** on what we've talked about?" },
+      { kind:"ask", label:"Open", text:"What do **you** think you need to solve this challenge?" },
+      { kind:"ask", label:"Ideas", text:"Can I try **a few additional ideas** on you?" },
+      { kind:"ask", label:"Capability test", text:"Imagine being able to [capability].\n\nTo what degree would that **move the needle** on the problem we're talking about?" },
     ],
+    tips:["Ask the open question first.","Only then test targeted capabilities tied to the root causes they named."],
+    watch:["Pitching capabilities before asking what they think they need","Skipping the summary — the contrast is where the feeling of value lives"],
   },
-
   "close-next-steps": {
+    rule:"Call back the ROE. Leave with a concrete decision — a next step is not real until it has an owner and a date.",
     script:[
       { kind:"say", beats:[
-        { cue:"Transition", check:true, text:"Looks like we're coming up on time. **Should we talk about next steps?**" },
-        { cue:"Call back the agenda", text:"At the start we said we'd decide whether a next step **even makes sense**." },
-        { cue:"Recommend", text:"You know [their company] better than me, so if you have a different idea, let me know. But based on what you told me today, **what I recommend we do next is** [recommended next step]." },
-        { cue:"Who", text:"It'd be helpful to include **[who should join]** to get their perspective." },
-        { cue:"Check", check:true, text:"**Does that feel fair?**" },
+        { cue:"Call back the agenda", text:"At the beginning of this call, we agreed we'd decide whether it makes sense to schedule a **next logical step** — or go our separate ways so we don't waste each other's time." },
+        { cue:"Give your read", text:"The sense I'm getting is [your honest read]." },
       ]},
-      { kind:"ask", label:"Lock it in", text:"Great — can we **get it on the calendar** now?" },
+      { kind:"ask", label:"Fairness check", text:"Does that **feel fair** to you?" },
+      { kind:"ask", label:"Next step", text:"What should the **next logical step** look like?\n\nAnd **who needs to be there**?" },
+      { kind:"ask", label:"Date", text:"Can we put **a specific date** on the calendar now?" },
     ],
+    tips:["Leave with a concrete decision.","A next step is not real until it has an owner and a date."],
+    watch:["Leaving without a booked meeting — 'I'll send some times' is not a next step","Skipping the ROE callback — the ask lands cold without it"],
   },
 };
 
