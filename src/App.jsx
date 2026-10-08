@@ -77,15 +77,16 @@ const STAGES = [
   { id:"prep",               icon:"◎",  short:"Prep Brief",               group:"setup" },
   { id:"rapport-opener",     icon:"1",  short:"Opening + Intros",         group:"setup" },
   { id:"rules-engagement",   icon:"2",  short:"Objective + Agenda",       group:"setup" },
-  { id:"context",            icon:"3",  short:"Orient to Buyer Focus",    group:"discovery" },
-  { id:"business-problem",   icon:"4",  short:"Business Problem",         group:"discovery" },
-  { id:"baseline-current",   icon:"5",  short:"Current State",            group:"discovery" },
-  { id:"cause-analysis",     icon:"6",  short:"Cause Analysis",           group:"discovery" },
-  { id:"negative-impact",    icon:"7",  short:"Negative Impact",          group:"discovery" },
-  { id:"future-state",       icon:"8",  short:"Future State",             group:"discovery" },
-  { id:"value-drop",         icon:"9",  short:"Value Drop",               group:"value" },
-  { id:"summary-buyin",      icon:"10", short:"Summary + Buy-in",         group:"value" },
-  { id:"close-next-steps",   icon:"11", short:"Close + Next Steps",       group:"close" },
+  { id:"context",            icon:"3",  short:"Clasp Context",            group:"setup" },
+  { id:"orient",             icon:"4",  short:"Orient to Buyer Focus",    group:"discovery" },
+  { id:"business-problem",   icon:"5",  short:"Business Problem",         group:"discovery" },
+  { id:"baseline-current",   icon:"6",  short:"Current State",            group:"discovery" },
+  { id:"cause-analysis",     icon:"7",  short:"Cause Analysis",           group:"discovery" },
+  { id:"negative-impact",    icon:"8",  short:"Negative Impact",          group:"discovery" },
+  { id:"future-state",       icon:"9",  short:"Future State",             group:"discovery" },
+  { id:"value-drop",         icon:"10", short:"Value Drop",               group:"value" },
+  { id:"summary-buyin",      icon:"11", short:"Summary + Buy-in",         group:"value" },
+  { id:"close-next-steps",   icon:"12", short:"Close + Next Steps",       group:"close" },
   { id:"outputs",            icon:"✦",  short:"Outputs",                  group:"close" },
 ];
 
@@ -93,7 +94,8 @@ const STAGES = [
 const STAGE_META = {
   "rapport-opener":   { phase:"OPEN",            timebox:"3 min" },
   "rules-engagement": { phase:"ALIGN",           timebox:"2 min" },
-  "context":          { phase:"ORIENT",          timebox:"4 min" },
+  "context":          { phase:"CONTEXT",         timebox:"2 min" },
+  "orient":           { phase:"ORIENT",          timebox:"2 min" },
   "value-drop":       { phase:"VALUE",           timebox:"12 min" },
   "summary-buyin":    { phase:"BUY-IN",          timebox:"1 min" },
   "business-problem": { phase:"BUSINESS PROBLEM",timebox:"5 min" },
@@ -109,7 +111,7 @@ const CAPTURE = {
   "rapport-opener":   [{ key:"win", label:"What would make today a win", hint:"Each person's answer" },
                        { key:"vibe", label:"Read on them", hint:"Pronouns, energy, anything they volunteered" }],
   "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
-  "context":          [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
+  "orient":           [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
                        { key:"startWhy", label:"What they said", hint:"Fills \"It sounds like…\" in Business Problem" }],
   "value-drop":       [{ key:"signOnView", label:"What they've seen with sign-ons" },
                        { key:"contractAreas", label:"Where they use contract labor most" },
@@ -187,13 +189,20 @@ const STAGE_DATA = {
     watch:["Rushing past the fairness checks without pausing","Skipping the agenda after they agree to the objective"],
   },
   "context": {
-    rule:"Give quick context to earn the right to ask questions, then let them choose where to focus. Their pick steers discovery.",
+    rule:"Brief context on who we are and what we do. Earn the right to ask questions, don't pitch.",
     script:[
       { kind:"say", title:"Who we are", beats:[
         { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
         { cue:"Who we are", text:"So at Clasp, we work **exclusively in healthcare** (full stop)… and within that, we exist to support HR and talent acquisition teams **attract and retain hard-to-fill clinical talent**." },
         { cue:"Proof", text:"Our partners include major systems such as **Novant Health, Northwestern Medicine and Boston Children's**, as well as smaller systems like **Saint Alphonsus**. And even outpatient clinics like **Confluent Health**, specialty clinics, the whole gamut." },
       ]},
+    ],
+    tips:["Keep it short. The point is to earn the right to ask questions, not to pitch."],
+    watch:["Turning the context into a full pitch"],
+  },
+  "orient": {
+    rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
+    script:[
       { kind:"say", title:"Three outcomes", beats:[
         { cue:"Who we talk to", text:"So we talk to a lot of HR leaders across the country — talent acquisition, L&D, workforce development, ops and business leaders — **a lot of smart folks**. And we talk to them about a lot of things, but **the three areas where we're able to drive the most value**, and where it often makes sense to work together, are here on your screen." },
         { cue:"Three areas", text:"", list:[
@@ -204,8 +213,8 @@ const STAGE_DATA = {
         { cue:"Hand it to them", check:"answer", text:"I have an idea where you might fit in given [what you spotted], and in general, the industry norm of **first-year nurse retention**. But given your current situation, **where would be the most relevant place for us to start** our conversation?", then:"Okay great, that makes sense." },
       ]},
     ],
-    tips:["Keep it to a few slides. The point is to earn the right to ask questions, not to pitch.","Mark the area they pick in the capture pane. Discovery and the Value Drop follow it."],
-    watch:["Turning the context into a full pitch","Picking the area for them — let them choose"],
+    tips:["Mark the area they pick in the capture pane. Discovery and the Value Drop follow it."],
+    watch:["Picking the area for them — let them choose"],
   },
   "value-drop": {
     rule:"Follow their interest. Focus the conversation on the area they chose. All three: pipeline, then spend, then retention.",
@@ -1499,7 +1508,7 @@ const sd = STAGE_DATA[activeStage];
   const stageElapsed = now - stageStart;
   const overTime = timeboxMs && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Identify + Validate the Business Problem","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Clasp Context","orient":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Identify + Validate the Business Problem","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Paste your prep brief. Everything downstream personalizes from this.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
