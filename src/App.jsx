@@ -1,45 +1,68 @@
 import { useState, useRef, useEffect } from "react";
 
 const C = {
-  pageBg: "#f0f2ee",
+  pageBg: "#f3f4f6",
   panelBg: "#ffffff",
-  border: "#d8e0d4",
-  textPrimary: "#1a2a1e",
-  textSecondary: "#4a6455",
-  textMuted: "#7a9485",
-  black: "#1a2a1e",
+  border: "#e3e6ea",
+  textPrimary: "#1c2733",
+  textSecondary: "#4b5a6a",
+  textMuted: "#8a94a3",
+  black: "#1c2733",
   white: "#ffffff",
-  sidebar: "#243c2c",
-  emerald: "#2e6040",
-  emeraldLight: "#e8f3ec",
-  emeraldMid: "#b8d8c4",
+  sidebar: "#1e40af",
+  emerald: "#2563eb",
+  emeraldLight: "#e9effe",
+  emeraldMid: "#bccdf5",
+  yellow: "#fef6d8",
+  yellowBorder: "#eed88a",
+  yellowText: "#8a6d1a",
   coral: "#c44848",
-  sand: "#f6f8f5",
+  sand: "#f8f9fb",
 };
 
 const STAGES = [
-  { id:"prep",               icon:"◎",  short:"Prep Brief",       group:"setup" },
-  { id:"open",               icon:"①",  short:"Open + ROE",       group:"setup" },
-  { id:"align-buyer",        icon:"②",  short:"Align with Buyer", group:"setup" },
-  { id:"current-situation",  icon:"③",  short:"Current Situation",group:"discovery" },
-  { id:"next-step",          icon:"⑦",  short:"Next Step",        group:"close" },
-  { id:"outputs",            icon:"✦",  short:"Outputs",          group:"close" },
+  { id:"prep",               icon:"◎",  short:"Prep Brief",               group:"setup" },
+  { id:"rapport-opener",     icon:"①",  short:"Rapport + Opener",         group:"setup" },
+  { id:"rules-engagement",   icon:"②",  short:"Rules of Engagement",      group:"setup" },
+  { id:"buyer-journey",      icon:"③",  short:"Buyer Journey Alignment",  group:"setup" },
+  { id:"need-behind-need",   icon:"④",  short:"Need Behind the Need",     group:"discovery" },
+  { id:"baseline-current",   icon:"⑤",  short:"Baseline the Current State", group:"discovery" },
+  { id:"validate-problem",   icon:"⑥",  short:"Validate the Business Problem", group:"discovery" },
+  { id:"cause-analysis",     icon:"⑦",  short:"Cause Analysis",           group:"discovery" },
+  { id:"negative-impact",    icon:"⑧",  short:"Build Negative Impact",    group:"discovery" },
+  { id:"future-state",       icon:"⑨",  short:"Future State",             group:"discovery" },
+  { id:"close-next-steps",   icon:"⑩",  short:"Close + Next Steps",       group:"close" },
+  { id:"outputs",            icon:"✦",  short:"Outputs",                  group:"close" },
 ];
+
+// Phase + timebox per stage (from the designed template)
+const STAGE_META = {
+  "rapport-opener":   { phase:"OPEN",            timebox:"2 min" },
+  "rules-engagement": { phase:"ALIGN",           timebox:"3 min" },
+  "buyer-journey":    { phase:"BUSINESS PROBLEM",timebox:"2 min" },
+  "need-behind-need": { phase:"BUSINESS PROBLEM",timebox:"3 min" },
+  "baseline-current": { phase:"CURRENT STATE",   timebox:"4 min" },
+  "validate-problem": { phase:"BUSINESS PROBLEM",timebox:"2 min" },
+  "cause-analysis":   { phase:"CAUSE ANALYSIS",  timebox:"4 min" },
+  "negative-impact":  { phase:"NEGATIVE IMPACT", timebox:"4 min" },
+  "future-state":     { phase:"FUTURE STATE",    timebox:"3 min" },
+  "close-next-steps": { phase:"CLOSE",           timebox:"3 min" },
+};
 
 const SPICED_QUESTIONS = [
   {
     key:"situation",
     label:"S — Situation",
-    color:"#5b8fd4",
-    bg:"#eef4ff",
-    border:"#b0ccf0",
+    color:"#2563eb",
+    bg:"#eef3ff",
+    border:"#bccdf5",
     questions:[
-      "How many people generate, send, track, or approve documents at your company?",
-      "How many documents do you typically send out on a monthly or annual basis?",
-      "What departments would be using a tool like PandaDoc?",
-      "From the beginning of your process to the end — what documents are sent, how are they completed, and where are they stored?",
-      "What solution are you using currently, if any?",
-      "What CRM do you use?",
+      "How many people are involved in this process day to day?",
+      "What kind of volume are we talking about — monthly or annually?",
+      "Which departments or teams would be affected by a change here?",
+      "Walk me through the process end to end — what happens first, and what happens last?",
+      "What are you using today to handle this, if anything?",
+      "What systems would a solution need to work with?",
       "Are there any security or compliance requirements we need to account for?",
     ]
   },
@@ -78,9 +101,9 @@ const SPICED_QUESTIONS = [
   {
     key:"critical_event",
     label:"C — Critical Event",
-    color:"#d47aaa",
-    bg:"#fef0f8",
-    border:"#c078b0",
+    color:"#2563eb",
+    bg:"#eef3ff",
+    border:"#7ba3f0",
     questions:[
       "When do you need this implemented by? What happens if we can't hit that timeline?",
       "Why now — not two months ago or two months from now?",
@@ -92,9 +115,9 @@ const SPICED_QUESTIONS = [
   {
     key:"decision",
     label:"D — Decision",
-    color:"#9a80e0",
-    bg:"#f4f0ff",
-    border:"#9080d8",
+    color:"#2563eb",
+    bg:"#eef3ff",
+    border:"#7ba3f0",
     questions:[
       "What steps do you and your company need to take to make a go or no-go decision on this?",
       "Who would be involved in each of those steps — and who ultimately signs off?",
@@ -108,303 +131,23 @@ const SPICED_QUESTIONS = [
 ];
 
 const TREES = [
-  {
-    id: "proposals-slow",
-    label: "Proposals take too long",
-    sub: "Starting from scratch, 30–45 min each, copy-paste from Word",
-    situation: [
-      { text: "Walk me through how a proposal gets built today — from when you decide to send one to when it goes out. Who touches it?", note: "Open and neutral. Don't name what you expect to find — let them describe the mess." },
-      { lead: "And just to put a number on it —", text: "How long does a typical proposal take your team to put together?", note: "Get the number. This is your ROI anchor. Don't accept 'it depends' — push for an average." },
-      { lead: "Got it. And what are they building them in?", text: "What tool are you building them in today?", note: "Word/PPT/Google Slides = massive gap. Existing proposal tool = you're displacing. CRM-built = process problem." },
-      { lead: "And volume-wise —", text: "How many proposals is your team sending in a typical month?", note: "Volume × time = total hours burning. You'll use this in Impact." },
-    ],
-    pain: [
-      { lead: "Let's peel this back a layer.", text: "What is going on in your business that's driving this to be a priority right now?", note: "The peel-the-onion opener. They almost always chuckle. That chuckle means you hit it. Shut up and let them go." },
-      { lead: "And I want to make sure I'm not missing anything —", text: "Aside from the time it takes — is there something going on behind the scenes making this urgent?", note: "Ask the same question twice, naturally. Second answer is almost always the real one." },
-      { lead: "I'm curious — what's your read on this?", text: "What's your take on why proposals take as long as they do? What's the root cause in your opinion?", note: "They've been thinking about this longer than you. Their diagnosis is the truth. Don't interrupt it." },
-      { lead: "Just so I understand what's already been tried —", text: "What have you tried to fix it? Did it work?", note: "Failed attempts prove the problem is real and not simple. Each failure is evidence." },
-      { lead: "I don't want to put you on the spot, but —", text: "Is getting this solved a nice-to-have or a need-to-have right now?", note: "Priority check. Nice-to-have means you're not at the real problem yet. Keep peeling." },
-    ],
-    impact: [
-      { lead: "To help me understand the business case —", text: "What metric is below expectations as a result of this — close rate, deal velocity, revenue per rep?", note: "Land on the CFO-worthy number. No metric = no business case. Symptoms get ghosted. Problems get funded." },
-      { lead: "Thinking bigger — across the whole org —", text: "What are the ripple effects this is having across the business?", note: "Not 'how does this impact you' — ripple effects. Opens the full blast radius. Who else feels it upstream." },
-      { lead: "Quick math here —", text: "If your team is spending [X min] on every proposal — what's getting pushed aside?", note: "Surface the opportunity cost. Time on proposals is time not spent selling." },
-      { lead: "This might be a tough one to recall, but —", text: "Have you lost deals because a proposal went out too slow? Tell me about one.", note: "One story here is worth 10 abstract answers. Let them recall it — it reinforces the pain." },
-      { lead: "Okay — bear with me for a second.", text: "Imagine we solved this completely. Put yourself 365 days from now — what would have to be true for you to feel good about the progress?", note: "The future state question. Buyers exhale here. Emotional contrast between painful present and compelling future is where value lives." },
-    ],
-    critical: [
-      { lead: "Just thinking about timing —", text: "When do you need this solved by? What happens if you can't hit that timeline?", note: "'What happens if not' is the real question — that's where consequences live." },
-      { lead: "And I want to make sure I understand what's driving the urgency —", text: "Why now — what changed that made this worth addressing at this specific moment?", note: "The trigger question. Something brought this to a head. Find it." },
-      { lead: "I want to be realistic with you about this —", text: "Would anything prevent your team from moving forward this quarter if everything checked out?", note: "Smoke out blockers early — budget freeze, competing priorities, pending reorg." },
-      { lead: "I'm going to be direct for a second —", text: "I'm getting the sense this might not be the top priority right now — am I off on that?", note: "The disqualifier. Use when you feel them going through the motions. Forces an honest answer." },
-    ],
-    decision: [
-      { lead: "Just so I can be most useful to you —", text: "What steps do you and your company need to take to make a go or no-go decision on this?", note: "Map the path. You're building a mutual close plan in real time." },
-      { lead: "And to make sure I'm mapping the right people —", text: "Who would be involved in each of those steps — and who ultimately signs off?", note: "'Who ultimately signs off' is the phrase that matters. Find the economic buyer now." },
-      { lead: "I don't want to gloss over this one —", text: "Whose budget would this come from?", note: "If they don't know, they're not the buyer. Don't get three calls deep before figuring this out." },
-      { lead: "And one last thing —", text: "What are the hurdles you've run into getting a solution like this approved in the past?", note: "Past predicts future. If it got killed before, find out why — and get ahead of it now." },
-    ],
-  },
-  {
-    id: "chasing-signatures",
-    label: "Chasing signatures",
-    sub: "Deals stuck after send, no visibility, following up blind",
-    situation: [
-      { text: "Walk me through what happens after you hit send on a proposal — what does follow-up look like?", note: "Let them describe the black hole. Don't lead." },
-      { lead: "And today, in terms of visibility —", text: "How do you know if someone has opened or read what you sent?", note: "Almost always 'I don't.' That's the moment." },
-      { lead: "Got it. And timeline-wise —", text: "What's your average time from proposal sent to signature?", note: "Baseline the cycle. You'll use this number in Impact." },
-      { lead: "And persistence-wise —", text: "How many follow-up attempts do you typically make before you get a response — or give up?", note: "Surfaces wasted effort and unqualified persistence." },
-    ],
-    pain: [
-      { lead: "Let's go a level deeper on this.", text: "What is going on in your business that's making this a priority right now?", note: "Let them name it. Pipeline review problems? Forecast miss? A deal that died silently?" },
-      { lead: "And I want to make sure I have the full story —", text: "Aside from the frustration of following up blind — is there a specific deal or situation that brought this to a head?", note: "There's almost always a story. A deal that ghosted. Get it — one story is worth everything." },
-      { lead: "I'm curious what your read is on why that happens —", text: "What's your take on why deals go quiet after the proposal goes out?", note: "Their diagnosis is the truth. Are they blaming themselves, their product, their pricing, their process?" },
-      { lead: "Just so I understand what's been tried —", text: "What have you tried to fix it — any tools, sequences, process changes?", note: "Failed attempts = real problem. Each one is evidence the solution isn't obvious." },
-      { lead: "I want to make sure this ties to something real —", text: "Is this affecting your quota attainment now, or is it more of an operational frustration?", note: "Tie it to a number or it stays a nice-to-have." },
-    ],
-    impact: [
-      { lead: "To tie this to a number —", text: "What metric is suffering most — pipeline velocity, close rate, or forecast accuracy?", note: "Get the number. No metric = no business case." },
-      { lead: "And zooming out to the management view —", text: "What are the ripple effects? How does this show up in your manager's view of your pipeline?", note: "Pipeline confidence affects everyone upstream. This isn't just a rep problem." },
-      { lead: "A rough estimate here —", text: "How much time a week do you estimate goes into follow-up on deals that were already dead?", note: "Let them calculate. Even rough: 3 hrs × 48 weeks = significant. Then multiply by team size." },
-      { lead: "Quick what-if —", text: "What's the revenue impact if 2–3 deals per month closed just one week faster?", note: "Let them do the math. Their number is always more powerful than yours." },
-      { lead: "Bear with me —", text: "Put yourself 365 days from now — if you solved this, what does good look like?", note: "Future state. Cast their imagination forward. Contrast between painful now and compelling future is where value lives." },
-    ],
-    critical: [
-      { lead: "On timing —", text: "Is there a quarter-end, a hiring plan, or a specific goal that makes solving this now important?", note: "Tie urgency to something real — a commitment they've already made." },
-      { lead: "And I want to understand what's driving this right now —", text: "Why now — what changed that made this worth taking a call about today?", note: "The trigger. Something shifted. Find it." },
-      { lead: "I want to be upfront about this —", text: "If everything checked out, is there anything that would slow down a decision this quarter?", note: "Budget freeze, competing tool eval, leadership change — surface it now." },
-    ],
-    decision: [
-      { lead: "Just to map this out —", text: "What steps would you and your company need to take to make a go or no-go decision?", note: "Build the close plan together in real time." },
-      { lead: "And who else would need to be in the room —", text: "Who else would need to be involved — sales ops, IT, your manager?", note: "Find all stakeholders. Surprises in evaluation = lost deal." },
-      { lead: "I don't want to skip past this —", text: "Whose budget would this come from — sales tech, RevOps, something else?", note: "If they don't know, they're not the buyer." },
-      { lead: "And one last thing —", text: "What's gotten in the way of solving this before?", note: "Budget, priority, past failed tools — get the obstacle now before it kills the deal later." },
-    ],
-  },
-  {
-    id: "rep-inconsistency",
-    label: "Reps sending off-brand proposals",
-    sub: "Everyone builds their own version, pricing varies, no control",
-    situation: [
-      { text: "How are your reps creating proposals today — is there a standard template, or does everyone build their own?", note: "'Their own version' opens everything." },
-      { lead: "And when someone new joins the team —", text: "When a new rep joins — how do they learn what a proposal should look like?", note: "Exposes the onboarding gap. Usually 'they copy someone else's' or 'we give them a Word doc.'" },
-      { lead: "I'm curious —", text: "How much variation is there between what one rep sends versus another?", note: "Get them to describe the range. Some will laugh. That laugh is the tell." },
-      { lead: "And oversight-wise —", text: "Who owns proposal quality today — is there a review process before anything goes out?", note: "Usually nobody or 'the manager sometimes.' Either answer is a gap." },
-    ],
-    pain: [
-      { lead: "Let's dig into what's actually driving this.", text: "What is going on in your business that's making proposal consistency a priority right now?", note: "Is it a lost deal? A compliance scare? A new sales leader? Find the trigger." },
-      { lead: "And I want to make sure I'm seeing the full picture —", text: "Aside from the brand inconsistency — what's the real concern underneath this?", note: "Dig deeper. Pricing errors? Legal risk? A specific client situation that stung?" },
-      { lead: "I'm curious what your read is on why this keeps happening —", text: "What's your take on why reps are building their own versions — is it process, tools, or something else?", note: "Their root cause analysis tells you what they've already tried to solve." },
-      { lead: "Has it ever cost you something real —", text: "Has a bad proposal ever cost you a deal or created a client issue you had to clean up?", note: "One story here anchors the impact. Let them recall it." },
-      { lead: "And just to understand what's already been tried —", text: "What have you tried — templates, training, manager reviews? What happened?", note: "Failed attempts = real problem. What broke down in each attempt?" },
-    ],
-    impact: [
-      { lead: "To tie this to a number —", text: "What metric is suffering — win rate, average deal size, or time to close?", note: "Get the number." },
-      { lead: "Thinking about the downstream effects —", text: "What are the ripple effects when a bad proposal goes out under your brand?", note: "Trust, client perception, re-work, management time — open the full blast radius." },
-      { lead: "This one might sting —", text: "Have you had to eat a pricing error or re-negotiate because the wrong number went out?", note: "This one stings. If it happened once they remember exactly. Let them tell it." },
-      { lead: "And the management overhead piece —", text: "What does it cost in management time to review and fix proposals before they go out?", note: "Quantify the oversight tax. Manager hours are expensive." },
-      { lead: "Okay — bear with me for a second.", text: "365 days from now — if reps were sending consistent, on-brand proposals every time, what changes?", note: "Future state. Contrast the chaos they described with the world where it's solved." },
-    ],
-    critical: [
-      { lead: "Just on timing —", text: "Is there a specific growth goal, new market, or compliance requirement that makes this urgent now?", note: "Tie to something real — a number or a deadline." },
-      { lead: "And what brought this to the surface right now —", text: "Why now — what brought this to the surface at this moment?", note: "New sales leader? Lost deal? Customer complaint? Find the trigger." },
-      { lead: "I want to be realistic with you —", text: "If everything checked out, what would it take to get this prioritized and budgeted this quarter?", note: "You're pre-qualifying budget before you ever submit a proposal." },
-    ],
-    decision: [
-      { lead: "Just to map the process —", text: "How does a decision like this get made — who's in the room?", note: "RevOps, marketing, legal, IT — find all the seats at the table." },
-      { lead: "And who ultimately —", text: "Who ultimately signs off?", note: "Economic buyer. Don't assume it's the person you're talking to." },
-      { lead: "I don't want to skip this one —", text: "Whose budget would this fall under?", note: "Sales enablement? Marketing? RevOps? The answer tells you who else to loop in." },
-      { lead: "And one last thing —", text: "What's gotten in the way of solving this in the past?", note: "The obstacle you don't know about is the one that kills the deal." },
-    ],
-  },
-  {
-    id: "approval-bottlenecks",
-    label: "Proposals stuck in approvals",
-    sub: "Manager sign-off required, deals waiting, email chains",
-    situation: [
-      { text: "Walk me through your approval process — who needs to sign off before a proposal goes out?", note: "Get the number of people and the path. More steps = more friction." },
-      { lead: "And in practice, how does that actually happen —", text: "How does that approval happen today — email, Slack, in-person?", note: "Email chains are where proposals go to die." },
-      { lead: "And timing-wise —", text: "How long does a typical proposal sit waiting for approval before it goes out?", note: "Baseline it. An hour? A day? 'It depends' is an answer too — get the range." },
-      { lead: "And while it's sitting there —", text: "What happens to a deal when it's waiting — does the rep keep working it or does it stall?", note: "Surfaces whether the delay creates compounding risk." },
-    ],
-    pain: [
-      { lead: "Let me ask you something.", text: "What is going on that's making approval bottlenecks a priority right now?", note: "Did a deal die in approval? Did a manager complain? Find the trigger." },
-      { lead: "And aside from the delay itself —", text: "Aside from the delay — what's the real cost of doing approvals over email?", note: "Version confusion, missed context, no audit trail — dig into what actually breaks." },
-      { lead: "I'm curious — what's your read on why it's set up this way?", text: "What's your take on why the process is set up this way — is it about compliance, pricing control, or something else?", note: "Understanding the WHY behind the process tells you what a solution needs to preserve." },
-      { lead: "And what's been tried —", text: "What have you tried — workflow tools, Slack approvals, designated windows?", note: "What broke in each attempt? That's your differentiation." },
-      { lead: "I want to understand the scope here —", text: "Is this slowing down a few deals or is it a systemic drag on your whole pipeline?", note: "Scope the blast radius before you start quantifying." },
-    ],
-    impact: [
-      { lead: "To tie this to a number —", text: "What metric is suffering most — deal velocity, close rate, or proposal output per rep?", note: "Get the number that matters to their manager." },
-      { lead: "And ripple effects —", text: "What are the ripple effects when a proposal sits in someone's inbox for 24–48 hours?", note: "Buyer intent decays fast. Open the full cost: lost momentum, missed follow-up windows, deals that went cold." },
-      { lead: "Has it ever actually cost you a deal —", text: "Have you lost urgency on a deal — or lost the deal entirely — because approval took too long?", note: "One story is worth more than any statistic. Let them tell it." },
-      { lead: "Quick math here —", text: "What does a 24–48 hour approval delay cost you if it's happening on 20–30 proposals a month?", note: "Let them calculate. Give them the inputs — they do the math." },
-      { lead: "Bear with me for a second —", text: "365 days from now — if approvals happened in minutes instead of days, what changes for the team?", note: "Future state. Contrast the drag they described with instant approvals." },
-    ],
-    critical: [
-      { lead: "On timing —", text: "Is there a growth target, a new product line, or a compliance deadline making this urgent now?", note: "Tie to something already on their plate." },
-      { lead: "What made this worth putting on the calendar today —", text: "Why now — what made this worth putting on the calendar?", note: "The trigger. Someone got burned recently, or a goal is at risk." },
-      { lead: "And I want to be realistic about this —", text: "Would anything prevent your team from moving forward this quarter if you had the right solution?", note: "Smoke out the real blocker before you invest more time." },
-    ],
-    decision: [
-      { lead: "Just so I can be most helpful —", text: "What steps would it take to get something like this approved and in place?", note: "You're evaluating their buying process before you go deeper." },
-      { lead: "And who else would need to be in the room —", text: "Who else would need to be involved — Legal, IT, Finance, your manager?", note: "Compliance and workflow tools often pull in more stakeholders than expected." },
-      { lead: "I don't want to gloss over this —", text: "Whose budget would this come from?", note: "Sales ops? RevOps? Legal? The answer determines who else you need in the room." },
-      { lead: "And one last thing —", text: "What's killed solutions like this in the past — budget, priority, or something else?", note: "Get the obstacle on the table now." },
-    ],
-  },
-  {
-    id: "no-visibility",
-    label: "No visibility after the proposal goes out",
-    sub: "Don't know if it was opened, who saw it, or where it stands",
-    situation: [
-      { text: "After a proposal goes out — how do you know if it's been opened? Do you get any signal at all?", note: "Almost always no. That absence of signal is the entire problem." },
-      { lead: "And when you do follow up —", text: "When you follow up, are you working from data or are you essentially guessing?", note: "Direct. They'll tell you they're guessing." },
-      { lead: "And how many times typically —", text: "How many follow-up attempts do you typically make before you get a response or give up?", note: "Surfaces wasted effort. The number usually surprises them when they say it out loud." },
-      { lead: "And in terms of prioritization —", text: "How does your team currently prioritize which proposals to chase?", note: "Usually gut feel or recency. That's the gap." },
-    ],
-    pain: [
-      { lead: "Let's go deeper on what this is actually creating.", text: "What is going on in your business that's making this visibility gap a priority right now?", note: "Is it a missed forecast? A rep complaining? A deal that ghosted at the worst time?" },
-      { lead: "And I want to make sure I'm not leaving anything out —", text: "Aside from the follow-up frustration — what's the real problem this is creating for you?", note: "Go one level deeper. Is it forecasting accuracy? Manager credibility? Rep morale?" },
-      { lead: "I'm curious — what's your read on why it's been hard to solve?", text: "What's your read on why this has been hard to solve — is it a tool problem, a process problem, or something else?", note: "Their diagnosis tells you what they've already ruled out." },
-      { lead: "And in terms of what's been tried —", text: "What have you tried — read receipts, follow-up sequences, CRM tasks?", note: "What broke in each attempt? That gap is your opening." },
-      { lead: "I want to make sure this ties to something real —", text: "Is this affecting your forecast confidence now, or is it more of a rep-level frustration?", note: "Tie it to forecast accuracy and it becomes a leadership problem, not just a rep problem." },
-    ],
-    impact: [
-      { lead: "To tie this to a number —", text: "What metric is suffering most because you're flying blind — win rate, deal velocity, forecast accuracy?", note: "Get the number. Forecast accuracy especially resonates with managers and VPs." },
-      { lead: "And zooming out to the leadership view —", text: "What are the ripple effects? How does this show up when you're building a pipeline call or a board update?", note: "Opens up the leadership visibility problem — not just the rep problem." },
-      { lead: "Quick estimate —", text: "How much time a week do you estimate goes into chasing proposals that were already dead?", note: "Quantify the waste. Even a rough estimate — 3 hrs × team size × 48 weeks = significant." },
-      { lead: "Has it ever blindsided you at the worst moment —", text: "Have you been blindsided by a deal you thought was moving that went silent at the worst possible moment?", note: "One story here carries everything. Let them tell it." },
-      { lead: "Bear with me —", text: "365 days from now — if you had perfect visibility into every proposal, what changes for the team?", note: "Future state. Let them describe the world with the problem solved." },
-    ],
-    critical: [
-      { lead: "On timing —", text: "Is there a specific quarter, forecast commitment, or leadership review that makes solving this now important?", note: "Tie to something they've already committed to." },
-      { lead: "And what brought this to the surface right now —", text: "Why now — what brought this to the surface at this specific moment?", note: "A missed number? A board question? A rep who quit? Find it." },
-      { lead: "I want to be realistic —", text: "If everything checked out, is there anything that would slow down a decision this quarter?", note: "Budget, competing tools, headcount freeze — surface it now." },
-    ],
-    decision: [
-      { lead: "Just to map the process —", text: "What steps would it take for you and your team to evaluate and approve something like this?", note: "Map the buying process." },
-      { lead: "And who else would need to be in the conversation —", text: "Who else needs to be in the conversation — RevOps, your manager, IT?", note: "Visibility tools often touch multiple teams. Find all the stakeholders." },
-      { lead: "I don't want to skip this one —", text: "Whose budget would this come from?", note: "RevOps? Sales enablement? The answer determines who needs to be involved." },
-      { lead: "And one last thing —", text: "What's gotten in the way of solving this before?", note: "The unsurfaced obstacle is always the one that kills the deal." },
-    ],
-  },
-  {
-    id: "disconnected-tools",
-    label: "Tools don't talk to each other",
-    sub: "Copy-paste from CRM, manual data entry, systems disconnected",
-    situation: [
-      { text: "Walk me through your current stack — CRM, proposals, e-sign. Are those connected, or are they separate systems?", note: "Map the gap before naming the solution." },
-      { lead: "And the data transfer piece —", text: "How does deal data get from your CRM into a proposal today?", note: "'We copy it over' or 'manually' is the answer you're waiting for." },
-      { lead: "And what happens on the back end —", text: "What happens after a contract is signed — how does that information get back into your CRM?", note: "Exposes the back-end manual loop that's usually even worse than the front-end." },
-      { lead: "And how many people touch it along the way —", text: "How many people touch a deal between CRM, proposal, and final signature?", note: "More handoffs = more errors, more time, more risk of something falling through." },
-    ],
-    pain: [
-      { lead: "What's actually driving this right now?", text: "What is going on that's making the disconnection between your tools a priority right now?", note: "Was there a data error? A compliance audit? A new CRM they just rolled out? Find the trigger." },
-      { lead: "And beyond the manual work itself —", text: "Aside from the manual work — what's the real risk of your tools not talking to each other?", note: "Errors that go out to clients? CRM data that can't be trusted? Bad reporting? Go deeper." },
-      { lead: "I'm curious — what's your read on why this hasn't been solved already?", text: "What's your take on why this hasn't been solved already — is it a technical limitation, a budget thing, or something else?", note: "Their explanation tells you what they've tried and ruled out." },
-      { lead: "And in terms of what's been tried —", text: "What have you tried — Zapier, native integrations, manual processes?", note: "Each failed attempt is evidence the problem is real." },
-      { lead: "I want to calibrate the urgency —", text: "Is this a frustration or is it creating actual business risk right now?", note: "The difference between a nice-to-have and a need-to-have." },
-    ],
-    impact: [
-      { lead: "To tie this to a number —", text: "What metric is suffering — data accuracy, time to close, reporting reliability?", note: "Get the number. Bad CRM data affects forecasting which affects leadership credibility." },
-      { lead: "And ripple effects across the business —", text: "What are the ripple effects of your tools not talking — who else in the business feels it?", note: "Open the blast radius: Finance, RevOps, leadership, customer success." },
-      { lead: "Quick estimate —", text: "How much time a week do you estimate your team spends on manual data transfer between systems?", note: "Get a number. Even rough: X hrs × team size × 48 weeks = significant." },
-      { lead: "Has it ever caused a real problem —", text: "Have you had a data integrity issue — wrong contact, wrong pricing, wrong terms — come from the manual handoff?", note: "One story here. Let them recall it. That's the moment that makes it real." },
-      { lead: "Bear with me for a second —", text: "365 days from now — if your CRM and proposals were fully synced automatically, what changes?", note: "Future state. Contrast the manual chaos they described with seamless data flow." },
-    ],
-    critical: [
-      { lead: "Is there something on the roadmap making this urgent —", text: "Is there a CRM migration, a compliance requirement, or a growth goal that makes solving this now important?", note: "Tie urgency to something already on their roadmap." },
-      { lead: "And what changed that brought this to the surface —", text: "Why now — what changed that brought this to the surface?", note: "New CRM? New sales leader? Audit finding? Find the trigger." },
-      { lead: "I want to be realistic —", text: "Would anything slow down a decision this quarter if you found the right solution?", note: "Budget, IT bandwidth, competing initiatives — smoke them out." },
-    ],
-    decision: [
-      { lead: "Just to map who needs to be involved —", text: "Who needs to be involved in evaluating and approving something like this — IT, RevOps, your manager?", note: "Integration projects almost always involve IT. Find all the seats." },
-      { lead: "And who ultimately —", text: "Who ultimately signs off?", note: "Economic buyer. Don't assume it's the person you're talking to." },
-      { lead: "I don't want to skip this —", text: "Whose budget would this come from?", note: "RevOps? IT? The answer changes who you need in the room." },
-      { lead: "And one last thing —", text: "What's killed integration projects like this in the past?", note: "IT pushback, security reviews, scope creep — get the obstacles now." },
-    ],
-  },
-  {
-    id: "slow-payments",
-    label: "Slow payment collection",
-    sub: "Payment separate from signing, AR aging, cash flow hit",
-    situation: [
-      { text: "What happens after a contract is signed — how do you collect payment?", note: "Exposes whether payment is connected to signing or totally decoupled." },
-      { lead: "And is that tied to the signing moment, or —", text: "Is payment collection tied to the signing moment, or does it happen separately through invoicing?", note: "If it's decoupled, there's a lag and a follow-up burden." },
-      { lead: "And timeline-wise —", text: "What's your typical time from contract signed to payment received?", note: "Baseline the cash conversion cycle. You'll use this in Impact." },
-      { lead: "And who actually owns that follow-up —", text: "Who owns payment follow-up — sales, finance, or someone else?", note: "Surfaces the ownership gap. Usually nobody really owns it." },
-    ],
-    pain: [
-      { lead: "Let's go a level deeper.", text: "What is going on in your business that's making payment collection a priority right now?", note: "Cash flow crunch? AR aging review? Board pressure? Find the trigger." },
-      { lead: "And I want to make sure I'm not missing anything —", text: "Aside from the cash flow impact — is there something else making this urgent?", note: "Dig deeper. Customer disputes over terms? Reps distracted by collections? Legal exposure?" },
-      { lead: "I'm curious — why is it disconnected from signing in the first place?", text: "What's your take on why payment collection is so disconnected from the signing moment?", note: "Their root cause tells you what they've already tried to patch." },
-      { lead: "And in terms of what's been tried —", text: "What have you tried — early payment incentives, invoicing automation, collections follow-up?", note: "What broke? Each failed attempt is evidence." },
-      { lead: "I want to calibrate whether this is frustration or real pressure —", text: "Is slow payment a frustration or is it creating real cash flow pressure right now?", note: "Tie it to a number — AR aging, days to collect, cash on hand — before you move forward." },
-    ],
-    impact: [
-      { lead: "To tie this to a CFO-worthy number —", text: "What metric is suffering — days sales outstanding, cash flow, or revenue recognition timing?", note: "Get the CFO-worthy number. This one often has a finance stakeholder." },
-      { lead: "And ripple effects —", text: "What are the ripple effects of slow payment — who else in the business feels it?", note: "Finance, leadership, investors, operations — open the full blast radius." },
-      { lead: "Just to make it concrete —", text: "What's sitting in AR right now that's been open for 30+ days?", note: "Concrete number. Makes the problem real and quantified." },
-      { lead: "Quick what-if —", text: "If you collected payment at the moment of signing — what would that do to your cash position?", note: "Future state embedded in a question. Let them calculate the delta." },
-      { lead: "Bear with me —", text: "365 days from now — if payment was collected automatically at signing, what changes for the business?", note: "Let them describe the world with the problem solved." },
-    ],
-    critical: [
-      { lead: "On timing —", text: "Is there a fundraise, a hiring plan, or a financial close that makes improving cash flow timing urgent now?", note: "Tie to something real and near-term." },
-      { lead: "And what brought this to the surface right now —", text: "Why now — what brought this to the surface at this specific moment?", note: "Board meeting? Quarter-end review? A specific customer dispute? Find it." },
-      { lead: "I want to be realistic about this —", text: "What would it take to get this prioritized this quarter?", note: "Pre-qualify the budget conversation." },
-    ],
-    decision: [
-      { lead: "Just to map who needs to be involved —", text: "Who needs to be involved in a decision like this — Finance, your CEO, operations?", note: "Payment and AR often pull in Finance or a CFO. Find all the seats." },
-      { lead: "And who ultimately signs off —", text: "Who ultimately signs off?", note: "Economic buyer. Finance might have veto even if Sales is driving." },
-      { lead: "I don't want to skip past this —", text: "Whose budget would this come from?", note: "Sales? Finance? Ops? The answer determines who else needs to be in the room." },
-      { lead: "And one last thing —", text: "What's gotten in the way of solving this before?", note: "The unsurfaced obstacle is always the one that kills the deal." },
-    ],
-  },
-  {
-    id: "version-chaos",
-    label: "Version chaos and re-negotiation",
-    sub: "Both sides editing, multiple versions flying, no single source of truth",
-    situation: [
-      { text: "What happens when a prospect wants to make changes to your proposal — how does that back-and-forth play out?", note: "Let them describe the chaos. Don't lead with the word 'version.'" },
-      { lead: "And how do you track what's been agreed to between drafts —", text: "How do you track changes between drafts — is there a clear record of what was agreed to?", note: "Usually email threads and unmarked PDFs. That's the gap." },
-      { lead: "And who actually owns the final version —", text: "Who owns the final version of a contract, and how does everyone know it's the final one?", note: "This is where confusion lives. 'I think it was the one I sent Thursday' is the answer." },
-      { lead: "And how often does that come up —", text: "How often do deals stall or get re-opened because both sides are working from different versions?", note: "Frequency matters. Even once a quarter with a big deal is a real problem." },
-    ],
-    pain: [
-      { lead: "Let's peel this back a layer.", text: "What is going on that's making version control and re-negotiation a priority right now?", note: "Did a deal re-open after signing? A compliance issue? A client dispute? Find the trigger." },
-      { lead: "And beyond the back-and-forth —", text: "Aside from the back-and-forth — what's the real risk of having no audit trail on what was agreed?", note: "Legal exposure, client disputes, revenue recognition issues — go deeper." },
-      { lead: "I'm curious — what's your read on why this keeps happening?", text: "What's your take on why this keeps happening — is it the tool, the process, or the nature of your deals?", note: "Their diagnosis tells you what they've already tried." },
-      { lead: "And in terms of what's been tried —", text: "What have you tried — tracked changes in Word, shared drives, email rules?", note: "What broke? Each failed attempt is evidence." },
-      { lead: "I want to understand whether this is a frustration or an actual risk —", text: "Is this a frustration or is it creating real legal or financial exposure?", note: "Legal risk or revenue risk makes this a CFO and Legal problem, not just a sales problem." },
-    ],
-    impact: [
-      { lead: "To tie this to a number —", text: "What metric is suffering — deal velocity, legal costs, or close rate?", note: "Re-negotiation drags velocity. Legal reviews cost real money. Get the number." },
-      { lead: "And ripple effects —", text: "What are the ripple effects when a deal re-opens — who else gets pulled in?", note: "Legal, Finance, Sales leadership — open the full blast radius of a re-opened deal." },
-      { lead: "Has it ever actually blown up after signing —", text: "Have you had a deal re-open after signing because the wrong version was executed?", note: "One story here. If it happened once, they remember exactly. Let them tell it." },
-      { lead: "And per-deal — the time drain —", text: "How much time per deal goes into managing versions — email threads, re-sends, 'wait, which one is current'?", note: "Quantify the drag. Even 2–3 hours per deal × volume = significant." },
-      { lead: "Bear with me —", text: "365 days from now — if there was one version, one source of truth, one audit trail — what changes?", note: "Future state. Let them describe the world without the chaos." },
-    ],
-    critical: [
-      { lead: "Is there something making this urgent right now —", text: "Is there a compliance requirement, a legal review, or a specific deal complexity driving this to be urgent now?", note: "Tie to something real — a deadline, a risk, a commitment." },
-      { lead: "And what happened that made it worth addressing —", text: "Why now — what happened that made this worth addressing?", note: "The trigger. A deal that blew up. A client that pushed back. Find it." },
-      { lead: "I want to be realistic —", text: "If everything checked out, what would it take to get this budgeted this quarter?", note: "Pre-qualify before you go deeper." },
-    ],
-    decision: [
-      { lead: "Just to map who needs to be involved —", text: "Who needs to be involved in evaluating something like this — Legal, IT, your manager?", note: "Version control and audit trails often pull in Legal. Find all the seats." },
-      { lead: "And who ultimately signs off —", text: "Who ultimately signs off?", note: "Economic buyer. Don't assume." },
-      { lead: "I don't want to skip this —", text: "Whose budget would this come from?", note: "Legal? Sales? RevOps? The answer changes who you need." },
-      { lead: "And one last thing —", text: "What's killed solutions like this in the past — was it Legal pushback, IT requirements, or something else?", note: "The obstacle you don't know about is always the one that kills the deal." },
-    ],
-  },
+  // Pain trees live here. Add one object per pain:
+  // {
+  //   id: "my-pain",
+  //   label: "Pain label",
+  //   sub: "One-line description",
+  //   situation: [ { text: "...", note: "..." }, { lead: "...", text: "...", note: "..." } ],
+  //   pain:       [ ... ],
+  //   impact:     [ ... ],
+  //   critical:   [ ... ],
+  //   decision:   [ ... ],
+  // },
 ];
 
 
-const PANDADOC_CONTEXT = `You are an AI sales coach in a live PandaDoc SMB discovery call companion. Coach using Chris Orlob's framework from pclub.io.
+const DISCOVERY_CONTEXT = `You are an AI sales coach in a live enterprise discovery call companion. Coach using Chris Orlob's framework.
 
 VALUE SELLING = 3 things: 1) Painful measurable current state 2) Compelling measurable future state 3) Your product as the bridge.
-
-PANDADOC: All-in-one document workflow. 50% reduction in doc creation time, 87% increase in closed deals/month, 36% increase in close rate, 20 min saved/contract via CRM auto-population. Core pains: manual proposals (30-45min→5min), no CRM integration, approval bottlenecks, no post-send visibility, inconsistent docs, slow e-sign.
 
 BUYER JOURNEY: Latent pain (dormant, back of mind) → Active pain (problem-language, not shopping) → Actively evaluating (solution-language, comparing vendors).
 
@@ -462,7 +205,7 @@ export default function App() {
   const [briefParsing, setBriefParsing] = useState(false);
   const [questionnaireText, setQuestionnaireText] = useState("");
   const [briefParseStatus, setBriefParseStatus] = useState("");
-  const [roi, setRoi] = useState({ proposalsPerMonth:"", minsPerProposal:"", teamSize:"", hourlyRate:"75", pandadocTimeMins:"15" });
+  const [roi, setRoi] = useState({ unitsPerMonth:"", minsPerUnit:"", teamSize:"", hourlyRate:"75", targetTimeMins:"15" });
   const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -470,12 +213,11 @@ export default function App() {
   const [callTranscript, setCallTranscript] = useState("");
   const [debriefLoading, setDebriefLoading] = useState(false);
   const [scriptEdits, setScriptEdits] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("smb-script-edits") || "{}"); } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem("discovery-script-edits") || "{}"); } catch { return {}; }
   });
   const [editingKey, setEditingKey] = useState(null);
-  const [situationStep, setSituationStep] = useState(0);
   useEffect(() => {
-    try { localStorage.setItem("smb-script-edits", JSON.stringify(scriptEdits)); } catch {}
+    try { localStorage.setItem("discovery-script-edits", JSON.stringify(scriptEdits)); } catch {}
   }, [scriptEdits]);
   const currentIdx = STAGES.findIndex(s => s.id === activeStage);
   const stageNote = notes[activeStage] || "";
@@ -493,7 +235,7 @@ export default function App() {
       const n = parseInt(e.key);
       if (n >= 1 && n <= 9) {
         const cardIdx = n - 1;
-        const prefix = activeStage === "align-buyer"
+        const prefix = activeStage === "buyer-journey"
           ? (buyerPath === "evaluating" ? "eval" : buyerPath === "active-pain" ? "active" : "latent")
           : activeStage;
         const key = `${prefix}-${cardIdx}`;
@@ -514,8 +256,8 @@ export default function App() {
     try {
       const res = await fetch("/api/claude", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1500, system:PANDADOC_CONTEXT,
-          messages:[{ role:"user", content:`You are coaching a PandaDoc AE using Chris Orlob's exact discovery framework from pclub.io. Analyze this call transcript and give a specific, honest debrief. Do not be generic. Reference exact moments from the transcript by quoting what was said.
+        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1500, system:DISCOVERY_CONTEXT,
+          messages:[{ role:"user", content:`You are coaching an enterprise AE using Chris Orlob's exact discovery framework from pclub.io. Analyze this call transcript and give a specific, honest debrief. Do not be generic. Reference exact moments from the transcript by quoting what was said.
 
 TRANSCRIPT:
 ${callTranscript}
@@ -561,8 +303,8 @@ Be direct. Be specific. Quote the transcript. This rep is trying to get better a
       const debriefContext = outputs.debrief ? `\n\nDEBRIEF ALREADY RUN:\n${outputs.debrief}` : "";
       const res = await fetch("/api/claude", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:2400, system: PANDADOC_CONTEXT,
-          messages:[{ role:"user", content:`You are a PandaDoc sales coach. Based on this transcript, tell me EXACTLY what to do to fix and advance this deal. Be surgical. No fluff.
+        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:2400, system: DISCOVERY_CONTEXT,
+          messages:[{ role:"user", content:`You are an enterprise sales coach. Based on this transcript, tell me EXACTLY what to do to fix and advance this deal. Be surgical. No fluff.
 
 TRANSCRIPT:
 ${callTranscript}
@@ -580,7 +322,7 @@ Write the full subject line and email body. Rules: reference ONE specific thing 
 What are the first 3 things I say when the call starts? What specific discovery gaps do I need to fill — give me the exact questions word for word. What must I get them to say out loud before I can move forward?
 
 3. WHAT TO SHOW IN THE DEMO
-Based on their specific situation from this call, what PandaDoc features should I actually demo? Map each feature directly to something THEY said. If they mentioned Salesforce integration, show that. If they mentioned approval bottlenecks, show approval workflows. Be specific to this account — not a generic demo list.
+Based on their specific situation from this call, what should I actually show in the demo? Map each part of the demo directly to something THEY said. Be specific to this account — not a generic demo list.
 
 4. MULTITHREAD — WHO ELSE I NEED TO BE TALKING TO
 This deal dies if I only have one contact. Based on everything in this transcript:
@@ -594,7 +336,7 @@ What are the 1-2 things most likely to kill this deal beyond single-threading? F
 
 CRITICAL LANGUAGE RULES for every script in this output:
 - Do NOT write ROI calculator questions. "What would your team do with that time back?" is banned. "How does that translate to more business for you?" is banned. These sound like a sales training video and every prospect hates them.
-- Do NOT lead with PandaDoc's value prop. Never say "if we could cut your time from X to Y" as a way to set up a question — that's pitching, not asking.
+- Do NOT lead with your product's value prop. Never say "if we could cut your time from X to Y" as a way to set up a question — that's pitching, not asking.
 - Do NOT write rhetorical questions designed to get a yes. "Wouldn't it be great if..." is banned.
 - Do NOT use phrases like "best bang for your buck," "game-changer," "solution," "streamline," or "leverage."
 - Write like a human who listened carefully and is genuinely curious, not like someone running a play. Short sentences. Acknowledge their reality first. Then ask from curiosity.
@@ -612,15 +354,15 @@ Use their actual language from the transcript. Make every line actionable. This 
     setOutputLoading(type);
     const allNotes = Object.entries(notes).filter(([,v])=>v).map(([k,v])=>k+": "+v).join("\n");
     const prompts = {
-      spiced:`Filled SPICED + next step for PandaDoc.\nPrep: ${prepBrief||"None"}\nBuyer path: ${buyerPath||"unknown"}\nNotes:\n${allNotes}\nUse their exact words. S=situation, P=need behind the need+root cause, I=metric+cost of inaction, C=timeline+trajectory+dissatisfaction, D=decision process. Recommend next step with What/Who/Why.`,
-      email:`Post-discovery follow-up email for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nRules: Reference ONE specific thing they said — not a summary. No "as discussed," no "per our conversation," no "hope this finds you well," no bullet-point next steps list. Do not open with a compliment. Do not say "excited to work together" or "looking forward to the journey." Write it the way a sharp rep messages a contact they actually like — direct, a little personality, three sentences max, one clear ask. Make them want to reply.`,
-      score:`Score this PandaDoc call out of 100.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nBuyer path: ${buyerPath||"unknown"}\nScore /20 each: 1) ROE set + buyer journey diagnosed 2) Need behind the need uncovered (not just symptoms) 3) Current state baselined with metric+trajectory 4) Future state quantified with value delta 5) Next step secured with What/Who/Why. Top 3 failure modes. 3 coaching actions for next call.`,
-      whatweheard:`Create a 'What We Heard' slide for PandaDoc.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\n\nFormat:\nCURRENT STATE: [problem in their exact words + metric suffering + current measurement]\nNEED BEHIND THE NEED: [underlying business problem + why it matters]\nDESIRED STATE: [what good looks like 365 days from now + target metric]\nVALUE DELTA: [current vs desired metric — calculate financial gap if possible]\nNO LOGO TEST: [could someone identify this company from this description alone? Rate 1-5 and explain]\nThis opens the next meeting.`,
+      spiced:`Filled SPICED + next step for this deal.\nPrep: ${prepBrief||"None"}\nBuyer path: ${buyerPath||"unknown"}\nNotes:\n${allNotes}\nUse their exact words. S=situation, P=need behind the need+root cause, I=metric+cost of inaction, C=timeline+trajectory+dissatisfaction, D=decision process. Recommend next step with What/Who/Why.`,
+      email:`Post-discovery follow-up email for this prospect.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nRules: Reference ONE specific thing they said — not a summary. No "as discussed," no "per our conversation," no "hope this finds you well," no bullet-point next steps list. Do not open with a compliment. Do not say "excited to work together" or "looking forward to the journey." Write it the way a sharp rep messages a contact they actually like — direct, a little personality, three sentences max, one clear ask. Make them want to reply.`,
+      score:`Score this discovery call out of 100.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nBuyer path: ${buyerPath||"unknown"}\nScore /20 each: 1) ROE set + buyer journey diagnosed 2) Need behind the need uncovered (not just symptoms) 3) Current state baselined with metric+trajectory 4) Future state quantified with value delta 5) Next step secured with What/Who/Why. Top 3 failure modes. 3 coaching actions for next call.`,
+      whatweheard:`Create a 'What We Heard' slide.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\n\nFormat:\nCURRENT STATE: [problem in their exact words + metric suffering + current measurement]\nNEED BEHIND THE NEED: [underlying business problem + why it matters]\nDESIRED STATE: [what good looks like 365 days from now + target metric]\nVALUE DELTA: [current vs desired metric — calculate financial gap if possible]\nNO LOGO TEST: [could someone identify this company from this description alone? Rate 1-5 and explain]\nThis opens the next meeting.`,
     };
     try {
       const res = await fetch("/api/claude", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, system:PANDADOC_CONTEXT, messages:[{ role:"user", content:prompts[type] }] }),
+        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, system:DISCOVERY_CONTEXT, messages:[{ role:"user", content:prompts[type] }] }),
       });
       const data = await res.json();
       setOutputs(o => ({ ...o, [type]:data.content?.[0]?.text || "Failed." }));
@@ -724,10 +466,10 @@ Return a JSON object with these keys:
 - prospect: first name only (explicit)
 - company: company name (explicit)
 - role: their exact job title (explicit)
-- tool: current doc/sign tool explicitly named
-- reps: number of people sending docs — digits only e.g. "15", NOT words like "fifteen". Use "" if not a specific number
-- volume: docs per month — digits only. Use "" if not stated
-- timePerDoc: minutes per doc — digits only. Use "" if not stated
+- tool: current tools/state explicitly named
+- reps: team size — digits only e.g. "40", NOT words like "forty". Use "" if not a specific number
+- volume: volume per month — digits only. Use "" if not stated
+- timePerDoc: minutes per unit — digits only. Use "" if not stated
 - metric: business metric they explicitly care about (e.g. "win rate"). Use "" if not stated
 - integrations: tools explicitly mentioned for integration
 - approval: approval process if explicitly described
@@ -764,26 +506,6 @@ ${combinedText}` }]
     return t;
   }
 
-  function getCardBriefValue(label) {
-    const l = (label || "").toLowerCase();
-    if (l.includes("4 —") || l.includes("current tool"))       return briefFields.tool;
-    if (l.includes("2 —") || l.includes("time to build"))      return briefFields.timePerDoc ? `${briefFields.timePerDoc} min to build` : "";
-    if (l.includes("3 —") || l.includes("who's involved")) {
-      // Only show hint if we have BOTH team size and volume — one alone isn't the full picture
-      if (!briefFields.reps || !briefFields.volume) return "";
-      return `${briefFields.reps} reps, ${briefFields.volume} docs/mo`;
-    }
-    if (l.includes("integration"))   return briefFields.integrations;
-    if (l.includes("approval"))      return briefFields.approval;
-    if (l.includes("6 —") || l.includes("roi math")) {
-      // Only auto-cover ROI if we have enough to actually compute math (reps + volume or reps + timePerDoc)
-      const hasMinROI = briefFields.reps && (briefFields.volume || briefFields.timePerDoc);
-      if (!hasMinROI) return "";
-      const p = [briefFields.reps && `${briefFields.reps} reps`, briefFields.volume && `${briefFields.volume}/mo`, briefFields.timePerDoc && `${briefFields.timePerDoc} min each`, briefFields.metric && `→ ${briefFields.metric}`].filter(Boolean);
-      return p.join(", ");
-    }
-    return "";
-  }
 
   function renderTreePicker() {
     return (
@@ -791,6 +513,12 @@ ${combinedText}` }]
         <div style={{ fontSize:14, color:C.textMuted, marginBottom:24, lineHeight:1.7 }}>
           Tap the pain that's the raging fire. You heard it while they were talking — this is where you go deep.
         </div>
+        {TREES.length === 0 && (
+          <div style={{ padding:"28px 24px", borderRadius:12, border:`1.5px dashed ${C.border}`, background:C.sand, textAlign:"center" }}>
+            <div style={{ fontSize:14, fontWeight:700, color:C.textSecondary, marginBottom:8 }}>No pain trees yet</div>
+            <div style={{ fontSize:13, color:C.textMuted, lineHeight:1.7 }}>Add your pain trees to the <span style={{ fontFamily:"monospace", background:"#eef0f3", padding:"1px 6px", borderRadius:4 }}>TREES</span> array in <span style={{ fontFamily:"monospace", background:"#eef0f3", padding:"1px 6px", borderRadius:4 }}>src/App.jsx</span> — one per pain, each with situation / pain / impact / critical / decision question sets.</div>
+          </div>
+        )}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
           {TREES.map(tree => (
             <button
@@ -813,19 +541,19 @@ ${combinedText}` }]
     const tree = TREES.find(t => t.id === selectedTree);
     if (!tree) return (
       <div style={{ color:C.textMuted, fontSize:14 }}>
-        No tree selected. <button onClick={() => setActiveStage("current-situation")} style={{ ...B, color:C.emerald, background:"none", border:"none", fontWeight:600 }}>← Go back</button>
+        No tree selected. <button onClick={() => setActiveStage("need-behind-need")} style={{ ...B, color:C.emerald, background:"none", border:"none", fontWeight:600 }}>← Go back</button>
       </div>
     );
 
     const sectionStyles = [
-      { key:"situation",  label:"S — Situation",       sub:"Map their process. Understand the context.",                  accent:"#5b8fd4", bg:"#eef4ff", border:"#b0ccf0" },
+      { key:"situation",  label:"S — Situation",       sub:"Map their process. Understand the context.",                  accent:"#2563eb", bg:"#eef3ff", border:"#bccdf5" },
       { key:"pain",       label:"P — Pain",             sub:"Find the need behind the need. Don't stop at the symptom.",   accent:C.emerald, bg:C.emeraldLight, border:C.emeraldMid,
         transition: "Summarize before you go deeper — \"Let me see if I've got this right — [their exact words]. Did I catch that?\"" },
       { key:"impact",     label:"I — Impact",           sub:"Quantify — metric, ripple effects, cost of inaction.",        accent:"#a07820", bg:"#fdf7e6", border:"#c09818",
         transition: "Validate the priority — \"Before we keep going — is this the challenge we should anchor our whole conversation to, or did I lead you somewhere you only mildly care about?\"" },
-      { key:"critical",   label:"C — Critical Event",   sub:"Why now? What happens if this doesn't get solved?",           accent:"#b060a0", bg:"#fef0f8", border:"#c078b0",
+      { key:"critical",   label:"C — Critical Event",   sub:"Why now? What happens if this doesn't get solved?",           accent:"#3b82c4", bg:"#eef3ff", border:"#7ba3f0",
         transition: "Summarize impact before timing — \"So just to make sure I have the full picture — [your impact summary]. Does that feel right?\"" },
-      { key:"decision",   label:"D — Decision",         sub:"Who decides, how, and what are the hurdles?",                 accent:"#7a60c8", bg:"#f4f0ff", border:"#9080d8",
+      { key:"decision",   label:"D — Decision",         sub:"Who decides, how, and what are the hurdles?",                 accent:"#1d4ed8", bg:"#eef3ff", border:"#7ba3f0",
         transition: "Bridge to process — \"I really appreciate you sharing all of that. Anything I missed before I ask a few questions about how decisions like this typically get made?\"" },
     ];
     const layers = sectionStyles.map(s => tree[s.key] || []);
@@ -837,7 +565,7 @@ ${combinedText}` }]
             <div style={{ fontSize:11, fontWeight:700, color:C.emerald, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>Raging fire</div>
             <div style={{ fontSize:17, fontWeight:700, color:C.textPrimary }}>{tree.label}</div>
           </div>
-          <button onClick={() => setActiveStage("current-situation")} style={{ ...B, fontSize:11, color:C.textMuted, background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"5px 12px", fontWeight:600 }}>← change</button>
+          <button onClick={() => setActiveStage("need-behind-need")} style={{ ...B, fontSize:11, color:C.textMuted, background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"5px 12px", fontWeight:600 }}>← change</button>
         </div>
 
         {sectionStyles.map((section, si) => (
@@ -910,14 +638,15 @@ ${combinedText}` }]
 
   function RhythmCard({ r, idx, prefix }) {
     const typeAccent = {
+      say: C.yellowText,
       ask: C.emerald,
-      wallow: "#5b8fd4",
+      wallow: "#2563eb",
       segue: "#7a5808",
       summarize: "#b07a14",
-      validate: "#8060d0",
-      transition: "#5b8fd4",
+      validate: "#2563eb",
+      transition: "#2563eb",
     };
-    const typeTag = { ask:"Question", wallow:"Wallow", segue:"Segue", summarize:"Summarize", validate:"Validate", transition:"Transition" };
+    const typeTag = { say:"Say", ask:"Question", wallow:"Wallow", segue:"Segue", summarize:"Summarize", validate:"Validate", transition:"Transition" };
     const accent = typeAccent[r.type] || C.emerald;
     const tag = typeTag[r.type] || "Question";
     const rawText = r.text || (r.alts ? r.alts.join("\n\n— or —\n\n") : "");
@@ -928,12 +657,25 @@ ${combinedText}` }]
     const isCovered = cardState === true;
 
     if (isCovered) return (
-      <div style={{ marginBottom:8, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 12px", borderRadius:8, background:"#e6f4ec", border:"1px solid #80c8a0" }}>
+      <div style={{ marginBottom:8, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 12px", borderRadius:8, background:"#e6f4ec", border:"1px solid #7ba3f0" }}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:99, background:"#4a9e78", color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>✓</span>
-          <span style={{ fontSize:13, fontWeight:700, color:"#4a9e78", fontStyle:"italic" }}>{r.label}</span>
+          <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:99, background:"#2563eb", color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>✓</span>
+          <span style={{ fontSize:13, fontWeight:700, color:"#2563eb", fontStyle:"italic" }}>{r.label}</span>
         </div>
-        <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: false }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:"1px solid #80c8a0", background:"transparent", color:"#3a9060", fontWeight:600, flexShrink:0 }}>↩ unmark</button>
+        <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: false }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:"1px solid #7ba3f0", background:"transparent", color:"#1d4ed8", fontWeight:600, flexShrink:0 }}>↩ unmark</button>
+      </div>
+    );
+
+    if (r.type === "say") return (
+      <div style={{ marginBottom:20, background:C.yellow, border:`1.5px solid ${C.yellowBorder}`, borderRadius:12, padding:"20px 22px" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+          <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background:C.yellowText, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>Say</span>
+          <span style={{ fontSize:13, fontWeight:700, color:C.yellowText, fontStyle:"italic" }}>{r.label}</span>
+        </div>
+        <div style={{ fontSize:17, color:C.textPrimary, lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{text}</div>
+        {r.note && coachingVisible && (
+          <div style={{ marginTop:12, fontSize:12, color:C.yellowText, lineHeight:1.65, background:"rgba(255,255,255,0.55)", padding:"10px 14px", borderRadius:7 }}>{r.note}</div>
+        )}
       </div>
     );
 
@@ -942,17 +684,17 @@ ${combinedText}` }]
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background:accent, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>{tag}</span>
-            <span style={{ fontSize:15, fontWeight:800, color:"#f2deb8", letterSpacing:"-0.02em", fontStyle:"italic" }}>{r.label}</span>
+            <span style={{ fontSize:15, fontWeight:800, color:"#1c2733", letterSpacing:"-0.02em", fontStyle:"italic" }}>{r.label}</span>
           </div>
           <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: true }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:`1px solid ${C.border}`, background:"transparent", color:C.textMuted, fontWeight:600, flexShrink:0 }}>✓ mark covered</button>
         </div>
         <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
         {r.note && coachingVisible && (
-          <div style={{ marginTop:10, fontSize:12, color:C.textSecondary, lineHeight:1.65, background:"#f4f7f5", padding:"10px 14px", borderRadius:7, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
+          <div style={{ marginTop:10, fontSize:12, color:C.textSecondary, lineHeight:1.65, background:"#f7f8fa", padding:"10px 14px", borderRadius:7, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
         )}
         {/* Per-card context note */}
         {notes[cardKey] && !noteOpen[cardKey] && (
-          <div style={{ marginTop:8, fontSize:12, color:"#9a80e0", background:"#f4f0ff", padding:"7px 12px", borderRadius:7, borderLeft:"2px solid #9080d8", cursor:"pointer" }} onClick={() => setNoteOpen(s => ({ ...s, [cardKey]: true }))}>
+          <div style={{ marginTop:8, fontSize:12, color:"#2563eb", background:"#eef3ff", padding:"7px 12px", borderRadius:7, borderLeft:"2px solid #7ba3f0", cursor:"pointer" }} onClick={() => setNoteOpen(s => ({ ...s, [cardKey]: true }))}>
             📝 {notes[cardKey]}
           </div>
         )}
@@ -968,7 +710,7 @@ ${combinedText}` }]
             }}
             placeholder="Add context or edit your approach for this card..."
             rows={2}
-            style={{ marginTop:8, width:"100%", fontSize:12, padding:"8px 12px", border:"1.5px solid #9080d8", borderRadius:7, background:"#f4f7f5", color:C.textPrimary, resize:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
+            style={{ marginTop:8, width:"100%", fontSize:12, padding:"8px 12px", border:"1.5px solid #7ba3f0", borderRadius:7, background:"#f7f8fa", color:C.textPrimary, resize:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
           />
         )}
         {!noteOpen[cardKey] && (
@@ -980,116 +722,10 @@ ${combinedText}` }]
     );
   }
 
-  const SITUATION_STEPS = [
-    {
-      step: 1,
-      label: "Open Current State",
-      tag: "Current Process",
-      tagColor: "#5b8fd4",
-      tagBg: "#eef4ff",
-      tagBorder: "#b0ccf0",
-      script: "Great, thanks for helping me understand the motivation for booking the call. Now I'd like to understand where we're starting from so we can map to where you'd like to be — walk me through your current process today on how documents are generated, edited, sent, signed, etc.",
-      note: "Open and neutral. Don't name what you expect to find — let them describe it. You're mapping reality before you pitch anything.",
-      cue: "Once they finish → advance to step 2",
-    },
-    {
-      step: 2,
-      label: "Desired State",
-      tag: "Future State",
-      tagColor: C.emerald,
-      tagBg: C.emeraldLight,
-      tagBorder: C.emeraldMid,
-      script: "Okay, so now I understand how it is today. What are you hoping to achieve or accomplish with a product like PandaDoc?",
-      note: "Let them paint the future in their own words before you describe it for them. Their language becomes your language for the rest of the call.",
-      cue: "Once they tell you what they want → advance to step 3",
-    },
-    {
-      step: 3,
-      label: "Priority Driver",
-      tag: "Why Now",
-      tagColor: "#a07820",
-      tagBg: "#fdf7e6",
-      tagBorder: "#c09818",
-      script: "What's going on in the business that's driving this to be a priority?",
-      note: "The peel-the-onion opener. They'll often chuckle — that chuckle means you hit it. Shut up and let them go. The real reason is almost always one layer below the first answer.",
-      cue: "This is the trigger. Find it. Then move to deeper discovery →",
-    },
-  ];
-
-  function renderCurrentSituation() {
-    const step = SITUATION_STEPS[situationStep];
-    const isLast = situationStep === SITUATION_STEPS.length - 1;
-    return (
-      <div>
-        {/* Step progress */}
-        <div style={{ display:"flex", gap:8, marginBottom:24 }}>
-          {SITUATION_STEPS.map((s, i) => {
-            const isActive = i === situationStep;
-            const isDone = i < situationStep;
-            return (
-              <button
-                key={i}
-                onClick={() => setSituationStep(i)}
-                style={{ ...B, display:"flex", alignItems:"center", gap:8, padding:"8px 14px", borderRadius:8, background: isActive ? C.emerald : isDone ? C.emeraldLight : C.white, border: `1.5px solid ${isActive ? C.emerald : isDone ? C.emeraldMid : C.border}`, flex:1 }}
-              >
-                <span style={{ width:22, height:22, borderRadius:6, background: isActive ? "#fff" : isDone ? C.emerald : C.border, color: isActive ? C.emerald : isDone ? "#fff" : C.textMuted, fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{isDone ? "✓" : i + 1}</span>
-                <span style={{ fontSize:12, fontWeight:700, color: isActive ? "#fff" : isDone ? C.emerald : C.textMuted, lineHeight:1.3 }}>{s.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Active step card */}
-        <div style={{ borderRadius:14, border:`2px solid ${step.tagBorder}`, background:step.tagBg, padding:28, marginBottom:20 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:18 }}>
-            <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:99, background:step.tagColor, color:"#fff", letterSpacing:"0.07em", textTransform:"uppercase" }}>{step.tag}</span>
-            <span style={{ fontSize:11, color:step.tagColor, fontWeight:600 }}>Step {step.step} of {SITUATION_STEPS.length}</span>
-          </div>
-          <div style={{ fontSize:18, color:C.textPrimary, lineHeight:1.9, fontWeight:500, marginBottom: coachingVisible ? 18 : 0 }}>
-            &ldquo;{step.script}&rdquo;
-          </div>
-          {coachingVisible && (
-            <div style={{ borderTop:`1px solid ${step.tagBorder}`, paddingTop:14, fontSize:13, color:step.tagColor, lineHeight:1.7 }}>{step.note}</div>
-          )}
-        </div>
-
-        {/* Cue */}
-        <div style={{ fontSize:13, color:C.textMuted, fontStyle:"italic", marginBottom:24, paddingLeft:4 }}>{step.cue}</div>
-
-        {/* Navigation */}
-        <div style={{ display:"flex", gap:10 }}>
-          {situationStep > 0 && (
-            <button
-              onClick={() => setSituationStep(s => s - 1)}
-              style={{ ...B, fontSize:13, padding:"11px 20px", borderRadius:8, border:`1.5px solid ${C.border}`, background:C.white, color:C.textMuted, fontWeight:600 }}
-            >← Back</button>
-          )}
-          {!isLast ? (
-            <button
-              onClick={() => setSituationStep(s => s + 1)}
-              style={{ ...B, flex:1, fontSize:14, padding:"13px 24px", borderRadius:8, border:"none", background:C.emerald, color:"#fff", fontWeight:700 }}
-            >They responded — next →</button>
-          ) : (
-            <button
-              onClick={() => setActiveStage("next-step")}
-              style={{ ...B, flex:1, fontSize:14, padding:"13px 24px", borderRadius:8, border:"none", background:C.emerald, color:"#fff", fontWeight:700 }}
-            >Discovery complete — Next Step →</button>
-          )}
-        </div>
-
-        {/* SPICED reminder */}
-        <div style={{ marginTop:28, padding:"14px 18px", borderRadius:10, background:C.white, border:`1.5px solid ${C.border}` }}>
-          <div style={{ fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:8 }}>Deep discovery questions</div>
-          <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7 }}>Use the <strong>Question Bank →</strong> in the right panel to go deeper on Situation, Pain, Impact, Critical Event, and Decision as the conversation unfolds.</div>
-        </div>
-      </div>
-    );
-  }
-
   function renderBuyerType() {
     const allPaths = [
-      { path:"evaluating", border:"#b0ccf0", bg:"#eef4ff", titleColor:"#5b8fd4", bodyColor:"#2a60a8", badge:"#b0ccf0", badgeText:"#2a60a8", icon:"⚡", title:"Solution language", sub:'"We\'re looking for a product that can do X..." — Actively evaluating. Comparing solutions.', technique:"→ Go Back In Time" },
-      { path:"active-pain", border:"#a8d0b8", bg:"#e8f3ec", titleColor:"#4a9e78", bodyColor:"#2a7850", badge:"#4a9e78", badgeText:"#fff", icon:"⚠", title:"Problem language", sub:'"We have a challenge with Y... Z is not where we want it..." — Active pain. Not yet solution-focused.', technique:"→ Symptoms → Problems" },
+      { path:"evaluating", border:"#bccdf5", bg:"#eef3ff", titleColor:"#2563eb", bodyColor:"#1d4ed8", badge:"#bccdf5", badgeText:"#1d4ed8", icon:"⚡", title:"Solution language", sub:'"We\'re looking for a product that can do X..." — Actively evaluating. Comparing solutions.', technique:"→ Go Back In Time" },
+      { path:"active-pain", border:"#bcd0f7", bg:"#e9effe", titleColor:"#2563eb", bodyColor:"#2a7850", badge:"#2563eb", badgeText:"#fff", icon:"⚠", title:"Problem language", sub:'"We have a challenge with Y... Z is not where we want it..." — Active pain. Not yet solution-focused.', technique:"→ Symptoms → Problems" },
       { path:"latent", border:"#d4a830", bg:"#fdf7e6", titleColor:"#7a5808", bodyColor:"#6a4a08", badge:"#d4a830", badgeText:"#7a5808", icon:"◎", title:"Vague or can\'t remember", sub:'"You said something that caught my attention..." — Latent pain. Dormant. Not top of mind.', technique:"→ Discovery Prompter" },
     ];
     const visiblePaths = callSource === "inbound" ? allPaths.filter(p=>p.path!=="latent") : allPaths;
@@ -1100,19 +736,19 @@ ${combinedText}` }]
           <div style={{ marginBottom:24 }}>
             <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:12 }}>How did this call originate?</div>
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-              <button onClick={()=>setCallSource("inbound")} style={{ ...B, width:"100%", padding:"24px 28px", border:"2px solid #4a9e78", borderRadius:14, background:"#e8f3ec", textAlign:"left" }}>
-                <div style={{ fontSize:22, fontWeight:800, color:"#4a9e78", marginBottom:10 }}>Inbound</div>
+              <button onClick={()=>setCallSource("inbound")} style={{ ...B, width:"100%", padding:"24px 28px", border:"2px solid #2563eb", borderRadius:14, background:"#e9effe", textAlign:"left" }}>
+                <div style={{ fontSize:22, fontWeight:800, color:"#2563eb", marginBottom:10 }}>Inbound</div>
                 <div style={{ fontSize:17, color:"#2a7850", lineHeight:1.7, fontWeight:500 }}>"So what brought you to the table today — what made this worth exploring?"</div>
               </button>
-              <button onClick={()=>setCallSource("outbound")} style={{ ...B, width:"100%", padding:"24px 28px", border:"2px solid #3b82f6", borderRadius:14, background:"#eef4ff", textAlign:"left" }}>
-                <div style={{ fontSize:22, fontWeight:800, color:"#3b82f6", marginBottom:10 }}>Outbound</div>
-                <div style={{ fontSize:17, color:"#5b8fd4", lineHeight:1.7, fontWeight:500 }}>"I know we reached out to you first, so this might sound like a funny question — but I'm curious, what made you agree to take the call?"</div>
+              <button onClick={()=>setCallSource("outbound")} style={{ ...B, width:"100%", padding:"24px 28px", border:"2px solid #2563eb", borderRadius:14, background:"#eef3ff", textAlign:"left" }}>
+                <div style={{ fontSize:22, fontWeight:800, color:"#2563eb", marginBottom:10 }}>Outbound</div>
+                <div style={{ fontSize:17, color:"#2563eb", lineHeight:1.7, fontWeight:500 }}>"I know we reached out to you first, so this might sound like a funny question — but I'm curious, what made you agree to take the call?"</div>
               </button>
             </div>
           </div>
         ) : (
-          <div style={{ marginBottom:20, padding:"12px 16px", borderRadius:10, background:callSource==="inbound"?"#e8f3ec":"#eef4ff", border:`1.5px solid ${callSource==="inbound"?"#4a9e78":"#3b82f6"}`, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <div style={{ fontSize:14, fontWeight:600, color:callSource==="inbound"?"#4a9e78":"#5b8fd4" }}>
+          <div style={{ marginBottom:20, padding:"12px 16px", borderRadius:10, background:callSource==="inbound"?"#e9effe":"#eef3ff", border:`1.5px solid ${callSource==="inbound"?"#2563eb":"#2563eb"}`, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ fontSize:14, fontWeight:600, color:callSource==="inbound"?"#2563eb":"#2563eb" }}>
               {callSource==="inbound" ? "Inbound — What motivated you to reach out?" : "Outbound — What made you agree to take this call?"}
             </div>
             <button onClick={()=>setCallSource(null)} style={{ ...B, fontSize:11, color:C.textMuted, background:"transparent", border:`1px solid ${C.border}`, borderRadius:5, padding:"3px 10px" }}>change</button>
@@ -1136,7 +772,7 @@ ${combinedText}` }]
     );
 
     const pathLabel = buyerPath==="evaluating"?"⚡ Actively Evaluating":buyerPath==="active-pain"?"⚠ Active Pain":"◎ Latent Pain";
-    const pathColor = buyerPath==="evaluating"?"#5b8fd4":buyerPath==="active-pain"?C.emerald:"#7a5808";
+    const pathColor = buyerPath==="evaluating"?"#2563eb":buyerPath==="active-pain"?C.emerald:"#7a5808";
 
     return (
       <div style={{ marginBottom:28 }}>
@@ -1148,7 +784,7 @@ ${combinedText}` }]
         {buyerPath === "evaluating" && <>
           {[
             { type:"ask", label:"1 — Reflect + wallow on requirements", text:"So it sounds like you're actively looking at solutions and you want to get a sense of whether we can help. Seems like a great place to start. Can you help me understand what else you're looking for in a product like ours?", note:"Reflect their solution language back. Then wallow. Get everything on the table before you go anywhere." },
-            { type:"wallow", label:"2 — Keep wallowing", text:"What else? I want to make sure I focus on the right things. The good and bad thing about PandaDoc is it can do a lot — and if anything is irrelevant to you I'd rather not spend energy there.", note:"Don't rush. Stay here 2-3 follow-ups minimum. Wallowing is what makes everything else feel earned." },
+            { type:"wallow", label:"2 — Keep wallowing", text:"What else? I want to make sure I focus on the right things. The good and bad thing about our platform is it can do a lot — and if anything is irrelevant to you I'd rather not spend energy there.", note:"Don't rush. Stay here 2-3 follow-ups minimum. Wallowing is what makes everything else feel earned." },
             { type:"summarize", label:"3 — Summarize requirements", text:"Okay so you're looking for [X, Y, Z]. Did I miss anything?", note:"Prove you listened. Give it back organized. If they add something — that's what mattered most." },
             { type:"ask", label:"4 — Accomplish question", text:"This might be a question you're tired of answering — but what are you looking to accomplish with capabilities like the ones you just listed?", note:"Bridges from solution requirements to business outcomes." },
             { type:"segue", label:"5 — Current state bridge", text:"Mind if I ask how you're getting along without those capabilities today? Everyone I talk to is getting by, maybe there's room for improvement — but you're still cruising I'm sure. What does that look like right now?", note:"Orlob segue — bridge from solution land to current reality." },
@@ -1161,7 +797,7 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("current-situation")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
@@ -1181,17 +817,17 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("current-situation")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
 
         {buyerPath === "latent" && <>
           <div style={{ fontSize:14, color:C.textSecondary, lineHeight:1.75, marginBottom:16, padding:"12px 16px", background:"#fdf7e6", borderRadius:10, border:"1.5px solid #c09818" }}>Their pain is dormant. Pushing it to the back of their mind. Questions tap into what's top of mind — and by definition, latent pain is not top of mind. Stories activate it. Your tool is the Discovery Prompter.</div>
-          <div style={{ background:"#f4f0ff", border:"1.5px solid #9080d8", borderRadius:10, padding:"14px 18px", marginBottom:16 }}>
-            <div style={{ fontSize:12, fontWeight:700, color:"#5a2ab0", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>Why they have latent pain — diagnose first</div>
+          <div style={{ background:"#eef3ff", border:"1.5px solid #7ba3f0", borderRadius:10, padding:"14px 18px", marginBottom:16 }}>
+            <div style={{ fontSize:12, fontWeight:700, color:"#1d4ed8", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>Why they have latent pain — diagnose first</div>
             {["Ignorance — don't know a solution exists for what you solve","Rationalization — tried to solve it, failed, gave up and decided to live with it","Too many other priorities — it's buried under six other things","No pain — genuinely unqualified. Different from latent."].map((r,i)=>(
-              <div key={i} style={{ display:"flex", gap:8, marginBottom:i<3?8:0 }}><span style={{ color:"#7a3ab0", fontSize:13, flexShrink:0, fontWeight:700 }}>{i+1}.</span><span style={{ fontSize:13, color:"#3a2060", lineHeight:1.6 }}>{r}</span></div>
+              <div key={i} style={{ display:"flex", gap:8, marginBottom:i<3?8:0 }}><span style={{ color:"#2b4fa3", fontSize:13, flexShrink:0, fontWeight:700 }}>{i+1}.</span><span style={{ fontSize:13, color:"#1c2f5e", lineHeight:1.6 }}>{r}</span></div>
             ))}
           </div>
           {[
@@ -1212,7 +848,7 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>
-          <button onClick={()=>setActiveStage("current-situation")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
           </button>
         </>}
@@ -1221,144 +857,104 @@ ${combinedText}` }]
   }
 
   const STAGE_DATA = {
-    "business-problem": {
-      bridgeBanner: true,
-      rule:"Summarize what you heard. Prioritize. Validate it is a raging fire. Summarize before moving on.",
+    "rules-engagement": {
+      rule:"Align on the objective, the agenda, and the decision to be made.",
       rhythm:[
-        { type:"summarize", label:"1 — Early summary + prioritize", text:"I heard a few things — [X, Y, Z]. Which one of those feels most top of mind? We will touch on all of them but in your opinion — what is the biggest headache right now?", note:"Do this immediately after their opening answer. Summarize what you heard, give it back organized, make them prioritize. The one they pick is where the real pain lives." },
-        { type:"ask", label:"2 — Validate: raging fire or brush fire", text:"Before we go too much further — I just want to make sure we are anchoring our conversation to the right thing. Is this the challenge we should be focused on together, or are there other things that are going to overpower this? Is this something that will be top of mind a week from now, or more of a nice-to-have?", note:"CFO acid test: would a CFO fund this problem statement? If no — keep peeling. Symptoms get ghosted. Problems get funded." },
-        { type:"summarize", label:"3 — Summarize before transition (Orlob Script #7)", text:"Let me see if I have this right so far. [Their exact words — not yours.] Did I get that right? ... Ok great. Thanks for confirming that. Now that we have your challenge established — what are the ripple effects this is having across the business?", note:"Summarize in their exact words — never paraphrase. When they say that is right you have true alignment. Then springboard to the next topic." },
-        { fallback:true, type:"ask", label:"4 — Domino effect", alts:["A — Orlob: There is a domino effect attached to that — what else does it affect when that breaks down?","D — TJ: There is a domino effect attached to that — why is it important to fix that one specifically?"], note:"Peels past the first answer to find what the operational problem is actually costing the business." },
-        { fallback:true, type:"ask", label:"5 — Aside from", alts:["A — Orlob: Aside from [what they just said] — is there something going on behind the scenes driving you to prioritize fixing this?","D — TJ: Aside from the obvious benefit of maybe a rep not giving your product away for free — what else would you stand to gain?"], note:"Ask the same question multiple times without it feeling repetitive." },
-        { fallback:true, type:"ask", label:"6 — Cost of inaction", alts:["A — Orlob: What happens if other priorities take over and you simply do not make this decision?","D — TJ: If I could ask an uncomfortable question — what happens if other priorities take over and you simply do not make that decision?"], note:"Makes the invisible cost visible. Soften it first." },
+        { type:"say", label:"Say \u2014 Rules of Engagement", text:"Here's what I'm thinking\nin terms of an agenda.\n\nLet me know if you had\nsomething else in mind\u2026\n\nThe outcome I recommend we shoot for\nis to learn enough about each other\nto decide whether or not\nit makes sense to have a second meeting.\n\nObviously, I don't expect us\nto do business on this call.\n\nSo let's just learn enough about each other\nto determine if another call makes sense.\n\nIs that fair so far?\n\nPerfect.\n\nNow here's the agenda\nI'm thinking will help us get there.\n\nFirst, I'll share a little about [Company] upfront\nso you have the context\nfor the rest of the call.\n\nI'd love to spend most of our time today\ngetting clear on the different challenges or goals\nyou might have\nas they relate to [their top initiatives].\n\nOnce we're clear on that\u2014\nand if I think we can help\u2014\nI'll explain more about how it works\nso you have an understanding.\n\nThen we can jointly decide\nwhether we set that next step.\n\nAnd I'll save some time\nat the end for that.\n\nDoes that agenda feel reasonable and fair?\n\nGreat.\n\nLet's take a crack at it." },
       ],
-      tips:["Little problems get little dollars. BIG problems get BIG dollars.","Summarize in their exact words — never paraphrase. Buyers resonate with their words not yours.","No Logo Challenge: could someone identify this company from your description alone?"],
-      watch:["Stopping at the first answer — it is almost always a symptom","Moving on before validating priority","Happy ears — getting excited before validating it is a raging fire"],
+      tips:["Align on the objective, the agenda, and the decision to be made.","Pause after each fairness check and let them answer."],
+      watch:["Rushing past the fairness checks without pausing","Skipping the agenda after they agree to the objective"],
     },
-    "current-process": {
-      rule:"Map where they are today. Scope the deal as you go. The metric will surface naturally.",
+    "buyer-journey": {
+      rule:"Choose one route, not all three. For an active buyer, go back in time. For an outbound buyer, lead with context.",
       rhythm:[
-        { type:"ask", label:"1 — Map the process", text:"Thanks for sharing all of that. What I'd love to do now is zoom out and talk about the actual process — from draft to signature. Walk me through that.", note:"Open, neutral. Don't name what you expect to find. Get them talking, then stop." },
-        { type:"ask", label:"2 — Time to build", text:"How long does that process take — from the moment someone starts building to when it lands in the prospect's inbox?", note:"Get the number. Everything else builds from here. If they give a range — take the midpoint." },
-        { type:"ask", label:"3 — Who's involved + volume", text:"And how many people on your team are doing this? Ballpark — how many documents go out in a typical month?", note:"Team size × volume × time = the real scope. You need all three for the ROI math." },
-        { type:"ask", label:"4 — Current tool", text:"What are you using today to create and send them?", note:"Tells you competitive landscape and switching cost. Listen for: Google Docs, Word, DocuSign standalone, or nothing." },
-        { type:"ask", label:"5 — Baseline expectation", text:"So [X minutes] today — how does that compare to where you or your leadership team would want it to be?", note:"Get their expectation before you show the delta. The gap is the business case." },
-        { type:"ask", label:"6 — ROI math", text:"So if I'm doing the math right — [X] reps, [Y] agreements a month, [Z] minutes each — that's roughly [total hours] a month just in the process itself.\n\nGiven that [metric they named] is what you're really trying to move — what would your team do with that time back?", note:"Do the math out loud. Then tie it directly to the metric they named earlier — not a generic 'more selling time' close. If they said win rate, ask what they'd do with the time toward that. If they said revenue, same. Mirror their language exactly." },
-        { type:"summarize", label:"7 — Summarize", text:"Let me see if I've understood you so far. [Problem in their words + the metric + where it stands today + trajectory.] Did I get that right?", note:"Their exact words — never paraphrase. When they say that's right you have alignment." },
-        { type:"validate", label:"8 — Validate priority", text:"Is this the problem we should anchor the rest of our conversation to — or is there something more pressing I should know about?", note:"Ask this before you move to Negative Impact. Better to know now than three weeks into a deal that goes dark." },
-        { fallback:true, type:"ask", label:"Integrations", text:"What else would you want this to plug into?", note:"CRM is usually first. Dig for HRIS, billing, project management. Each integration = stickiness." },
-        { fallback:true, type:"ask", label:"Approval workflow", text:"Does anyone need to approve internally before a document goes out?", note:"Approval workflows = higher tier product need. If yes, this is a feature conversation, not just seat count." },
-        { fallback:true, type:"ask", label:"Audience", text:"Are you typically sending to one person or a buying committee?", note:"Committee = more complex signature workflows." },
-        { fallback:true, type:"ask", label:"Engagement + metric callback", alts:["Once it's out the door — how do you track engagement and manage follow-ups?","To what extent would it be helpful in improving [metric they shared] — to be able to act the second they've opened it?"], note:"Set up document analytics. Tie it to their stated metric." },
-        { fallback:true, type:"ask", label:"Other departments", text:"What other departments do you think would be positively impacted from using a tool like PandaDoc?", note:"Expands scope beyond the obvious team. Sales reps often undercount Legal, Finance, HR, CS." },
-        { fallback:true, type:"ask", label:"Templates", text:"How many templates do you think you'd need to start?", note:"High count = longer ramp. Feeds a PS conversation." },
-        { fallback:true, type:"ask", label:"Security + compliance", text:"Any compliance, security, or data residency requirements we should know about?", note:"One question covers all three. HIPAA, SOC2, GDPR vary by plan." },
-        { fallback:true, type:"ask", label:"Proposals (if sales)", text:"How do you make your proposals stand out from the competition?", note:"Only if they're in sales. Opens content library, brand, and interactive pricing." },
-        { fallback:true, type:"ask", label:"Notary (if legal)", text:"Ever need notarization?", note:"Only if legal, real estate, or similar. PandaDoc Notary is a separate SKU." },
-        { fallback:true, type:"ask", label:"Find the friction", alts:["Every process has at least one part that's more painful than the rest — where does yours break down?","When things go sideways — what usually causes it?"], note:"Hughes: complaint bait. Only use if friction hasn't surfaced naturally." },
-        { fallback:true, type:"ask", label:"Lego technique", alts:["It sounds like a lot of the friction is on the front end — getting the thing built and out the door. [pause] And then separately, once it's out there's not a lot of visibility. [pause]","So there's the creation side, and then there's what happens after. Which one causes more pain day to day?"], note:"Hughes: lay two pieces on the table, never connect them. Their brain connects them." },
-        { fallback:true, type:"ask", label:"Trajectory", text:"Has it always been that way — or is it getting better, worse, or staying flat?", note:"Trajectory changes urgency. Getting worse fast = raging fire." },
+        { type:"say", label:"Say", text:"To start\u2014\n\ntake me back to the beginning." },
+        { type:"ask", label:"Q1 \u2014 Origin", text:"What was going on in your business\nthat made you start exploring solutions like ours\nin the first place?" },
+        { type:"ask", label:"Q2 \u2014 The moment", text:"Can you walk me back\nto the moment this became a priority?\n\nWhat happened?" },
+        { type:"ask", label:"Q3 \u2014 Their world", text:"It seems like [relevant company or market observation].\n\nHow are you seeing that\nshow up in your world?" },
       ],
-      tips:[
-        "The metric will surface naturally if you ask the active listening questions well. Don't hunt for it.",
-        "Team size × volume × time per doc = the real scope. Get all three before the ROI math.",
-        "The baseline expectation (where do you want it to be) is more important than the current state. The gap is the business case.",
+      tips:["Choose one route, not all three.","For an active buyer, go back in time. For an outbound buyer, lead with context."],
+    },
+    "need-behind-need": {
+      rule:"Find the need behind the need. Don't stop at the symptom.",
+      rhythm:[
+        { type:"say", label:"Say", text:"I understand why you would want\n[surface need].\n\nBut what's actually going on?" },
+        { type:"ask", label:"Q1 \u2014 Priority driver", text:"What's causing that\nto be a priority?" },
+        { type:"ask", label:"Q2 \u2014 Energy", text:"What's driving you\nto prioritize that?" },
+        { type:"ask", label:"Q3 \u2014 Business driver", text:"What is going on in your business\nthat's driving you\nto put the focus and energy on that?" },
       ],
-      watch:[
-        "Hunting for the metric with a direct question — let it surface through active listening",
-        "Moving to Negative Impact without validating priority",
-        "Re-asking things they already told you in the word vomit — reference it instead",
+      tips:["Keep asking only while the answer is still a symptom, capability, or surface-level need."],
+      watch:["Stopping at the symptom and moving on","Asking all three back to back like a checklist"],
+    },
+    "baseline-current": {
+      rule:"Map where they are today. Capture their exact words and units.",
+      rhythm:[
+        { type:"say", label:"Say", text:"I'm asking because\u2014\n\nif we end up doing business together,\nyour CFO is probably going to care about this." },
+        { type:"ask", label:"Q1 \u2014 Metric", text:"What metric do you think\nwould improve the most\nif we solved this challenge?" },
+        { type:"ask", label:"Q2 \u2014 Current state", text:"What's the current state\nof that metric?" },
+        { type:"ask", label:"Q3 \u2014 Target", text:"Where should it be?\n\nAnd why should it be there?" },
       ],
+      tips:["Capture their exact words and units.","Do not invent a number if they do not know it yet."],
+      watch:["Moving on without a metric","Paraphrasing their numbers instead of using their exact words"],
+    },
+    "validate-problem": {
+      rule:"Get explicit agreement that this is the right problem and that it is worth solving now.",
+      rhythm:[
+        { type:"say", label:"Say", text:"Before we go too much further\u2014\n\nI want to make sure\nwe're anchoring this conversation\nto the right thing." },
+        { type:"ask", label:"Q1 \u2014 Anchor check", text:"Is this the challenge\nwe should be focused on solving together?\n\nOr are there other things\nthat are going to overpower this?" },
+        { type:"ask", label:"Q2 \u2014 Priority test", text:"Is this going to make its way\nonto your priorities slide?\n\nOr is this a shiny object?" },
+      ],
+      tips:["Get explicit agreement that this is the right problem and that it is worth solving now."],
+      watch:["Happy ears \u2014 getting excited before validating it is a raging fire","Skipping this because it feels confrontational"],
     },
     "cause-analysis": {
-      rule: "Mutually identify and challenge the true root cause. Don't accept the first answer.",
-      rhythm: [
-        { type:"ask", label:"1 — Root cause question", text: "What's your take on why this is happening? In your opinion — what's the actual cause of this?", note: "Orlob: 'What's your opinion on why this is happening?' — three things happen: you signal you value their opinion, you get the real cause, and you find out whether they've thought about this deeply." },
-        { type:"ask", label:"2 — Challenge it", text: "That's interesting. Is that a new development, or has it always been that way?", note: "Challenge gently. Has it always been this way = is this structural or situational? Structural has less urgency. Situational (something changed) has more." },
-        { type:"ask", label:"3 — Validate it's the real cause", text: "So if we solved [root cause they named] — would that actually fix the problem you described? Or do you think there's something else underneath it?", note: "CFO test for root cause. If yes → you have the real cause. If they hesitate → keep digging." },
-        { type:"summarize", label:"4 — Summarize + transition to impact", text: "So the real cause here is [their words] — not just a symptom. Did I get that right? ... Perfect. Based on that — I want to make sure I understand what this is actually costing the business.", note: "Transition into Negative Impact. Root cause summary sets up the impact questions perfectly." },
+      rule:"Mutually identify the true root cause. Their perceived cause sets the buying criteria.",
+      rhythm:[
+        { type:"say", label:"Say \u2014 Summarize first", text:"Let me summarize\nwhat I've heard so far.\n\n[business problem and current state]\n\nDid I get that right?" },
+        { type:"ask", label:"Q1 \u2014 Open diagnostic", text:"Why do you think\nthis challenge is happening?" },
+        { type:"ask", label:"Q2 \u2014 Blocker", text:"What's preventing you\nfrom improving it?" },
+        { type:"ask", label:"Q3 \u2014 Suspected cause", text:"To what extent do you think\n[suspected root cause]\nis contributing to the challenge?" },
       ],
-      tips: [
-        "First answer is almost always a symptom. The real cause is usually 1-2 layers deeper.",
-        "Mutual means they discovered it too — not just confirmed your hypothesis.",
-        "'Is that a new development?' challenges without confronting.",
-      ],
-      watch: [
-        "Accepting the first answer as the root cause",
-        "Moving to impact before you've confirmed the cause",
-        "Leading them to your conclusion instead of letting them arrive at it",
-      ],
+      tips:["Ask the open diagnostic first, then one or two targeted questions.","Their perceived cause sets the buying criteria."],
+      watch:["Accepting the first answer as the root cause","Leading them to your conclusion instead of letting them arrive at it"],
     },
     "negative-impact": {
-      rule:"Time savings alone rarely justifies a rollout. Find what it is actually costing the business.",
+      rule:"Explore cost, consequences, and ripple effects. One or two negative ramifications is enough on a first call.",
       rhythm:[
-        { type:"ask", label:"1 — Transition + metric question", alts:["So we've talked about the time your team is spending — and that's real. But usually when teams make a change like this, there's something bigger driving it underneath. What metric would improve the most if you solved the challenges you've been sharing with me?","What metric is suffering as a result of what you've been sharing with me?"], note:"Orlob Script #6 exact language. Time savings is the efficiency story. The metric question surfaces the revenue or business story — which is what makes a CFO fund it. Positive or negative framing — pick whichever fits." },
-        { type:"ask", label:"2 — Context-led impact (built from what they told you)", alts:["They mentioned losing deals → 'You mentioned losing a couple of deals where the competitor got there faster — what's the average size of those?'","They mentioned board/investors → 'You mentioned the board meeting in six weeks — what does walking in without an answer to this look like?'","They mentioned scaling → 'You mentioned bringing on more reps — what does onboarding them into this process look like if nothing changes?'"], note:"Context-led means you're using something specific they told you — not a generic impact question. It proves you were listening and makes the question feel like a natural continuation of the conversation, not an interrogation." },
-        { type:"ask", label:"3 — Ripple effects (Orlob Script #7 springboard)", text:"What are the ripple effects this challenge is having across the business?", note:"Orlob exact language — not 'how does this impact you?' That sounds cheesy. 'Ripple effects across the business' signals business acumen. Same question, completely different reception." },
-        { type:"summarize", label:"4 — Confirm + summarize + transition", alts:["So the real cost here isn't just the time — it's [metric] sitting at [X] when leadership wants it at [Y]. Did I get that right?","Let me make sure I have the full picture. [Process pain + metric + gap + business consequence.] Did I get that right?","If you're open to it — I'd love to flip this. If you solved everything you just described, what does good look like 365 days from now?"], note:"Option 3 is the transition into Future State. The contrast between the painful present you just summarized and the future they're about to describe is where the feeling of value lives." },
+        { type:"say", label:"Say \u2014 Summarize first", text:"All right.\n\nOne more time,\nlet me summarize what I've heard.\n\n[business problem + root causes]\n\nDid I get that right?" },
+        { type:"ask", label:"Q1 \u2014 Ripple effects", text:"What ripple effects\nare you seeing this challenge have\non the rest of the business?" },
+        { type:"ask", label:"Q2 \u2014 Derailed", text:"What would get derailed\nif you didn't make progress\nin solving these challenges?" },
+        { type:"ask", label:"Q3 \u2014 Who else", text:"Who else does this challenge impact\nwithin the business?\n\nAnd how?" },
+        { type:"ask", label:"Q4 \u2014 Cost", text:"What's the financial cost\nof not closing that gap\nper month?" },
       ],
-      tips:[
-        "Time savings is rarely enough to justify a software rollout. Find the revenue story underneath.",
-        "Context-led questions feel like listening. Generic impact questions feel like a checklist.",
-        "Orlob: ripple effects across the business — not how does this impact you. Same question, 10x more sophisticated.",
-        "The metric + gap you surface here becomes the ROI foundation for the business case.",
-      ],
-      watch:[
-        "Leading with time savings and stopping there — it's the efficiency story, not the business story",
-        "Asking generic impact questions instead of context-led ones — they'll feel interrogated",
-        "More than 3 impact questions — diminishing returns fast",
-      ],
+      tips:["After they confirm the summary, explore cost, consequences, and ripple effects.","One or two negative ramifications is enough on a first call."],
+      watch:["More than 3 impact questions \u2014 diminishing returns fast","Asking about cost before they confirm the summary"],
     },
     "future-state": {
-      rule:"Contrast painful present with compelling future. Then understand the decision before you make a recommendation.",
+      rule:"Contrast painful present with compelling future. Ask the open question first.",
       rhythm:[
-        { type:"ask", label:"1 — The 365-day question", text:"If you're open to it — I'd love to flip this. If we solved everything you just described, what does good look like 365 days from now?", note:"Buyers exhale at this question. They've been in pain for the last 20 minutes and now you're casting their imagination into relief. The emotional contrast between painful present and compelling future is where the feeling of value lives." },
-        { type:"ask", label:"2 — Quantify if they didn't", text:"Where would [the metric they shared] have to be for you and everyone involved to feel good about the progress you've made?", note:"Only ask this if they didn't naturally quantify it. Current state number + desired state number = the value delta. That delta is all a business case is." },
-        { type:"ask", label:"3 — Personal stake", text:"I want to ask you something a little different. Beyond what this means for the business — what does solving this mean for you personally?", note:"The most powerful question on the call. Ask it after future state is established — it feels earned here. The personal motivation is what keeps deals from going dark when things get complicated internally." },
-        { type:"ask", label:"4 — Pressure test alignment", text:"How aligned would everybody else involved be if that was the explicit goal — is that the goal everyone else cares about too?", note:"Prevents them from voicing a random aspiration. Makes sure the future state has organizational alignment. If others don't care about this goal — it won't get funded." },
-        { type:"ask", label:"5 — Buying criteria (Script #9)", text:"What do you think you need in a solution to solve these challenges?", note:"Ask this before you show them anything. It surfaces their buying criteria in their own words — and can reveal misalignment between what they think they need and what would actually solve the problem. Never assume your product maps to what they have in mind. This is what separates reps who tailor demos from reps who just pitch." },
-        { type:"summarize", label:"6 — Final summary before decision process", text:"Before we talk about what a next step looks like — let me make sure I've captured everything correctly. [Current state in their words + the metric + where it is today + where they want it + the business consequence + what it means personally + timeline.] Did I get that right? Anything you'd add?", note:"This summary becomes the What We Heard slide that opens your next meeting. Do it in their exact words — never paraphrase." },
-        { type:"transition", label:"7 — Transition to decision process", text:"This has been really helpful. Before we talk about what a next step looks like, I'd love to understand how decisions like this typically get made on your end — just so I'm not making assumptions. Mind if I ask a few questions around that?", note:"Natural bridge from future state to decision process. Positions the decision questions as practical, not pushy." },
-        { fallback:true, type:"ask", label:"8 — Decision process", alts:["Walk me through what the decision process typically looks like for something like this — what steps would you and your team need to go through?","Who else would be involved in those steps — and what does their role look like?","What would drive the timeline for moving through those steps?","What would each person involved need to see or hear to feel good about moving forward?","And if we got to the point of doing business — how do you think something like this would get funded, based on how you've handled similar decisions?"], note:"Ask at least the first two. You need to know who else is involved before you can recommend the right next step. The funding question is last — it feels natural after you've established what the decision looks like." },
+        { type:"say", label:"Say \u2014 Summarize first", text:"Let me summarize\nwhat I've heard about the challenges so far.\n\n[brief summary]\n\nDid I get that right?" },
+        { type:"ask", label:"Q1 \u2014 Open", text:"What do you think you need\nto solve this challenge?" },
+        { type:"ask", label:"Q2 \u2014 Ideas", text:"Can I try\na few additional ideas on you?" },
+        { type:"ask", label:"Q3 \u2014 Capability test", text:"Imagine being able to [capability].\n\nTo what degree would that move the needle\non the problem we're talking about?" },
       ],
-      tips:[
-        "The contrast between painful present and compelling future is where the feeling of value lives — don't skip the summary before this.",
-        "The personal stake question is the most powerful thing you'll ask all call. Earn it by establishing business pain and future state first.",
-        "Ask buying criteria (card 5) before you show them anything — it tells you what to demo and can surface misalignment before it kills the deal.",
-        "The decision process questions tell you whether to recommend a solo demo or a multi-threaded one.",
-        "The final summary becomes the What We Heard slide — it opens every subsequent meeting.",
-      ],
-      watch:[
-        "Skipping the personal stake question — it's the emotional fuel for urgency",
-        "Assuming you know what they need before asking — card 5 prevents this",
-        "Not asking who else is involved before recommending a next step — you'll recommend the wrong one",
-        "Leaving without a clear picture of how they make decisions and who holds the veto",
-      ],
+      tips:["Ask the open question first.","Only then test targeted capabilities tied to the root causes they named."],
+      watch:["Pitching capabilities before asking what they think they need","Skipping the summary \u2014 the contrast is where the feeling of value lives"],
     },
-    "next-step": {
-      rule:"Call back the ROE first. Then make a specific recommendation — not an open-ended ask.",
+    "close-next-steps": {
+      rule:"Call back the ROE. Leave with a concrete decision \u2014 a next step is not real until it has an owner and a date.",
       rhythm:[
-        { type:"ask", label:"1 — Transition", text:"This has been really helpful — I feel like I have a genuine understanding of where you are and what matters most. Based on everything we've talked about, I have a pretty clear idea of what I'd want to show you. Mind if I share what I'm thinking for a next step?", note:"Ask permission before you make the recommendation. It gives them control and makes the recommendation feel collaborative rather than presumptuous." },
-        { type:"ask", label:"2 — Call back the ROE", text:"So at the start of our conversation we agreed we'd both walk away with a decision — does it make sense to keep talking or not. I don't want to speak for you — but from my end I think there's something worth exploring here. How are you feeling about it?", note:"Always call back the ROE before you make the recommendation. This is how you nearly guarantee a next step — you pre-framed the decision at the start of the call." },
-        { type:"ask", label:"3 — Recommend: solo or small group demo", text:"Great — based on what you shared today, if it's okay with you, what I'd suggest as a next step is a custom demo built specifically around our conversation. It wouldn't be a grand tour — just focused on what matters to you. Does that sound reasonable?", note:"Specific recommendation — not 'what would you like to do?' Make a call. Use this version if it's just them or a small group you've already identified." },
-        { type:"ask", label:"4 — Recommend: decision maker in the room", text:"Great — based on what you've shared, what I'd suggest is a focused demo with you and [name/role]. It'd be helpful to have them there since what we talked about directly affects [their situation]. You know your company better than I do — does that feel like the right call?", note:"Use this version when the decision process questions revealed someone else who needs to be in the room. You're deferring to their judgment while still making a specific recommendation." },
+        { type:"say", label:"Say \u2014 Honest read", text:"At the beginning of this call,\nwe agreed we'd decide\nwhether it makes sense\nto schedule a next logical step\u2014\n\nor go our separate ways\nso we don't waste each other's time.\n\nThe sense I'm getting is\n[your honest read]." },
+        { type:"ask", label:"Q1 \u2014 Fairness check", text:"Does that feel fair\nto you?" },
+        { type:"ask", label:"Q2 \u2014 Next step", text:"What should the next logical step look like?\n\nAnd who needs to be there?" },
+        { type:"ask", label:"Q3 \u2014 Date", text:"Can we put a specific date\non the calendar now?" },
       ],
-      tips:[
-        "Card 3 or Card 4 — not both. Pick based on what came out of the decision process questions.",
-        "A specific recommendation lands better than an open-ended ask every time. Make a call.",
-        "The ROE callback is what makes the next step feel like a natural conclusion rather than a sales push.",
-        "Book it before you hang up. Not 'I'll follow up with some times.' Get the calendar invite sent.",
-      ],
-      watch:[
-        "Skipping the ROE callback — the next step ask lands cold without it",
-        "Asking 'so what would you like to do?' instead of making a recommendation — puts the burden on them",
-        "Leaving without a booked meeting — 'I'll send some times' is not a next step",
-        "Recommending a demo without knowing who else should be in the room",
-      ],
+      tips:["Leave with a concrete decision.","A next step is not real until it has an owner and a date."],
+      watch:["Leaving without a booked meeting \u2014 'I'll send some times' is not a next step","Skipping the ROE callback \u2014 the ask lands cold without it"],
     },
   };
 
-  const sd = STAGE_DATA[activeStage];
+const sd = STAGE_DATA[activeStage];
 
   return (
     <div style={{ display:"flex", height:"100vh", fontFamily:"'Inter', system-ui, sans-serif", background:C.pageBg, overflow:"hidden" }}>
@@ -1366,7 +962,7 @@ ${combinedText}` }]
       {/* SIDEBAR */}
       <div style={{ width:200, background:C.sidebar, display:"flex", flexDirection:"column", flexShrink:0, overflowY:"auto" }}>
         <div style={{ padding:"22px 18px 14px" }}>
-          <div style={{ fontSize:9, fontWeight:700, color:"#6aaa80", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:3 }}>PandaDoc</div>
+          <div style={{ fontSize:9, fontWeight:700, color:"#8fb0f2", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:3 }}>Enterprise</div>
           <div style={{ fontSize:16, fontWeight:700, color:"#fafafa", letterSpacing:"0.01em" }}>Discovery</div>
         </div>
 
@@ -1377,18 +973,18 @@ ${combinedText}` }]
             const groupLabel = group === "setup" ? "Setup" : group === "discovery" ? "Discovery" : "Close";
             return (
               <div key={group} style={{ marginBottom: group === "close" ? 0 : 16, display: groupStages.length ? "block" : "none" }}>
-                <div style={{ fontSize:9, fontWeight:700, color:"#7aba90", letterSpacing:"0.15em", textTransform:"uppercase", padding:"0 8px", marginBottom:6 }}>{groupLabel}</div>
+                <div style={{ fontSize:9, fontWeight:700, color:"#9db9f6", letterSpacing:"0.15em", textTransform:"uppercase", padding:"0 8px", marginBottom:6 }}>{groupLabel}</div>
                 {groupStages.map(s => {
                   const isActive = s.id === activeStage;
                   const isFramework = s.group === "discovery";
                   return (
-                    <button key={s.id} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:10, padding:"11px 10px", borderRadius:8, background:isActive?"rgba(90,154,112,0.15)":"transparent", border:"none", borderLeft:isActive?"2px solid #5a9a70":"2px solid transparent", textAlign:"left", marginBottom:2 }}>
+                    <button key={s.id} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:10, padding:"11px 10px", borderRadius:8, background:isActive?"rgba(90,154,112,0.15)":"transparent", border:"none", borderLeft:isActive?"2px solid #1d4ed8":"2px solid transparent", textAlign:"left", marginBottom:2 }}>
                       {isFramework ? (
-                        <span style={{ fontSize:11, fontWeight:800, width:22, height:22, borderRadius:6, background:isActive?"#4a9e78":"#dce8f0", color:isActive?"#fff":"#6aaa80", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{s.icon}</span>
+                        <span style={{ fontSize:11, fontWeight:800, width:22, height:22, borderRadius:6, background:isActive?"#2563eb":"#e9effe", color:isActive?"#fff":"#8fb0f2", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{s.icon}</span>
                       ) : (
-                        <span style={{ fontSize:14, color:isActive?"#4a9e78":"#6aaa80", fontWeight:700, minWidth:22, textAlign:"center" }}>{s.icon}</span>
+                        <span style={{ fontSize:14, color:isActive?"#2563eb":"#8fb0f2", fontWeight:700, minWidth:22, textAlign:"center" }}>{s.icon}</span>
                       )}
-                      <span style={{ fontSize:13, color:isActive?"#fafafa":"#6aaa80", fontWeight:isActive?600:400, lineHeight:1.3 }}>{s.short}</span>
+                      <span style={{ fontSize:13, color:isActive?"#fafafa":"#8fb0f2", fontWeight:isActive?600:400, lineHeight:1.3 }}>{s.short}</span>
                     </button>
                   );
                 })}
@@ -1398,12 +994,12 @@ ${combinedText}` }]
         </div>
 
         {buyerPath && (
-          <div style={{ padding:"14px 16px", borderTop:"1px solid #d8e4d8" }}>
-            <div style={{ fontSize:9, color:"#7aba90", marginBottom:5, textTransform:"uppercase", letterSpacing:"0.1em" }}>Buyer Path</div>
-            <div style={{ display:"inline-flex", fontSize:11, fontWeight:600, padding:"3px 10px", borderRadius:99, background:buyerPath==="evaluating"?"#b0ccf0":buyerPath==="active-pain"?"#e8f3ec":"#fdf0d0", color:buyerPath==="evaluating"?"#1a50c0":buyerPath==="active-pain"?"#4a9e78":"#7a5808" }}>
+          <div style={{ padding:"14px 16px", borderTop:"1px solid #e3e6ea" }}>
+            <div style={{ fontSize:9, color:"#9db9f6", marginBottom:5, textTransform:"uppercase", letterSpacing:"0.1em" }}>Buyer Path</div>
+            <div style={{ display:"inline-flex", fontSize:11, fontWeight:600, padding:"3px 10px", borderRadius:99, background:buyerPath==="evaluating"?"#bccdf5":buyerPath==="active-pain"?"#e9effe":"#fdf0d0", color:buyerPath==="evaluating"?"#1d4ed8":buyerPath==="active-pain"?"#2563eb":"#7a5808" }}>
               {buyerPath==="evaluating"?"⚡ Evaluating":buyerPath==="active-pain"?"⚠ Active Pain":"◎ Latent"}
             </div>
-            <button onClick={()=>setBuyerPath(null)} style={{ ...B, display:"block", marginTop:5, fontSize:10, color:"#6aaa80", background:"none", border:"1px solid #c8d4c8", borderRadius:5, padding:"3px 8px" }}>← change</button>
+            <button onClick={()=>setBuyerPath(null)} style={{ ...B, display:"block", marginTop:5, fontSize:10, color:"#8fb0f2", background:"none", border:"1px solid #dfe3e8", borderRadius:5, padding:"3px 8px" }}>← change</button>
           </div>
         )}
       </div>
@@ -1416,16 +1012,16 @@ ${combinedText}` }]
           <div style={{ flex:1 }}>
             <div style={{ display:"flex", alignItems:"baseline", gap:10 }}>
               <div style={{ fontSize:20, fontWeight:700, color:C.textPrimary, letterSpacing:"-0.02em", lineHeight:1.2 }}>
-                {{"prep":"Pre-Call Prep Brief","open":"Open + ROE","align-buyer":"Align with Buyer","current-situation":"Current Situation","next-step":"Secure the Next Step","outputs":"Outputs"}[activeStage]}
+                {{"prep":"Pre-Call Prep Brief","rapport-opener":"Rapport + Opener","rules-engagement":"Rules of Engagement","buyer-journey":"Buyer Journey Alignment","need-behind-need":"Need Behind the Need","baseline-current":"Baseline the Current State","validate-problem":"Validate the Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage]}
               </div>
               {(briefFields.prospect || briefFields.company) && activeStage !== "prep" && (
-                <span style={{ fontSize:13, color:"#9a80e0", fontWeight:500 }}>
+                <span style={{ fontSize:13, color:"#2563eb", fontWeight:500 }}>
                   {[briefFields.prospect, briefFields.company].filter(Boolean).join(" @ ")}
                 </span>
               )}
             </div>
             <div style={{ fontSize:13, color:C.textMuted, marginTop:3 }}>
-              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","open":"Rapport. Agenda. ROE. Diagnostic.","align-buyer":"Listen for their language. Meet them where they are.","current-situation":"Map where they are today, where they want to go, and why now.","next-step":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
+              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","rapport-opener":"Land the opener. Read the room.","rules-engagement":"Align on objective, agenda, and the decision to be made.","buyer-journey":"Listen for their language. Meet them where they are.","need-behind-need":"Peel past the symptom. Find the real driver.","baseline-current":"Map where they are today and where they want to be.","validate-problem":"Summarize, prioritize, validate it is a raging fire.","cause-analysis":"Mutually identify the true root cause.","negative-impact":"Quantify what this is actually costing.","future-state":"Contrast painful present with compelling future.","close-next-steps":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
             </div>
           </div>
           <div style={{ display:"flex", gap:8, alignItems:"center", flexShrink:0 }}>
@@ -1445,10 +1041,10 @@ ${combinedText}` }]
 
         {/* LIVE STATUS BAR */}
         {liveMode && (
-          <div style={{ padding:"6px 28px", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#fff0f0" : "#f0faf5", borderBottom:`1px solid ${liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#f0a8a8" : "#80c8a0"}`, display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
-            <span style={{ width:6, height:6, borderRadius:"50%", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#e05c5c" : "#4a9e78", display:"inline-block", flexShrink:0, animation:"pulse 1.5s infinite" }} />
-            <span style={{ fontSize:11, color: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#e05c5c" : "#4a9e78", fontWeight:500 }}>{liveStatus}</span>
-            {liveLastPoll && !liveStatus.startsWith("Can't") && <span style={{ fontSize:10, color:"#3a9060", marginLeft:"auto" }}>Last checked {liveLastPoll.toLocaleTimeString()}</span>}
+          <div style={{ padding:"6px 28px", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#fff0f0" : "#f0faf5", borderBottom:`1px solid ${liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#f0a8a8" : "#7ba3f0"}`, display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
+            <span style={{ width:6, height:6, borderRadius:"50%", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#e05c5c" : "#2563eb", display:"inline-block", flexShrink:0, animation:"pulse 1.5s infinite" }} />
+            <span style={{ fontSize:11, color: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#e05c5c" : "#2563eb", fontWeight:500 }}>{liveStatus}</span>
+            {liveLastPoll && !liveStatus.startsWith("Can't") && <span style={{ fontSize:10, color:"#1d4ed8", marginLeft:"auto" }}>Last checked {liveLastPoll.toLocaleTimeString()}</span>}
           </div>
         )}
 
@@ -1470,25 +1066,25 @@ ${combinedText}` }]
                   {prepOpen && (
                     <div style={{ padding:"0 26px 26px" }}>
                       <div style={{ fontSize:15, color:C.textSecondary, marginBottom:16, lineHeight:1.7 }}>Paste the output from your pre-call research. The coach and all outputs will use this to personalize every response.</div>
-                      <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Company] — [Date]\n\nContact: [Name], [Title] | Tenure: X years\nCall Source: Inbound/Outbound\n\nMoney Signals: ...\nTech Stack: ...\nCompelling Trigger: ...\nOpen Gaps: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#f4f7f5", color:C.textPrimary, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
+                      <textarea value={prepBrief} onChange={e=>setPrepBrief(e.target.value)} placeholder={"CALL BRIEF: [Company] — [Date]\n\nContact: [Name], [Title] | Tenure: X years\nCall Source: Inbound/Outbound\n\nMoney Signals: ...\nTech Stack: ...\nCompelling Trigger: ...\nOpen Gaps: ..."} style={{ width:"100%", minHeight:180, fontSize:14, lineHeight:1.8, padding:"14px 16px", border:`1.5px solid ${C.emeraldMid}`, borderRadius:10, background:"#f7f8fa", color:C.textPrimary, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
                       {prepBrief && <div style={{ marginTop:12, fontSize:14, color:C.emerald, fontWeight:600 }}>✓ Brief loaded — coach personalized to this prospect</div>}
                     </div>
                   )}
                 </div>
                 {/* PRE-CALL INTEL */}
-                <div style={{ background:"#f4f0ff", border:"1.5px solid #9080d8", borderRadius:12, padding:20, marginBottom:16 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#9a80e0", marginBottom:12 }}>Pre-Call Intel</div>
+                <div style={{ background:"#eef3ff", border:"1.5px solid #7ba3f0", borderRadius:12, padding:20, marginBottom:16 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#2563eb", marginBottom:12 }}>Pre-Call Intel</div>
                   <div style={{ marginBottom:12 }}>
-                    <div style={{ fontSize:10, color:"#5848a8", fontWeight:700, marginBottom:6, textTransform:"uppercase", letterSpacing:"0.07em" }}>Paste questionnaire answers (brief goes above ↑) → auto-fill fields</div>
+                    <div style={{ fontSize:10, color:"#2b4fa3", fontWeight:700, marginBottom:6, textTransform:"uppercase", letterSpacing:"0.07em" }}>Paste questionnaire answers (brief goes above ↑) → auto-fill fields</div>
                     <div style={{ display:"flex", gap:8 }}>
                       <textarea
                         value={questionnaireText}
                         onChange={e => setQuestionnaireText(e.target.value)}
                         placeholder="Paste questionnaire answers or additional context here..."
                         rows={3}
-                        style={{ flex:1, fontSize:12, padding:"8px 12px", border:"1.5px solid #9080d8", borderRadius:7, background:"#f4f7f5", color:C.textPrimary, resize:"none", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
+                        style={{ flex:1, fontSize:12, padding:"8px 12px", border:"1.5px solid #7ba3f0", borderRadius:7, background:"#f7f8fa", color:C.textPrimary, resize:"none", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
                       />
-                      <button onClick={parseBrief} disabled={briefParsing || (!prepBrief.trim() && !questionnaireText.trim())} style={{ ...B, fontSize:12, padding:"0 16px", borderRadius:7, border:"none", background: briefParsing ? "#c0dac8" : (!prepBrief.trim() && !questionnaireText.trim()) ? "#ede9f8" : C.emerald, color: (!prepBrief.trim() && !questionnaireText.trim()) ? "#9080c8" : "#fff", fontWeight:700, whiteSpace:"nowrap", alignSelf:"stretch" }}>
+                      <button onClick={parseBrief} disabled={briefParsing || (!prepBrief.trim() && !questionnaireText.trim())} style={{ ...B, fontSize:12, padding:"0 16px", borderRadius:7, border:"none", background: briefParsing ? "#c0dac8" : (!prepBrief.trim() && !questionnaireText.trim()) ? "#e8edf7" : C.emerald, color: (!prepBrief.trim() && !questionnaireText.trim()) ? "#9080c8" : "#fff", fontWeight:700, whiteSpace:"nowrap", alignSelf:"stretch" }}>
                         {briefParsing ? "Parsing..." : "⚡ Auto-fill"}
                       </button>
                     </div>
@@ -1496,49 +1092,49 @@ ${combinedText}` }]
                   <div style={{ fontSize:11, color:"#9080c8", marginBottom:16 }}>Or fill in manually below:</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                     {[
-                      { key:"prospect",    label:"Prospect name",       placeholder:"e.g. Kimberly" },
-                      { key:"company",     label:"Company",              placeholder:"e.g. Iron Constructor" },
-                      { key:"role",        label:"Their role",           placeholder:"e.g. VP of Sales" },
-                      { key:"tool",        label:"Current tool",         placeholder:"e.g. Word + DocuSign" },
-                      { key:"reps",        label:"Team size (# reps)",   placeholder:"e.g. 12" },
-                      { key:"volume",      label:"Docs / month",         placeholder:"e.g. 50" },
-                      { key:"timePerDoc",  label:"Min per doc today",    placeholder:"e.g. 45" },
-                      { key:"metric",      label:"Their metric / goal",  placeholder:"e.g. win rate, close rate" },
-                      { key:"integrations",label:"Integrations needed",  placeholder:"e.g. HubSpot, Salesforce" },
-                      { key:"approval",    label:"Approval process",     placeholder:"e.g. manager approves before send" },
-                      { key:"pain",        label:"Known pain",           placeholder:"e.g. proposals take too long" },
+                      { key:"prospect",    label:"Prospect name",       placeholder:"e.g. Jane" },
+                      { key:"company",     label:"Company",              placeholder:"e.g. Acme Health" },
+                      { key:"role",        label:"Their role",           placeholder:"e.g. VP of Operations" },
+                      { key:"tool",        label:"Current state / tools", placeholder:"e.g. spreadsheets + email" },
+                      { key:"reps",        label:"Team size",            placeholder:"e.g. 40" },
+                      { key:"volume",      label:"Volume",               placeholder:"e.g. 200 / month" },
+                      { key:"timePerDoc",  label:"Time per unit (min)",  placeholder:"e.g. 45" },
+                      { key:"metric",      label:"Their metric / goal",  placeholder:"e.g. retention rate, time to fill" },
+                      { key:"integrations",label:"Integrations needed",  placeholder:"e.g. Salesforce, Workday" },
+                      { key:"approval",    label:"Approval process",     placeholder:"e.g. CFO signs off over $50k" },
+                      { key:"pain",        label:"Known pain",           placeholder:"e.g. losing new hires in year one" },
                     ].map(f => (
                       <div key={f.key} style={f.key === "pain" ? { gridColumn:"1 / -1" } : {}}>
-                        <div style={{ fontSize:10, color:"#5848a8", fontWeight:700, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.07em" }}>{f.label}</div>
+                        <div style={{ fontSize:10, color:"#2b4fa3", fontWeight:700, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.07em" }}>{f.label}</div>
                         <input
                           value={briefFields[f.key]}
                           onChange={e => setBriefFields(s => ({ ...s, [f.key]: e.target.value }))}
                           placeholder={f.placeholder}
-                          style={{ width:"100%", fontSize:13, padding:"7px 11px", border:"1.5px solid #9080d8", borderRadius:7, background:"#f4f7f5", color:C.textPrimary, outline:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif" }}
+                          style={{ width:"100%", fontSize:13, padding:"7px 11px", border:"1.5px solid #7ba3f0", borderRadius:7, background:"#f7f8fa", color:C.textPrimary, outline:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif" }}
                         />
                       </div>
                     ))}
                   </div>
-                  {briefParseStatus === "ok" && <div style={{ marginTop:12, padding:"7px 14px", background:"#e8f3ec", borderRadius:8, border:"1px solid #4a9e78", fontSize:12, color:"#4a9e78", fontWeight:600 }}>✓ Fields populated from brief</div>}
+                  {briefParseStatus === "ok" && <div style={{ marginTop:12, padding:"7px 14px", background:"#e9effe", borderRadius:8, border:"1px solid #2563eb", fontSize:12, color:"#2563eb", fontWeight:600 }}>✓ Fields populated from brief</div>}
                   {briefParseStatus.startsWith("error") && <div style={{ marginTop:12, padding:"7px 14px", background:"#1e1010", borderRadius:8, border:"1px solid #e05c5c", fontSize:11, color:"#e05c5c", fontWeight:500, wordBreak:"break-all" }}>{briefParseStatus}</div>}
                   {Object.values(briefFields).some(v => v) && briefParseStatus !== "ok" && (
-                    <div style={{ marginTop:14, padding:"8px 14px", background:"#e8f3ec", borderRadius:8, border:"1px solid #4a9e78", fontSize:12, color:"#4a9e78", fontWeight:600 }}>
+                    <div style={{ marginTop:14, padding:"8px 14px", background:"#e9effe", borderRadius:8, border:"1px solid #2563eb", fontSize:12, color:"#2563eb", fontWeight:600 }}>
                       ✓ Intel loaded — matching cards will show pre-answered during the call
                     </div>
                   )}
                 </div>
 
-                <div style={{ background:"#eef4ff", border:"1.5px solid #b0ccf0", borderRadius:12, padding:20, marginBottom:16 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"#5b8fd4", marginBottom:14 }}>Pre-call behavioral read — Hughes Six-Minute X-Ray</div>
-                  <div style={{ fontSize:13, color:"#2a60a8", lineHeight:1.7, marginBottom:12 }}>Based on their email, LinkedIn, or context — profile before you dial. You're looking for three things:</div>
+                <div style={{ background:"#eef3ff", border:"1.5px solid #bccdf5", borderRadius:12, padding:20, marginBottom:16 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#2563eb", marginBottom:14 }}>Pre-call behavioral read — Hughes Six-Minute X-Ray</div>
+                  <div style={{ fontSize:13, color:"#1d4ed8", lineHeight:1.7, marginBottom:12 }}>Based on their email, LinkedIn, or context — profile before you dial. You're looking for three things:</div>
                   {[
                     { label:"Primary Social Need", detail:"What makes them feel significant? Approval (they want validation), Power (they want control), Intelligence (they want to be seen as sharp), Acceptance (they want to belong). Tailor your opener to meet that need." },
                     { label:"Decision Style", detail:"Novelty seeker (show them something new), Social conformist (show them who else uses it), Necessity driven (show them the cost of not acting), Investment driven (show them the ROI math)." },
                     { label:"Sensory preference", detail:"Scan their writing. Visual = 'I see,' 'looks like,' 'picture this.' Auditory = 'sounds right,' 'rings true.' Kinesthetic = 'feels like,' 'get a sense.' Mirror their language in the call." },
                   ].map((s,i)=>(
-                    <div key={i} style={{ marginBottom:i<2?12:0, paddingBottom:i<2?12:0, borderBottom:i<2?`1px solid #c8e0f8`:"none" }}>
-                      <div style={{ fontSize:12, fontWeight:700, color:"#5b8fd4", marginBottom:4 }}>{s.label}</div>
-                      <div style={{ fontSize:13, color:"#2a60a8", lineHeight:1.65 }}>{s.detail}</div>
+                    <div key={i} style={{ marginBottom:i<2?12:0, paddingBottom:i<2?12:0, borderBottom:i<2?`1px solid #d5e2fa`:"none" }}>
+                      <div style={{ fontSize:12, fontWeight:700, color:"#2563eb", marginBottom:4 }}>{s.label}</div>
+                      <div style={{ fontSize:13, color:"#1d4ed8", lineHeight:1.65 }}>{s.detail}</div>
                     </div>
                   ))}
                 </div>
@@ -1574,83 +1170,60 @@ ${combinedText}` }]
 
 
             {/* RAPPORT */}
-            {activeStage === "open" && (
+            {activeStage === "rapport-opener" && (
               <div>
-                {/* OPENER — always */}
-                <div style={{ marginBottom:20, background:C.emerald, borderRadius:14, padding:26 }}>
-                  <div style={{ fontSize:22, color:"#fff", lineHeight:1.85, fontWeight:600, marginBottom:16 }}>"Hey [Name] — I'm glad we could find the time to meet today. How's your week going?"</div>
-                  <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                    <div style={{ background:"rgba(0,0,0,0.25)", borderRadius:8, padding:"12px 16px", fontSize:14, color:"#fff", lineHeight:1.7 }}>
-                      <strong>Rapport →</strong> hang with it, find the natural end → "Mind if we hop into the agenda?"
-                    </div>
-                    <div style={{ background:"rgba(0,0,0,0.25)", borderRadius:8, padding:"12px 16px", fontSize:14, color:"#fff", lineHeight:1.7 }}>
-                      <strong>Business →</strong> "Week's going good, thanks. Look, I know your time is valuable and you reached out for a reason — mind if we talk about the agenda?"
-                    </div>
+                {/* OPENER — teleprompter */}
+                <div style={{ marginBottom:20, background:C.yellow, border:`1.5px solid ${C.yellowBorder}`, borderRadius:14, padding:26 }}>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
+                    <span style={{ fontSize:11, fontWeight:700, color:C.yellowText, letterSpacing:"0.08em", textTransform:"uppercase" }}>Say — opener</span>
+                    <span style={{ fontSize:11, fontWeight:700, color:C.yellowText }}>OPEN · 2 min</span>
                   </div>
+                  <div style={{ fontSize:21, color:C.textPrimary, lineHeight:2.1, fontWeight:500, whiteSpace:"pre-wrap" }}>{"Hey [Names]\u2014\n\nglad we found the time\nto meet today.\n\nHow's your week been?\n\nWell, cool.\n\nWe've got a lot to get to today.\n\nMind if we talk about the agenda?"}</div>
                 </div>
 
                 {/* HUGHES SIGNALS */}
-                {coachingVisible && <div style={{ marginBottom:16, background:"#eef4ff", border:"1.5px solid #b0ccf0", borderRadius:10, padding:"14px 18px" }}>
-                  <div style={{ fontSize:11, fontWeight:700, color:"#5b8fd4", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Read them in the first 60 seconds — Hughes</div>
+                {coachingVisible && <div style={{ marginBottom:16, background:"#eef3ff", border:"1.5px solid #bccdf5", borderRadius:10, padding:"14px 18px" }}>
+                  <div style={{ fontSize:11, fontWeight:700, color:"#2563eb", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Read them in the first 60 seconds — Hughes</div>
                   {[
                     { signal:"Pronouns", read:"I/me/my → individual, personal stakes matter. We/us/our → team focus, consensus matters." },
                     { signal:"Energy", read:"Talkative → stay with it. Business → pivot. Don't force the wrong mode." },
                     { signal:"Complaint", read:"If they volunteer a frustration before you ask — that's the center. Note it." },
                   ].map((s,i)=>(
                     <div key={i} style={{ marginBottom:i<2?8:0, display:"flex", gap:10 }}>
-                      <span style={{ fontSize:11, fontWeight:700, color:"#5b8fd4", flexShrink:0, minWidth:80 }}>{s.signal}</span>
-                      <span style={{ fontSize:13, color:"#2a60a8", lineHeight:1.6 }}>{s.read}</span>
+                      <span style={{ fontSize:11, fontWeight:700, color:"#2563eb", flexShrink:0, minWidth:80 }}>{s.signal}</span>
+                      <span style={{ fontSize:13, color:"#1d4ed8", lineHeight:1.6 }}>{s.read}</span>
                     </div>
                   ))}
                 </div>}
 
-                {/* ROE CARDS */}
-                <div style={{ fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>ROE — pick one</div>
-                {[
-                  { label:"A — Orlob", text:"Here's what I'm thinking in terms of an agenda. Let me know if you had something else in mind.\n\nThe objective of this meeting in my mind is simply to determine if we should have a next step. Obviously I don't expect us to do business on this call. So let's just learn enough about each other to determine whether the next logical step even makes sense.\n\nFair?\n\nGreat. Now here's the agenda I'm thinking:\n\nFirst, let's spend most of our time getting clear on the challenges you're facing.\n\nOnce we're clear on that, I can share a bit about what PandaDoc does and by the end of the call based on what we learn about each other, I'd like to put us in a position where we can jointly decide whether a next step makes sense or not. Either is completely fine. In fact, sometimes we're a perfect fit — other times, not so much. And I'll be sure to call that out if I hear something that gives me hesitation. On the other side, I'd invite you to let me know if you feel yourself starting to think this might not work — whether that's on pricing we can't agree on, a missing feature, or even intuition.\n\nDoes that agenda feel fair?" },
-                  { label:"B — Hughes", text:"Here's what I'm thinking for today, feel free to let me know if you had something else in mind.\n\nMost calls like this start with feature dumping, jumping into the product prematurely, and taking you on a grand tour of which 90% of it is irrelevant.\n\nWhat I'd rather do is spend most of our time understanding what's actually going on in your world — why you're here, why today. And then I'll share how PandaDoc might help. At the end, I'd like to put us in a position to decide if a next step even makes sense. That next step would be a demo built specifically around our conversation.\n\nDoes that sound fair?" },
-                  { label:"C — TJ", text:"Here's what I'm thinking for today — feel free to let me know if you had something else in mind.\n\nI know you want to see the product, and there are a lot of vendors out there who jump straight to a demo before they understand anything about your situation. I'd rather not do that — it wastes both our time and honestly doesn't serve you well.\n\nSo if it's okay with you, I'd love to spend the first part of this call just understanding where you are today — what's going on, why you're here, why now. From there I'll share a bit about how PandaDoc helps teams like yours, and by the end I'd like to put us in a position where we can both make a decision on whether a next step makes sense or not. The next call would be a tight demo built around what I heard today. Sometimes it's 20 minutes, sometimes 45. But specific to you.\n\nDoes that sound fair?" },
-                ].map((s,i)=>{
-                  const key=`open-${i}`, isOpen=collapsedCards[key]!==undefined ? !collapsedCards[key] : false;
-                  return (<div key={i} style={{ marginBottom:8, borderRadius:10, overflow:"hidden", border:`1.5px solid ${isOpen?C.emerald:C.border}`, background:C.white }}>
-                    <button onClick={()=>setCollapsedCards(s=>({...s,[key]:s[key]===undefined?true:!s[key]}))} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?C.emeraldLight:C.white, border:"none", textAlign:"left" }}>
-                      <span style={{ fontSize:15, fontWeight:700, color:isOpen?C.emerald:C.textPrimary }}>{s.label}</span>
-                      <span style={{ fontSize:13, color:isOpen?C.emerald:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
-                    </button>
-                    {isOpen && <div style={{ padding:"18px 22px", fontSize:15, color:C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400, background:C.emeraldLight }}>{s.text}</div>}
-                  </div>);
-                })}
-
-
                 {coachingVisible && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
-                  {["Thanking the prospect for their time — immediately positions you lower","Running both ROE versions back to back — pick one and commit"].map((w,i)=>(
+                  {["Thanking the prospect for their time — immediately positions you lower","Running ROE versions back to back — pick one and commit"].map((w,i)=>(
                     <div key={i} style={{ display:"flex", gap:12, marginBottom:i<1?12:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#e07070", lineHeight:1.7 }}>{w}</span></div>
                   ))}
                 </Collapsible>}
               </div>
             )}
 
-            {/* BUYER TYPE */}
-            {activeStage === "align-buyer" && renderBuyerType()}
-
-            {/* CURRENT SITUATION */}
-            {activeStage === "current-situation" && renderCurrentSituation()}
-
+            {/* BUYER JOURNEY ALIGNMENT */}
                         {/* RHYTHM STAGES */}
             {sd && (
               <div>
                 {sd.bridgeBanner && buyerPath && (
-                  <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, padding:"10px 16px", borderRadius:10, background: buyerPath==="evaluating"?"#eef4ff":buyerPath==="active-pain"?"#e8f3ec":"#fdf7e6", border:`1.5px solid ${buyerPath==="evaluating"?"#b0ccf0":buyerPath==="active-pain"?"#a8d0b8":"#d4a830"}` }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, padding:"10px 16px", borderRadius:10, background: buyerPath==="evaluating"?"#eef3ff":buyerPath==="active-pain"?"#e9effe":"#fdf7e6", border:`1.5px solid ${buyerPath==="evaluating"?"#bccdf5":buyerPath==="active-pain"?"#bcd0f7":"#d4a830"}` }}>
                     <span style={{ fontSize:16 }}>{buyerPath==="evaluating"?"⚡":buyerPath==="active-pain"?"⚠":"◎"}</span>
                     <div style={{ flex:1 }}>
-                      <span style={{ fontSize:12, fontWeight:700, color: buyerPath==="evaluating"?"#5b8fd4":buyerPath==="active-pain"?C.emerald:"#7a5808" }}>
+                      <span style={{ fontSize:12, fontWeight:700, color: buyerPath==="evaluating"?"#2563eb":buyerPath==="active-pain"?C.emerald:"#7a5808" }}>
                         {buyerPath==="evaluating"?"Evaluating buyer — they came in solution-mode. You went back in time. Now anchor to the business problem.":buyerPath==="active-pain"?"Active pain buyer — they surfaced a challenge. Now prioritize it and validate it's a raging fire.":"Latent buyer — you ran the Discovery Prompter. Now find what resonated and anchor to it."}
                       </span>
                     </div>
-                    <button onClick={()=>setActiveStage("align-buyer")} style={{ ...B, fontSize:10, color:C.textMuted, background:"transparent", border:`1px solid ${C.border}`, borderRadius:5, padding:"3px 8px", flexShrink:0 }}>← back</button>
+                    <button onClick={()=>setActiveStage("buyer-journey")} style={{ ...B, fontSize:10, color:C.textMuted, background:"transparent", border:`1px solid ${C.border}`, borderRadius:5, padding:"3px 8px", flexShrink:0 }}>← back</button>
                   </div>
                 )}
-                <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.06em", marginBottom:16, paddingBottom:12, borderBottom:`1px solid ${C.border}` }}>{sd.rule}</div>
+                <div style={{ marginBottom:16, paddingBottom:12, borderBottom:`1px solid ${C.border}`, display:"flex", alignItems:"baseline", gap:10, flexWrap:"wrap" }}>
+                  <span style={{ fontSize:11, fontWeight:800, color:C.emerald, letterSpacing:"0.08em" }}>{(STAGE_META[activeStage]||{}).phase||""}</span>
+                  <span style={{ fontSize:11, fontWeight:700, color:C.textMuted }}>{(STAGE_META[activeStage]||{}).timebox||""}</span>
+                </div>
+                <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.06em", marginBottom:16 }}>{sd.rule}</div>
                 {sd.rhythm.filter(r=>!r.fallback).map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix={activeStage} />)}
                 {sd.rhythm.some(r=>r.fallback) && coachingVisible && (
                   <Collapsible label="+ More techniques" isOpen={moreOpen} onToggle={()=>setMoreOpen(v=>!v)} accent={C.textMuted}>
@@ -1665,6 +1238,7 @@ ${combinedText}` }]
                 </Collapsible>}
               </div>
             )}
+            {activeStage === "buyer-journey" && renderBuyerType()}
 
 
             {/* OUTPUTS */}
@@ -1682,7 +1256,7 @@ ${combinedText}` }]
                     value={callTranscript}
                     onChange={e => setCallTranscript(e.target.value)}
                     placeholder="Paste your Granola transcript here... (e.g. 0:00 | Tyler — hey how's it going...)"
-                    style={{ width:"100%", minHeight:160, fontSize:14, lineHeight:1.75, padding:"14px 16px", border:`1.5px solid ${C.border}`, borderRadius:10, background:"#f4f7f5", color:C.textPrimary, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none", marginBottom:14 }}
+                    style={{ width:"100%", minHeight:160, fontSize:14, lineHeight:1.75, padding:"14px 16px", border:`1.5px solid ${C.border}`, borderRadius:10, background:"#f7f8fa", color:C.textPrimary, resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none", marginBottom:14 }}
                   />
                   <button
                     onClick={generateDebrief}
@@ -1698,7 +1272,7 @@ ${combinedText}` }]
                 </div>
 
                 {/* FIX PLAN */}
-                <div style={{ background:C.white, border:`2px solid #7a60c8`, borderRadius:14, padding:26, marginBottom:18 }}>
+                <div style={{ background:C.white, border:`2px solid #1d4ed8`, borderRadius:14, padding:26, marginBottom:18 }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom: outputs.fixplan ? 0 : 0 }}>
                     <div>
                       <div style={{ fontSize:18, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Deal Fix Plan</div>
@@ -1707,13 +1281,13 @@ ${combinedText}` }]
                     <button
                       onClick={generateFixPlan}
                       disabled={fixPlanLoading || !callTranscript.trim()}
-                      style={{ ...B, fontSize:14, padding:"10px 22px", border:"none", borderRadius:8, background:fixPlanLoading||!callTranscript.trim()?"#f0eeff":"#7a60c8", color:fixPlanLoading||!callTranscript.trim()?"#7a60c8":"#fff", fontWeight:700, flexShrink:0, marginLeft:16 }}>
+                      style={{ ...B, fontSize:14, padding:"10px 22px", border:"none", borderRadius:8, background:fixPlanLoading||!callTranscript.trim()?"#eef3ff":"#1d4ed8", color:fixPlanLoading||!callTranscript.trim()?"#1d4ed8":"#fff", fontWeight:700, flexShrink:0, marginLeft:16 }}>
                       {fixPlanLoading ? "Building plan..." : "Fix This Deal ↗"}
                     </button>
                   </div>
                   {outputs.fixplan && (
                     <div style={{ marginTop:20 }}>
-                      <div style={{ fontSize:15, color:C.textSecondary, lineHeight:1.9, whiteSpace:"pre-wrap", borderTop:"1px solid #e8e0f8", paddingTop:16 }}>{outputs.fixplan}</div>
+                      <div style={{ fontSize:15, color:C.textSecondary, lineHeight:1.9, whiteSpace:"pre-wrap", borderTop:"1px solid #dfe8fa", paddingTop:16 }}>{outputs.fixplan}</div>
                     </div>
                   )}
                 </div>
@@ -1749,7 +1323,7 @@ ${combinedText}` }]
               onChange={e=>setNotes(n=>({...n,[activeStage]:e.target.value}))}
               placeholder="Notes for this stage..."
               rows={2}
-              style={{ width:"100%", fontSize:13, lineHeight:1.7, padding:"8px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, background:"#f4f7f5", color:C.textPrimary, resize:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
+              style={{ width:"100%", fontSize:13, lineHeight:1.7, padding:"8px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, background:"#f7f8fa", color:C.textPrimary, resize:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
             />
           </div>
           </div>
@@ -1809,88 +1383,12 @@ ${combinedText}` }]
             {/* ENTERPRISE TAB */}
             {rightTab === "enterprise" && (
               <div style={{ overflowY:"auto", flex:1 }}>
-                <div style={{ padding:"18px 20px 6px", fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase" }}>Enterprise Features</div>
-                <div style={{ padding:"0 20px 12px", fontSize:12, color:C.textMuted, lineHeight:1.6 }}>Ask these mid-discovery. A yes to any red question = Enterprise is a no-brainer.</div>
-                {[
-                  { feature:"Workspaces", color:"#5b8fd4", bg:"#eef4ff", border:"#b0ccf0", questions:[
-                    { q:"Which teams would realistically be using PandaDoc day-to-day?", hot:false },
-                    { q:"Do different teams need their own templates, branding, or approval flows?", hot:false },
-                    { q:"Would it ever be a problem if HR could see sales contracts — or vice versa?", hot:true },
-                  ]},
-                  { feature:"Smart Content", color:C.textPrimary, bg:C.emeraldLight, border:C.emeraldMid, questions:[
-                    { q:"How much of your proposals stays the same vs. customized each time?", hot:false },
-                    { q:"Do you have content that depends on industry, product, or region?", hot:false },
-                    { q:"Do reps ever copy-paste sections from old docs to save time?", hot:true },
-                    { q:"How do you make sure reps are using the right version of messaging?", hot:true },
-                  ]},
-                  { feature:"Approval Workflows", color:"#7a5808", bg:"#fdf7e6", border:"#d4a830", questions:[
-                    { q:"At what point does a deal need internal approval today?", hot:false },
-                    { q:"What usually triggers that — pricing, discounting, legal terms?", hot:false },
-                    { q:"How do you handle approvals now — Slack, email, something else?", hot:false },
-                    { q:"Ever had a deal go out that shouldn't have without approval?", hot:true },
-                  ]},
-                  { feature:"Renewal Notifications", color:"#9a80e0", bg:"#f4f0ff", border:"#9080d8", questions:[
-                    { q:"Do you manage contracts with renewal dates today?", hot:false },
-                    { q:"How do you usually keep track of upcoming renewals?", hot:false },
-                    { q:"Ever had something auto-renew or expire without your team noticing?", hot:true },
-                  ]},
-                  { feature:"Content Locking", color:"#e07070", bg:"#1e1010", border:"#f5a0a0", questions:[
-                    { q:"How much flexibility do reps have when editing templates?", hot:false },
-                    { q:"Are there parts of the doc that should never be changed?", hot:false },
-                    { q:"Have you ever had issues with reps tweaking pricing, terms, or content?", hot:true },
-                  ]},
-                  { feature:"Redlining", color:"#5b8fd4", bg:"#eef4ff", border:"#b0ccf0", questions:[
-                    { q:"How do contract negotiations usually happen today?", hot:false },
-                    { q:"Do you go back and forth in Word or PDF — or directly in the doc?", hot:false },
-                    { q:"Who's typically involved in reviewing changes — legal, finance, client?", hot:false },
-                  ]},
-                  { feature:"Salesforce / HubSpot 2-way Sync", color:C.textPrimary, bg:C.emeraldLight, border:C.emeraldMid, questions:[
-                    { q:"How important is it that data flows both ways automatically?", hot:false },
-                    { q:"Do reps update your CRM manually after sending docs?", hot:false },
-                    { q:"Any errors or mismatches happening after that?", hot:true },
-                    { q:"Do you need signed PDFs attached to records so legal or billing can see them?", hot:true },
-                  ]},
-                  { feature:"Custom Roles", color:"#7a5808", bg:"#fdf7e6", border:"#d4a830", questions:[
-                    { q:"Do different people on your team need different levels of access?", hot:false },
-                    { q:"Do you need to limit who can see certain templates, pricing, or actions?", hot:false },
-                    { q:"Has someone ever accidentally changed or sent something they shouldn't have?", hot:true },
-                  ]},
-                  { feature:"SSO", color:"#9a80e0", bg:"#f4f0ff", border:"#9080d8", questions:[
-                    { q:"How does your team usually log into tools — individual logins or centralized?", hot:false },
-                    { q:"Does your IT team require or enforce SSO for new tools?", hot:true },
-                  ]},
-                  { feature:"Whitelabeling", color:"#e07070", bg:"#1e1010", border:"#f5a0a0", questions:[
-                    { q:"Do you want clients to feel like everything is coming directly from your domain?", hot:false },
-                    { q:"Have you ever had issues with emails landing in spam or looking external?", hot:true },
-                  ]},
-                  { feature:"HIPAA Compliance", color:"#5b8fd4", bg:"#eef4ff", border:"#b0ccf0", questions:[
-                    { q:"Does your company handle any personal health information (PHI)?", hot:false },
-                    { q:"Is HIPAA compliance a requirement for any of the software you use?", hot:true },
-                  ]},
-                ].map((f, fi) => {
-                  const isOpen = openSpiced === `ent-${fi}`;
-                  return (
-                    <div key={fi} style={{ borderTop:`1px solid ${C.border}` }}>
-                      <button onClick={()=>setOpenSpiced(isOpen?null:`ent-${fi}`)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 20px", background:isOpen?f.bg:"transparent", border:"none", textAlign:"left" }}>
-                        <span style={{ fontSize:13, fontWeight:700, color:isOpen?f.color:C.textPrimary }}>{f.feature}</span>
-                        <span style={{ fontSize:14, color:isOpen?f.color:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
-                      </button>
-                      {isOpen && (
-                        <div style={{ padding:"4px 20px 16px", background:f.bg, borderTop:`1px solid ${f.border}` }}>
-                          {f.questions.map((q,qi)=>(
-                            <div key={qi} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:qi<f.questions.length-1?12:0 }}>
-                              <span style={{ fontSize:12, fontWeight:800, color:q.hot?C.coral:f.color, marginTop:2, flexShrink:0 }}>{q.hot?"🔴":"→"}</span>
-                              <div style={{ fontSize:13, color:q.hot?"#8b1a00":"#1a2a1e", lineHeight:1.7, fontWeight:q.hot?600:400 }}>{q.q}</div>
-                            </div>
-                          ))}
-                          {f.questions.some(q=>q.hot) && (
-                            <div style={{ marginTop:12, fontSize:11, color:C.coral, fontWeight:600 }}>🔴 = yes to this → Enterprise is the right plan</div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                <div style={{ padding:"18px 20px 6px", fontSize:12, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase" }}>Enterprise Qualification</div>
+                <div style={{ padding:"0 20px 12px", fontSize:12, color:C.textMuted, lineHeight:1.6 }}>Buying-committee and qualification questions live here.</div>
+                <div style={{ margin:"0 20px", padding:"28px 20px", borderRadius:12, border:`1.5px dashed ${C.border}`, background:C.sand, textAlign:"center" }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:C.textSecondary, marginBottom:8 }}>No qualification questions yet</div>
+                  <div style={{ fontSize:12, color:C.textMuted, lineHeight:1.7 }}>Add your enterprise qualification sets in <span style={{ fontFamily:"monospace", background:"#eef0f3", padding:"1px 6px", borderRadius:4 }}>src/App.jsx</span> — same accordion pattern as the Questions tab.</div>
+                </div>
               </div>
             )}
 
@@ -1901,42 +1399,43 @@ ${combinedText}` }]
                 <div style={{ fontSize:13, color:C.textMuted, marginBottom:20, lineHeight:1.6 }}>Fill in as they answer. Business case builds itself.</div>
                 <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:20 }}>
                   {[
-                    { key:"proposalsPerMonth", label:"Proposals / month",          placeholder:"e.g. 80" },
-                    { key:"minsPerProposal",   label:"Avg time per proposal (min)", placeholder:"e.g. 120" },
-                    { key:"teamSize",          label:"Number of AEs / reps",        placeholder:"e.g. 15" },
-                    { key:"hourlyRate",        label:"Avg hourly cost per rep ($)",  placeholder:"e.g. 75" },
+                    { key:"unitsPerMonth", label:"Units / month",             placeholder:"e.g. 200" },
+                    { key:"minsPerUnit",   label:"Avg time per unit (min)",   placeholder:"e.g. 45" },
+                    { key:"teamSize",      label:"Team size",                 placeholder:"e.g. 40" },
+                    { key:"hourlyRate",    label:"Avg hourly cost ($)",       placeholder:"e.g. 75" },
+                    { key:"targetTimeMins",label:"Target time per unit (min)",placeholder:"e.g. 15" },
                   ].map(f => (
                     <div key={f.key}>
                       <div style={{ fontSize:12, fontWeight:600, color:C.textSecondary, marginBottom:6 }}>{f.label}</div>
-                      <input type="number" value={roi[f.key]} onChange={e=>setRoi(r=>({...r,[f.key]:e.target.value}))} placeholder={f.placeholder} style={{ width:"100%", fontSize:15, fontWeight:600, padding:"10px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, background:"#f4f7f5", color:C.textPrimary, boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
+                      <input type="number" value={roi[f.key]} onChange={e=>setRoi(r=>({...r,[f.key]:e.target.value}))} placeholder={f.placeholder} style={{ width:"100%", fontSize:15, fontWeight:600, padding:"10px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, background:"#f7f8fa", color:C.textPrimary, boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }} />
                     </div>
                   ))}
                 </div>
                 {(() => {
-                  const ppm = parseFloat(roi.proposalsPerMonth);
-                  const mpp = parseFloat(roi.minsPerProposal);
+                  const upm = parseFloat(roi.unitsPerMonth);
+                  const mpu = parseFloat(roi.minsPerUnit);
                   const ts  = parseFloat(roi.teamSize);
                   const hr  = parseFloat(roi.hourlyRate);
-                  const pdm = 15;
-                  if (!ppm || !mpp || !ts || !hr) return (
+                  const tm  = parseFloat(roi.targetTimeMins) || 15;
+                  if (!upm || !mpu || !ts || !hr) return (
                     <div style={{ fontSize:13, color:C.textMuted, fontStyle:"italic", textAlign:"center", padding:"20px 0" }}>Fill in the fields above to see the business case</div>
                   );
-                  const hoursNowYear  = (ppm * mpp / 60) * 12;
+                  const hoursNowYear  = (upm * mpu / 60) * 12;
                   const costNowYear   = hoursNowYear * hr;
-                  const hoursPDYear   = (ppm * pdm / 60) * 12;
-                  const costPDYear    = hoursPDYear * hr;
-                  const savedHours    = hoursNowYear - hoursPDYear;
-                  const savedDollars  = costNowYear - costPDYear;
-                  const savePct       = Math.round((1 - pdm / mpp) * 100);
+                  const hoursTgtYear  = (upm * tm / 60) * 12;
+                  const costTgtYear   = hoursTgtYear * hr;
+                  const savedHours    = hoursNowYear - hoursTgtYear;
+                  const savedDollars  = costNowYear - costTgtYear;
+                  const savePct       = Math.round((1 - tm / mpu) * 100);
                   const fmt  = n => n >= 1000 ? `$${(n/1000).toFixed(1)}k` : `$${Math.round(n)}`;
                   const fmtH = n => n >= 1000 ? `${(n/1000).toFixed(1)}k hrs` : `${Math.round(n)} hrs`;
-                  const cfoCopy = `Your team of ${Math.round(ts)} reps is spending ${fmtH(hoursNowYear)} a year — ${fmt(costNowYear)} in labor — just building proposals. With PandaDoc that drops to ${fmtH(hoursPDYear)}. That's ${fmtH(savedHours)} and ${fmt(savedDollars)} back to the business every year.`;
+                  const cfoCopy = `Your team of ${Math.round(ts)} is spending ${fmtH(hoursNowYear)} a year — ${fmt(costNowYear)} in labor — just on this process. With the right solution that drops to ${fmtH(hoursTgtYear)}. That's ${fmtH(savedHours)} and ${fmt(savedDollars)} back to the business every year.`;
                   return (
                     <div>
                       {[
-                        { label:"Current cost / yr",    value:fmt(costNowYear),   sub:`${fmtH(hoursNowYear)} building docs`,        color:C.coral,    bg:"#1e1010",    border:`${C.coral}50` },
-                        { label:"With PandaDoc / yr",   value:fmt(costPDYear),    sub:`${fmtH(hoursPDYear)} at 15 min/proposal`,    color:C.emerald,  bg:C.emeraldLight, border:C.emeraldMid },
-                        { label:"Annual value delta",   value:fmt(savedDollars),  sub:`${fmtH(savedHours)} reclaimed — ${savePct}% saved`, color:"#5b8fd4", bg:"#eef4ff", border:"#b0ccf0" },
+                        { label:"Current cost / yr",    value:fmt(costNowYear),   sub:`${fmtH(hoursNowYear)} on the process today`,        color:C.coral,    bg:"#1e1010",    border:`${C.coral}50` },
+                        { label:"With solution / yr",   value:fmt(costTgtYear),   sub:`${fmtH(hoursTgtYear)} at ${tm} min/unit`,    color:C.emerald,  bg:C.emeraldLight, border:C.emeraldMid },
+                        { label:"Annual value delta",   value:fmt(savedDollars),  sub:`${fmtH(savedHours)} reclaimed — ${savePct}% saved`, color:"#2563eb", bg:"#eef3ff", border:"#bccdf5" },
                       ].map((m,i)=>(
                         <div key={i} style={{ background:m.bg, border:`1.5px solid ${m.border}`, borderRadius:10, padding:"14px 16px", marginBottom:10 }}>
                           <div style={{ fontSize:11, fontWeight:700, color:m.color, letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:4 }}>{m.label}</div>
