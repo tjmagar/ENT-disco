@@ -25,10 +25,10 @@ export const STAGES = [
 // Timeboxes add up to a 30-minute call.
 export const STAGE_META = {
   "rapport-opener":   { phase:"OPEN",             timebox:"2 min" },
-  "rules-engagement": { phase:"ALIGN",            timebox:"1 min" },
+  "rules-engagement": { phase:"ALIGN",            timebox:"2 min" },
   "context":          { phase:"CONTEXT",          timebox:"1 min" },
   "orient":           { phase:"ORIENT",           timebox:"2 min" },
-  "value-drop":       { phase:"VALUE",            timebox:"8 min" },
+  "value-drop":       { phase:"VALUE",            timebox:"7 min" },
   "summary-buyin":    { phase:"BUY-IN",           timebox:"1 min" },
   "business-problem": { phase:"BUSINESS PROBLEM", timebox:"3 min" },
   "baseline-current": { phase:"CURRENT STATE",    timebox:"3 min" },
@@ -85,15 +85,18 @@ export const STAGE_DATA = {
   "rules-engagement": {
     script:[
       { kind:"say", beats:[
-        { cue:"Propose", text:"Perfect, that leads into what I had in mind for today. Here's what I'm thinking in terms of **how we spend our time** — let me know if you had something else in mind…" },
-        { cue:"Objective", check:true, text:"The outcome I'd suggest is to **learn enough about each other** to decide whether a **second meeting** makes sense. Obviously I don't expect us to do business today. **Fair?**", then:"Great." },
-        { cue:"Agenda", text:"Here's the agenda I'm thinking will get us there:", list:[
-          "I'll share **a little about Clasp** so you have context.",
-          "Then I'd love to spend **most of our time** on what's important to [their company] — your goals around **recruiting, developing and retaining** clinical talent.",
-          "If it looks like we can help, I'll **explain how it works**.",
-          "And I'll save a few minutes at the end so we can **jointly decide** on a next step.",
+        { cue:"Bridge from intros", text:"Perfect, that leads into what I had in mind for today." },
+        { cue:"Propose the agenda", text:"Here's what I'm thinking in terms of **how we spend our time**. Let me know if you had something else in mind…" },
+        { cue:"Set the outcome", text:"But the outcome I recommend we shoot for is to **learn enough about each other** to decide whether or not it makes sense to have a **second meeting**." },
+        { cue:"Lower the stakes", text:"Obviously, I **don't expect us to do business** on this call. So let's just learn enough about each other to determine if another call makes sense." },
+        { cue:"Check", check:true, text:"Is that **fair so far**?", then:"Perfect." },
+        { cue:"Walk the agenda", text:"Now here's the agenda I'm thinking will help us get there.", list:[
+          "First, I'll share **a little about Clasp** upfront so you have the context for the rest of the call.",
+          "But I'd love to spend **most of our time** today getting clear on **what's important to [their company]** — maybe the different challenges or goals you might have as they relate to **workforce recruitment, development, or retention**.",
+          "Once we're clear on that — and if I think we can help — I'll **explain more about how it works** so you have an understanding.",
+          "Then we can **jointly decide** whether we set that next step. And I'll save some time at the end for that.",
         ]},
-        { cue:"Check", check:true, text:"Does that agenda **feel fair**?", then:"Great — let's take a crack at it." },
+        { cue:"Check", check:true, text:"Does that all feel **reasonable and fair**?", then:"Great. Let's take a crack at it." },
       ]},
     ],
   },
@@ -101,9 +104,9 @@ export const STAGE_DATA = {
   "context": {
     script:[
       { kind:"say", title:"Who we are", beats:[
-        { cue:"Set up", text:"So like I said, to give you some context, I've got **a few short slides**. Feel free to **interrupt me** anytime." },
-        { cue:"Who we are", text:"At Clasp, we work **exclusively in healthcare**. Within that, we help HR and talent acquisition teams **attract and retain hard-to-fill clinical talent**." },
-        { cue:"Who we work with", text:"Partners range from major systems like **Novant Health, Northwestern Medicine and Boston Children's**, to smaller systems like **Saint Alphonsus**, to outpatient groups like **Confluent Health**." },
+        { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
+        { cue:"Who we are", text:"So at Clasp, we work **exclusively in healthcare** (full stop)… and within that, we exist to support HR and talent acquisition teams **attract and retain hard-to-fill clinical talent**." },
+        { cue:"Proof", text:"Our partners include major systems such as **Novant Health, Northwestern Medicine and Boston Children's**, as well as smaller systems like **Saint Alphonsus**. And even outpatient clinics like **Confluent Health**, specialty clinics, the whole gamut." },
       ]},
     ],
   },
@@ -111,10 +114,11 @@ export const STAGE_DATA = {
   "orient": {
     script:[
       { kind:"say", title:"Three outcomes", beats:[
-        { cue:"Who we talk to", text:"We talk to a lot of HR leaders — talent acquisition, L&D, workforce development, ops. And the **three areas where we tend to drive the most value** are here on your screen:", list:[
-          { tag:"Pipeline", text:"Some partners use this to build a **bigger, stronger pipeline** of soon-to-graduate RNs, imaging techs, rehab therapists and other clinical roles — **before they hit the open market**." },
-          { tag:"Labor cost", text:"Others are **bleeding money** on sign-on bonuses, contract labor and recruitment costs just to keep roles filled." },
-          { tag:"Retention", text:"And some are **losing good people** to competitors — so they use it to offer **career pathways**, like MAs into RNs or PTAs into PTs, instead of watching them walk out the door." },
+        { cue:"Who we talk to", text:"So we talk to a lot of HR leaders across the country — talent acquisition, L&D, workforce development, ops and business leaders — **a lot of smart folks**. And we talk to them about a lot of things, but **the three areas where we're able to drive the most value**, and where it often makes sense to work together, are here on your screen." },
+        { cue:"Three areas", text:"", list:[
+          { tag:"Pipeline", text:"Our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
+          { tag:"Labor cost", text:"Others are **bleeding money** on sign-on bonuses and contract labor, and recruitment costs just to fill and keep roles filled." },
+          { tag:"Retention", text:"And some are **losing good people** they already have to a competitor for more money — so they're motivating them to stay by offering **career pathways** and internal development opportunities — MAs into RNs, PTAs into PTs — instead of watching them walk out the door." },
         ]},
         { cue:"Hand it to them", check:"answer", text:"I have a hunch where you might fit, given [what you spotted] and the industry norm on **first-year nurse retention**. But given your situation, **where would be the most relevant place for us to start?**" },
       ]},
