@@ -1337,6 +1337,28 @@ ${combinedText}` }]
           );
         })}
 
+        {stageId === "orient" && (
+          <div style={{ marginTop:4, marginBottom:14, padding:"16px 18px", borderRadius:14, background:C.white, border:`1px solid ${C.border}` }}>
+            <div style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginBottom:12 }}>Where do they want to start?</div>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))", gap:10 }}>
+              {[
+                { a:"Pipeline", sub:"Bigger, stronger pipeline" },
+                { a:"Labor cost", sub:"Less on sign-ons + contract labor" },
+                { a:"Retention", sub:"Retain + grow current staff" },
+                { a:"All three", sub:"Pipeline, then spend, then retention" },
+              ].map(({ a, sub }) => {
+                const on = captures.startArea === a;
+                return (
+                  <button key={a} onClick={() => { setCapture("startArea", on ? "" : a); setShowAllAreas(false); }}
+                    style={{ ...B, textAlign:"left", padding:"14px 16px", borderRadius:12, border:`1.5px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textPrimary, boxShadow:on ? "0 4px 14px rgba(37,99,235,0.25)" : "none" }}>
+                    <div style={{ fontSize:17, fontWeight:700, marginBottom:3 }}>{on ? "✓ " : ""}{a}</div>
+                    <div style={{ fontSize:13, color:on ? "rgba(255,255,255,0.85)" : C.textMuted, lineHeight:1.4 }}>{sub}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
         {handoff && renderHandoff(stageId)}
       </div>
     );
