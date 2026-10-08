@@ -1575,13 +1575,6 @@ const sd = STAGE_DATA[activeStage];
         {/* TOP BAR */}
         <div style={{ padding:"12px 24px 12px 32px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", flexWrap:"wrap", gap:"8px 16px", flexShrink:0 }}>
           <div style={{ flex:"1 1 240px", minWidth:0 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:8, fontSize:11, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginBottom:3 }}>
-              {isNumbered && <span>Step {STAGES[currentIdx].icon} of {STAGES.filter(st => /^\d+$/.test(st.icon)).length}</span>}
-              {meta.phase && <><span style={{ color:C.border }}>•</span><span style={{ color:C.emerald }}>{meta.phase}</span></>}
-              {(briefFields.prospect || briefFields.company) && activeStage !== "prep" && (
-                <><span style={{ color:C.border }}>•</span><span style={{ color:C.textSecondary, textTransform:"none", letterSpacing:0, fontWeight:600 }}>{[briefFields.prospect, briefFields.company].filter(Boolean).join(" @ ")}</span></>
-              )}
-            </div>
             <div style={{ fontSize:22, fontWeight:700, color:C.textPrimary, letterSpacing:"-0.02em", lineHeight:1.2, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{stageTitle}</div>
             {stageSub && <div style={{ fontSize:13, color:C.textMuted, marginTop:2 }}>{stageSub}</div>}
           </div>
