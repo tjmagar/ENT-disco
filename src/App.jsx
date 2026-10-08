@@ -300,23 +300,25 @@ const STAGE_DATA = {
     screen:"Video on, no content shared",
     script:[
       { kind:"say", beats:[
-        { cue:"Thank them", text:"I appreciate you letting me share with you how we work with healthcare systems to benefit from an **innovative Student Loan Repayment and recruitment program**." },
-        { cue:"Recap the value", text:"", list:[
-          { tag:"Pipeline", text:"How our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs, Rehabilitation Therapists using our **recruitment marketing and campus recruitment** machine." },
-          { tag:"Labor cost", text:"How they're **saving money** not having to pay out sign-ons again and again, and filling roles with **full-time employees** that would have been worked by contract labor." },
-          { tag:"Retention", text:"And how they're **retaining their employees** and motivating them down career pathways, creating a **stronger, more stable workforce**. All through the power of their Student Loan Repayment program." },
+        { cue:"Thank them", text:"I really appreciate you letting me share a bit about how we work with healthcare systems on an **innovative Student Loan Repayment and recruitment program**." },
+        { cue:"Their words first", check:"answer", text:"Before I recap — let me make sure I've got this right. You mentioned [what they said]. **Did I get that right?**" },
+        { cue:"Recap the value", text:"Great. Just to bring it back together — here's how our partners **tend to use** the program:", list:[
+          { tag:"Pipeline", text:"Building a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs and Rehabilitation Therapists, through our **recruitment marketing and campus recruitment** machine." },
+          { tag:"Labor cost", text:"**Saving money** by not paying out sign-ons again and again, and filling roles with **full-time employees** that would otherwise be worked by contract labor." },
+          { tag:"Retention", text:"And **retaining their people** and motivating them down career pathways — a **stronger, more stable workforce**. All through the power of their Student Loan Repayment program." },
         ]},
-        { cue:"Step back", text:"At this point, it's important to take a step back and **understand where your head is at**." },
-        { cue:"Buy-in check", check:"answer", text:"How is this all feeling? On a **scale of 1 to 10**, with 10 being a heck yes — **where would you say you're at?**" },
+        { cue:"Tie it to them", check:"answer", text:"I may be off here, so correct me — but it sounds like **[the area they chose]** is where this could matter most for you. **Does that sound right?**" },
+        { cue:"Step back", text:"At this point, I'd love to take a step back and **understand where your head is at**. The reason I ask is I'd rather not keep going if this isn't a fit for you — so I want your **honest read, not the polite one**." },
+        { cue:"Buy-in check", check:"answer", text:"How is this all feeling? On a **scale of 1 to 10**, with 10 being a heck yes — **where would you say you're at?** No wrong answer." },
         { cue:"Read the reaction", text:"", list:[
-          { tag:"Negative", text:"Do discovery on why: \"That's fair. **What's giving you pause?**\"" },
-          { tag:"Positive, with questions", text:"**Answer their questions.** Then: \"What would need to be true for that to be a 10?\"" },
-          { tag:"Positive, no questions", text:"**Do discovery on their current state** — next stage, Business Problem." },
+          { tag:"Hesitant or negative", text:"\"That's totally fair — and I appreciate the honesty. **What's giving you pause?**\" Then do discovery on why they feel that way." },
+          { tag:"Positive, with questions", text:"**Answer their questions.** Then: \"I'm curious — **what would need to be true for that to be a 10?**\"" },
+          { tag:"Positive, no questions", text:"\"I'm glad it's resonating. **Mind if I ask a few questions about how things work today?** The reason I ask is I don't want to assume anything.\" Then move into Business Problem." },
         ]},
       ]},
     ],
-    tips:["Keep it to a minute. This is a reframe, not a second pitch.","Below a 10, get curious about the gap. Don't defend."],
-    watch:["Skipping the 1–10 — it's your read on whether to keep going","Answering an objection before you understand it"],
+    tips:["Their words first, not yours. Parrot their exact language back before you recap.","Give a reason before the hard question ('The reason I ask is…').","Hedge the tie-back ('I may be off here') so they correct you rather than nod along.","Below a 10, get curious about the gap. Don't defend.","Save 'fair' for the agenda and the close."],
+    watch:["Skipping the 1–10 — it's your read on whether to keep going","Answering an objection before you understand it","Recapping all three areas at the same weight when they only care about one"],
   },
   "business-problem": {
     rule:"Identify the business problem behind what they asked for, find out who cares, then validate it's the one to anchor on.",
