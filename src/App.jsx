@@ -80,15 +80,12 @@ const STAGES = [
   { id:"context",            icon:"3",  short:"Clasp Context",            group:"setup" },
   { id:"value-drop",         icon:"4",  short:"Value Drop",               group:"value" },
   { id:"summary-buyin",      icon:"5",  short:"Summary + Buy-in",         group:"value" },
-  { id:"dig-in",             icon:"6",  short:"Dig In by Area",           group:"discovery" },
-  { id:"buyer-journey",      icon:"7",  short:"Buyer Journey",            group:"discovery" },
-  { id:"need-behind-need",   icon:"8",  short:"Need Behind the Need",     group:"discovery" },
-  { id:"baseline-current",   icon:"9",  short:"Baseline Current State",   group:"discovery" },
-  { id:"validate-problem",   icon:"10", short:"Validate the Problem",     group:"discovery" },
-  { id:"cause-analysis",     icon:"11", short:"Cause Analysis",           group:"discovery" },
-  { id:"negative-impact",    icon:"12", short:"Negative Impact",          group:"discovery" },
-  { id:"future-state",       icon:"13", short:"Future State",             group:"discovery" },
-  { id:"close-next-steps",   icon:"14", short:"Close + Next Steps",       group:"close" },
+  { id:"business-problem",   icon:"6",  short:"Business Problem",         group:"discovery" },
+  { id:"baseline-current",   icon:"7",  short:"Current State",            group:"discovery" },
+  { id:"cause-analysis",     icon:"8",  short:"Cause Analysis",           group:"discovery" },
+  { id:"negative-impact",    icon:"9",  short:"Negative Impact",          group:"discovery" },
+  { id:"future-state",       icon:"10", short:"Future State",             group:"discovery" },
+  { id:"close-next-steps",   icon:"11", short:"Close + Next Steps",       group:"close" },
   { id:"outputs",            icon:"✦",  short:"Outputs",                  group:"close" },
 ];
 
@@ -99,11 +96,8 @@ const STAGE_META = {
   "context":          { phase:"CONTEXT",         timebox:"4 min" },
   "value-drop":       { phase:"VALUE",           timebox:"12 min" },
   "summary-buyin":    { phase:"BUY-IN",          timebox:"1 min" },
-  "dig-in":           { phase:"CURRENT STATE",   timebox:"8 min" },
-  "buyer-journey":    { phase:"BUSINESS PROBLEM",timebox:"2 min" },
-  "need-behind-need": { phase:"BUSINESS PROBLEM",timebox:"3 min" },
+  "business-problem": { phase:"BUSINESS PROBLEM",timebox:"5 min" },
   "baseline-current": { phase:"CURRENT STATE",   timebox:"4 min" },
-  "validate-problem": { phase:"BUSINESS PROBLEM",timebox:"2 min" },
   "cause-analysis":   { phase:"CAUSE ANALYSIS",  timebox:"4 min" },
   "negative-impact":  { phase:"NEGATIVE IMPACT", timebox:"4 min" },
   "future-state":     { phase:"FUTURE STATE",    timebox:"3 min" },
@@ -116,28 +110,27 @@ const CAPTURE = {
                        { key:"vibe", label:"Read on them", hint:"Pronouns, energy, anything they volunteered" }],
   "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
   "context":          [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
-                       { key:"startWhy", label:"What they said", hint:"Fills \"It sounds like…\" in Dig In" }],
+                       { key:"startWhy", label:"What they said", hint:"Fills \"It sounds like…\" in Business Problem" }],
   "value-drop":       [{ key:"signOnView", label:"What they've seen with sign-ons" },
                        { key:"contractAreas", label:"Where they use contract labor most" },
                        { key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
   "summary-buyin":    [{ key:"buyIn", label:"Buy-in score (1–10)" },
                        { key:"toTen", label:"What would make it a 10" }],
-  "dig-in":           [{ key:"roles", label:"Roles they hire new grads in" },
-                       { key:"schools", label:"School relationships", hint:"Who owns them, how well they work" },
-                       { key:"turnover", label:"First-year turnover", hint:"Number + department" },
-                       { key:"signOns", label:"Sign-on bonuses", hint:"Type, amount, how much they matter" },
-                       { key:"contract", label:"Contract labor", hint:"How much, where" },
-                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" }],
-  "buyer-journey":    [{ key:"trigger", label:"Trigger event", hint:"What set this in motion, in their words" },
-                       { key:"origin", label:"Why now", hint:"The moment it became a priority" }],
-  "need-behind-need": [{ key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
-                       { key:"businessDriver", label:"Need behind the need", hint:"The business problem. Would a CFO fund it?" }],
-  "baseline-current": [{ key:"metric", label:"Metric", hint:"e.g. first-year attrition" },
+  "business-problem": [{ key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
+                       { key:"businessDriver", label:"Need behind the need", hint:"The business problem. Would a CFO fund it?" },
+                       { key:"trigger", label:"Trigger event", hint:"What set this in motion, in their words" },
+                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" },
+                       { key:"validated", label:"Confirmed as the anchor?", type:"choice", options:["Yes","Partly","No"] },
+                       { key:"competing", label:"Competing priorities" }],
+  "baseline-current": [{ key:"metric", label:"Metric", hint:"e.g. first-year turnover" },
                        { key:"current", label:"Current", hint:"Their number and unit" },
                        { key:"target", label:"Target", hint:"Where it should be" },
-                       { key:"why", label:"Why that target" }],
-  "validate-problem": [{ key:"validated", label:"Confirmed as the anchor?", type:"choice", options:["Yes","Partly","No"] },
-                       { key:"competing", label:"Competing priorities" }],
+                       { key:"why", label:"Why that target" },
+                       { key:"roles", label:"Roles they hire new grads in" },
+                       { key:"schools", label:"School relationships", hint:"Which programs, who owns them" },
+                       { key:"turnover", label:"First-year turnover", hint:"Number + department" },
+                       { key:"signOns", label:"Sign-on bonuses", hint:"Type and amount" },
+                       { key:"contract", label:"Contract labor", hint:"How much, where" }],
   "cause-analysis":   [{ key:"rootCause", label:"Root cause", hint:"Their words" },
                        { key:"suspected", label:"Your suspected root cause", hint:"Fills Q3" },
                        { key:"blocker", label:"What's blocking them" }],
@@ -211,7 +204,7 @@ const STAGE_DATA = {
         { cue:"Hand it to them", check:"answer", text:"I have an idea where you might fit in given [what you spotted], and in general, the industry norm of **first-year nurse retention**. But given your current situation, **where would be the most relevant place for us to start** our conversation?", then:"Okay great, that makes sense." },
       ]},
     ],
-    tips:["Keep it to a few slides. The point is to earn the right to ask questions, not to pitch.","Mark the area they pick in the capture pane. Dig In opens on it."],
+    tips:["Keep it to a few slides. The point is to earn the right to ask questions, not to pitch.","Mark the area they pick in the capture pane. Value Drop and discovery follow it."],
     watch:["Turning the context into a full pitch","Picking the area for them — let them choose"],
   },
   "value-drop": {
@@ -300,48 +293,21 @@ const STAGE_DATA = {
         { cue:"Read the reaction", text:"", list:[
           { tag:"Negative", text:"Do discovery on why: \"That's fair. **What's giving you pause?**\"" },
           { tag:"Positive, with questions", text:"**Answer their questions.** Then: \"What would need to be true for that to be a 10?\"" },
-          { tag:"Positive, no questions", text:"**Move to discovery on their current state** — next stage, Dig In." },
+          { tag:"Positive, no questions", text:"**Move into discovery** — next stage, Business Problem." },
         ]},
       ]},
     ],
     tips:["Keep it to a minute. This is a reframe, not a second pitch.","Below a 10, get curious about the gap. Don't defend."],
     watch:["Skipping the 1–10 — it's your read on whether to keep going","Answering an objection before you understand it"],
   },
-  "dig-in": {
-    rule:"Frame the potential value and let them point you to what matters. Acknowledge each answer and follow their lead.",
+  "business-problem": {
+    rule:"Identify the business problem behind what they asked for, find out who cares, then validate it's the one to anchor on.",
     script:[
       { kind:"say", beats:[
         { cue:"Reflect + permission", check:"answer", text:"It sounds like [what they said]. **Can we dig into that some more?**" },
       ]},
-      { kind:"ask", group:"Pipeline", label:"Roles", text:"What **clinical and allied health roles** do you hire new grads in the most?" },
-      { kind:"ask", group:"Pipeline", label:"Department heads", text:"Which **department heads** do you work with the most to fill their new grad needs?" },
-      { kind:"ask", group:"Pipeline", label:"School relationships", text:"What existing relationships do you have with the **local college programs** to funnel students in these fields your way?\n\nWho works on those relationships?" },
-      { kind:"ask", group:"Pipeline", label:"Fit", text:"**How well** is that meeting your needs?" },
-      { kind:"ask", group:"Pipeline", label:"Loan debt", text:"How often have you had these students **ask about help with their student loan debt**?" },
-      { kind:"ask", group:"Retention", label:"Replacement hires", text:"How many **replacement hires** do you make in these departments?" },
-      { kind:"ask", group:"Retention", label:"First-year turnover", text:"What is the **first-year turnover** there?" },
-      { kind:"ask", group:"Retention", label:"Priority", text:"How often have you **spoken internally** about reducing that number?\n\nWho **cares the most** about the turnover number?" },
-      { kind:"ask", group:"Labor cost", label:"Sign-ons", text:"What type of **sign-on bonuses** are you offering for these roles?\n\nHow important do you find them to be in **getting a commitment**?" },
-      { kind:"ask", group:"Labor cost", label:"Sign-on priority", text:"How often have you **spoken internally** about reducing the amount you spend on sign-ons?\n\nWho **cares the most** about how much you spend on sign-ons?" },
-      { kind:"ask", group:"Labor cost", label:"Contract labor", text:"How much **contract labor** do you use to fill the gaps for these roles?" },
-      { kind:"ask", group:"Labor cost", label:"Contract priority", text:"How often have you **spoken internally** about reducing the amount of contract labor you use in these departments?\n\nWho **cares the most** about what you spend on contract labor?" },
-    ],
-    tips:["Acknowledge every answer before the next question.","Follow their lead into the areas they want to discuss in more detail.","\"Who cares the most\" tells you who else needs to be in the next meeting."],
-    watch:["Running the list like a survey — pick the questions that follow what they just said","Moving on without a number for turnover, sign-ons or contract labor"],
-  },
-  "buyer-journey": {
-    rule:"Choose one route, not all three. For an active buyer, go back in time. For an outbound buyer, lead with context.",
-    script:[
-      { kind:"say", beats:[{ cue:"Open", text:"To start — **take me back to the beginning**." }] },
       { kind:"ask", label:"Origin", text:"What was going on in your business that made you **start exploring solutions** like ours in the first place?" },
       { kind:"ask", label:"The moment", text:"Can you walk me back to **the moment this became a priority**?\n\nWhat happened?" },
-      { kind:"ask", label:"Their world", text:"It seems like [relevant company or market observation].\n\nHow are you seeing that **show up in your world**?" },
-    ],
-    tips:["Choose one route, not all three.","For an active buyer, go back in time. For an outbound buyer, lead with context."],
-  },
-  "need-behind-need": {
-    rule:"Find the need behind the need. Don't stop at the symptom.",
-    script:[
       { kind:"say", beats:[
         { cue:"Acknowledge", text:"I understand why you would want [surface need]." },
         { cue:"Dig", text:"**But what's actually going on?**" },
@@ -349,30 +315,34 @@ const STAGE_DATA = {
       { kind:"ask", label:"Priority driver", text:"What's causing that to be **a priority**?" },
       { kind:"ask", label:"Energy", text:"What's driving you to **prioritize that**?" },
       { kind:"ask", label:"Business driver", text:"What is going on **in your business** that's driving you to put the focus and energy on that?" },
+      { kind:"ask", group:"Retention", label:"Priority", text:"How often have you **spoken internally** about reducing that turnover number?\n\nWho **cares the most** about the turnover number?" },
+      { kind:"ask", group:"Labor cost", label:"Sign-on priority", text:"How often have you **spoken internally** about reducing the amount you spend on sign-ons?\n\nWho **cares the most** about how much you spend on sign-ons?" },
+      { kind:"ask", group:"Labor cost", label:"Contract priority", text:"How often have you **spoken internally** about reducing the amount of contract labor you use in these departments?\n\nWho **cares the most** about what you spend on contract labor?" },
+      { kind:"say", beats:[{ cue:"Pause the flow", text:"Before we go too much further — I want to make sure we're **anchoring this conversation to the right thing**." }] },
+      { kind:"ask", label:"Anchor check", text:"Is this **the challenge we should be focused on** solving together?\n\nOr are there other things that are going to overpower this?" },
+      { kind:"ask", label:"Priority test", text:"Is this going to make its way onto your **priorities slide**?\n\nOr is this a **shiny object**?" },
     ],
-    tips:["Keep asking only while the answer is still a symptom, capability, or surface-level need."],
-    watch:["Stopping at the symptom and moving on","Asking all three back to back like a checklist"],
+    tips:["Keep peeling only while the answer is still a symptom. Stop when a CFO would fund it.","\"Who cares the most\" is your multithreading list.","Get explicit agreement that this is the problem worth solving now."],
+    watch:["Stopping at the symptom and moving on","Happy ears — getting excited before validating it is a raging fire","Skipping the anchor check because it feels confrontational"],
   },
   "baseline-current": {
-    rule:"Map where they are today. Capture their exact words and units.",
+    rule:"Map where they are today. Capture their exact words, numbers and units.",
     script:[
       { kind:"say", beats:[{ cue:"Frame why you ask", text:"I'm asking because — if we end up doing business together, **your CFO is probably going to care** about this." }] },
       { kind:"ask", label:"Metric", text:"What **metric** do you think would improve the most if we solved this challenge?" },
       { kind:"ask", label:"Current state", text:"What's the **current state** of that metric?" },
       { kind:"ask", label:"Target", text:"Where **should it be**?\n\nAnd **why** should it be there?" },
+      { kind:"ask", group:"Pipeline", label:"Roles", text:"What **clinical and allied health roles** do you hire new grads in the most?" },
+      { kind:"ask", group:"Pipeline", label:"Department heads", text:"Which **department heads** do you work with the most to fill their new grad needs?" },
+      { kind:"ask", group:"Pipeline", label:"School relationships", text:"What existing relationships do you have with the **local college programs** to funnel students in these fields your way?\n\nWho works on those relationships?" },
+      { kind:"ask", group:"Pipeline", label:"Loan debt", text:"How often have you had these students **ask about help with their student loan debt**?" },
+      { kind:"ask", group:"Retention", label:"Replacement hires", text:"How many **replacement hires** do you make in these departments?" },
+      { kind:"ask", group:"Retention", label:"First-year turnover", text:"What is the **first-year turnover** there?" },
+      { kind:"ask", group:"Labor cost", label:"Sign-ons", text:"What type of **sign-on bonuses** are you offering for these roles?" },
+      { kind:"ask", group:"Labor cost", label:"Contract labor", text:"How much **contract labor** do you use to fill the gaps for these roles?" },
     ],
     tips:["Capture their exact words and units.","Do not invent a number if they do not know it yet."],
-    watch:["Moving on without a metric","Paraphrasing their numbers instead of using their exact words"],
-  },
-  "validate-problem": {
-    rule:"Get explicit agreement that this is the right problem and that it is worth solving now.",
-    script:[
-      { kind:"say", beats:[{ cue:"Pause the flow", text:"Before we go too much further — I want to make sure we're **anchoring this conversation to the right thing**." }] },
-      { kind:"ask", label:"Anchor check", text:"Is this **the challenge we should be focused on** solving together?\n\nOr are there other things that are going to overpower this?" },
-      { kind:"ask", label:"Priority test", text:"Is this going to make its way onto your **priorities slide**?\n\nOr is this a **shiny object**?" },
-    ],
-    tips:["Get explicit agreement that this is the right problem and that it is worth solving now."],
-    watch:["Happy ears — getting excited before validating it is a raging fire","Skipping this because it feels confrontational"],
+    watch:["Moving on without a number for turnover, sign-ons or contract labor","Paraphrasing their numbers instead of using their exact words"],
   },
   "cause-analysis": {
     rule:"Mutually identify the true root cause. Their perceived cause sets the buying criteria.",
@@ -384,6 +354,8 @@ const STAGE_DATA = {
       ]},
       { kind:"ask", label:"Open diagnostic", text:"**Why** do you think this challenge is happening?" },
       { kind:"ask", label:"Blocker", text:"What's **preventing you** from improving it?" },
+      { kind:"ask", group:"Pipeline", label:"School fit", text:"**How well** are those school relationships meeting your needs?" },
+      { kind:"ask", group:"Labor cost", label:"Sign-on reliance", text:"How important do you find sign-ons to be in **getting a commitment**?" },
       { kind:"ask", label:"Suspected cause", text:"To what extent do you think [suspected root cause] is **contributing to the challenge**?" },
     ],
     tips:["Ask the open diagnostic first, then one or two targeted questions.","Their perceived cause sets the buying criteria."],
@@ -436,15 +408,11 @@ const STAGE_DATA = {
   },
 };
 
-// Script items to show. Questions tagged with a group (Pipeline / Retention / Labor cost)
-// show only the area they picked, first, unless "all areas" is on.
+// Script items to show. Items tagged with an area (Pipeline / Labor cost / Retention)
+// show only for the area they picked, unless "all areas" is on.
 function visibleScript(stageId, area, showAll) {
   const script = STAGE_DATA[stageId]?.script || [];
-  if (area === "All three") area = "";
-  if (!area || showAll || !script.some(it => it.group)) {
-    if (!area) return script;
-    return [...script.filter(it => !it.group), ...script.filter(it => it.group === area), ...script.filter(it => it.group && it.group !== area)];
-  }
+  if (!area || area === "All three" || showAll) return script;
   return script.filter(it => !it.group || it.group === area);
 }
 
@@ -1022,7 +990,7 @@ ${combinedText}` }]
     const tree = TREES.find(t => t.id === selectedTree);
     if (!tree) return (
       <div style={{ color:C.textMuted, fontSize:14 }}>
-        No tree selected. <button onClick={() => setActiveStage("need-behind-need")} style={{ ...B, color:C.emerald, background:"none", border:"none", fontWeight:600 }}>← Go back</button>
+        No tree selected. <button onClick={() => setActiveStage("business-problem")} style={{ ...B, color:C.emerald, background:"none", border:"none", fontWeight:600 }}>← Go back</button>
       </div>
     );
 
@@ -1046,7 +1014,7 @@ ${combinedText}` }]
             <div style={{ fontSize:11, fontWeight:700, color:C.emerald, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>Raging fire</div>
             <div style={{ fontSize:17, fontWeight:700, color:C.textPrimary }}>{tree.label}</div>
           </div>
-          <button onClick={() => setActiveStage("need-behind-need")} style={{ ...B, fontSize:11, color:C.textMuted, background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"5px 12px", fontWeight:600 }}>← change</button>
+          <button onClick={() => setActiveStage("business-problem")} style={{ ...B, fontSize:11, color:C.textMuted, background:"none", border:`1px solid ${C.border}`, borderRadius:6, padding:"5px 12px", fontWeight:600 }}>← change</button>
         </div>
 
         {sectionStyles.map((section, si) => (
@@ -1454,8 +1422,8 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#9b2c2c", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize, then find the need behind the need</span><span style={{ fontSize:18 }}>→</span>
+          <button onClick={()=>setActiveStage("baseline-current")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize, then baseline the current state</span><span style={{ fontSize:18 }}>→</span>
           </button>
         </>}
 
@@ -1474,8 +1442,8 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#9b2c2c", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize, then find the need behind the need</span><span style={{ fontSize:18 }}>→</span>
+          <button onClick={()=>setActiveStage("baseline-current")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize, then baseline the current state</span><span style={{ fontSize:18 }}>→</span>
           </button>
         </>}
 
@@ -1505,8 +1473,8 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#9b2c2c", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>
-          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize, then find the need behind the need</span><span style={{ fontSize:18 }}>→</span>
+          <button onClick={()=>setActiveStage("baseline-current")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize, then baseline the current state</span><span style={{ fontSize:18 }}>→</span>
           </button>
         </>}
       </div>
@@ -1520,7 +1488,7 @@ const sd = STAGE_DATA[activeStage];
   const stageElapsed = now - stageStart;
   const overTime = timeboxMs && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Earn the Right: Clasp Context","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","dig-in":"Dig In by Area","buyer-journey":"Buyer Journey Alignment","need-behind-need":"Need Behind the Need","baseline-current":"Baseline the Current State","validate-problem":"Validate the Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Earn the Right: Clasp Context","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Identify + Validate the Business Problem","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Paste your prep brief. Everything downstream personalizes from this.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
@@ -1779,10 +1747,15 @@ const sd = STAGE_DATA[activeStage];
                     <span style={{ fontSize:14, color:C.textMuted }}>{sd.screen}</span>
                   </div>
                 )}
-                {renderStageScript(activeStage, activeStage !== "buyer-journey")}
+                {renderStageScript(activeStage, activeStage !== "business-problem")}
               </div>
             )}
-            {activeStage === "buyer-journey" && <>{renderBuyerType()}{renderHandoff(activeStage)}</>}
+            {activeStage === "business-problem" && <>
+              <Collapsible label="Buyer path playbook — inbound / outbound, evaluating / active / latent" isOpen={moreOpen} onToggle={()=>setMoreOpen(v=>!v)} accent={C.textSecondary}>
+                {renderBuyerType()}
+              </Collapsible>
+              {renderHandoff(activeStage)}
+            </>}
 
 
             {/* OUTPUTS */}
