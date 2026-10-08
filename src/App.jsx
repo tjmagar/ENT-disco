@@ -78,15 +78,17 @@ const STAGES = [
   { id:"rapport-opener",     icon:"1",  short:"Opening + Intros",         group:"setup" },
   { id:"rules-engagement",   icon:"2",  short:"Objective + Agenda",       group:"setup" },
   { id:"context",            icon:"3",  short:"Clasp Context",            group:"setup" },
-  { id:"dig-in",             icon:"4",  short:"Dig In by Area",           group:"discovery" },
-  { id:"buyer-journey",      icon:"5",  short:"Buyer Journey",            group:"discovery" },
-  { id:"need-behind-need",   icon:"6",  short:"Need Behind the Need",     group:"discovery" },
-  { id:"baseline-current",   icon:"7",  short:"Baseline Current State",   group:"discovery" },
-  { id:"validate-problem",   icon:"8",  short:"Validate the Problem",     group:"discovery" },
-  { id:"cause-analysis",     icon:"9",  short:"Cause Analysis",           group:"discovery" },
-  { id:"negative-impact",    icon:"10", short:"Negative Impact",          group:"discovery" },
-  { id:"future-state",       icon:"11", short:"Future State",             group:"discovery" },
-  { id:"close-next-steps",   icon:"12", short:"Close + Next Steps",       group:"close" },
+  { id:"value-drop",         icon:"4",  short:"Value Drop",               group:"value" },
+  { id:"summary-buyin",      icon:"5",  short:"Summary + Buy-in",         group:"value" },
+  { id:"dig-in",             icon:"6",  short:"Dig In by Area",           group:"discovery" },
+  { id:"buyer-journey",      icon:"7",  short:"Buyer Journey",            group:"discovery" },
+  { id:"need-behind-need",   icon:"8",  short:"Need Behind the Need",     group:"discovery" },
+  { id:"baseline-current",   icon:"9",  short:"Baseline Current State",   group:"discovery" },
+  { id:"validate-problem",   icon:"10", short:"Validate the Problem",     group:"discovery" },
+  { id:"cause-analysis",     icon:"11", short:"Cause Analysis",           group:"discovery" },
+  { id:"negative-impact",    icon:"12", short:"Negative Impact",          group:"discovery" },
+  { id:"future-state",       icon:"13", short:"Future State",             group:"discovery" },
+  { id:"close-next-steps",   icon:"14", short:"Close + Next Steps",       group:"close" },
   { id:"outputs",            icon:"✦",  short:"Outputs",                  group:"close" },
 ];
 
@@ -95,6 +97,8 @@ const STAGE_META = {
   "rapport-opener":   { phase:"OPEN",            timebox:"3 min" },
   "rules-engagement": { phase:"ALIGN",           timebox:"2 min" },
   "context":          { phase:"CONTEXT",         timebox:"4 min" },
+  "value-drop":       { phase:"VALUE",           timebox:"12 min" },
+  "summary-buyin":    { phase:"BUY-IN",          timebox:"1 min" },
   "dig-in":           { phase:"CURRENT STATE",   timebox:"8 min" },
   "buyer-journey":    { phase:"BUSINESS PROBLEM",timebox:"2 min" },
   "need-behind-need": { phase:"BUSINESS PROBLEM",timebox:"3 min" },
@@ -111,8 +115,13 @@ const CAPTURE = {
   "rapport-opener":   [{ key:"win", label:"What would make today a win", hint:"Each person's answer" },
                        { key:"vibe", label:"Read on them", hint:"Pronouns, energy, anything they volunteered" }],
   "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
-  "context":          [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Retention","Labor cost"] },
+  "context":          [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
                        { key:"startWhy", label:"What they said", hint:"Fills \"It sounds like…\" in Dig In" }],
+  "value-drop":       [{ key:"signOnView", label:"What they've seen with sign-ons" },
+                       { key:"contractAreas", label:"Where they use contract labor most" },
+                       { key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
+  "summary-buyin":    [{ key:"buyIn", label:"Buy-in score (1–10)" },
+                       { key:"toTen", label:"What would make it a 10" }],
   "dig-in":           [{ key:"roles", label:"Roles they hire new grads in" },
                        { key:"schools", label:"School relationships", hint:"Who owns them, how well they work" },
                        { key:"turnover", label:"First-year turnover", hint:"Number + department" },
@@ -204,6 +213,99 @@ const STAGE_DATA = {
     ],
     tips:["Keep it to a few slides. The point is to earn the right to ask questions, not to pitch.","Mark the area they pick in the capture pane. Dig In opens on it."],
     watch:["Turning the context into a full pitch","Picking the area for them — let them choose"],
+  },
+  "value-drop": {
+    rule:"Follow their interest. Focus the conversation on the area they chose. All three: pipeline, then spend, then retention.",
+    screen:"Sharing the slides and examples for each talk track",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Acknowledge + start", text:"Okay, let's start with how we help our partners [the area they chose]." },
+      ]},
+      { kind:"say", group:"Pipeline", title:"The outcome", screen:"Slides 6–9", beats:[
+        { cue:"The outcome", text:"The biggest outcome we drive for our partners is building them a **bigger pipeline of soon-to-graduate talent**. We do this through a number of channels.", list:[
+          { tag:"Educate", text:"Channels that **educate the students** on the possibilities and benefits of this type of program." },
+          { tag:"Awareness", text:"Channels that **generate awareness** of this type of program as a reason to join your system after graduation." },
+          { tag:"Convert", text:"And channels to **convert them into applicants** — to get them to raise their hand and say, \"When I graduate, I want to come work for you!\"" },
+        ]},
+      ]},
+      { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", screen:"TikTok search + example video", beats:[
+        { cue:"Get the word out", text:"First we have to get the word out — if you're becoming a Nurse, an Imaging Tech, a Rehab Therapist, there are healthcare systems that will **help repay part of your student loans** so that you'll want to work with them." },
+        { cue:"Influencers", text:"One of the most effective ways we've found to do this is through **social media influencers**. We have a whole curated network of **TikTok influencers who are clinicians and techs**. We've really cracked the code on this. I know it may sound funny, but it really works and it's so important for this generation." },
+        { cue:"Where they talk", text:"This is where they go to talk to each other, and **their student loan debt is what they're talking about**. Matter of fact, let me show you something." },
+        { cue:"Show the search", text:"I did a simple search for TikTok videos talking about nursing student loan debt / PT debt / Rad Tech debt, and look at the results. **Video after video** of nurses and nursing school students talking about their debt — how they will pay it off, do they regret getting into that much debt. **This is on their minds**, and they go to TikTok to ask each other about it." },
+        { cue:"Creative + compliance", text:"That's why we have a **creative team** working with influencers who are clinicians and techs to make content that lets these students know about these programs. We have a **compliance team** that makes sure it's buttoned up — not boring, but buttoned up." },
+        { cue:"Show a video", text:"Videos like this one. We can see the **level of engagement** — the views, the comments, the reshares. It gets these students **thinking about what's possible**." },
+      ]},
+      { kind:"say", group:"Pipeline", title:"Schools + campus", beats:[
+        { cue:"School network", text:"To really engage with the students, we've built out a **nationwide network of school relationships** that drive applicants into the top of your funnel. We talk with **Program Directors and Career Services** to spread the word that there are healthcare systems, like yourself, that will help their students pay part of their loans when they come to work for you." },
+        { cue:"Why schools care", text:"This is an appealing message to these leaders, one that resonates with them in a way **offering a sign-on bonus doesn't**. It motivates them to share this information with their students, and gets us **access to their students** in a way that many employers don't have." },
+        { cue:"Campus ambassadors", text:"We also have a network of **campus ambassadors**, boots on the ground, to engage the students on campus. They're talking to soon-to-graduate nurses, imaging techs, and rehab therapists about our partners who are offering these programs." },
+        { cue:"Wider reach", text:"These channels are what we use to **fill the top of your funnel** with applicants. And since we have relationships with schools across the country, this **widens your talent pool**. It allows you to pull in students from beyond your immediate area. Gives you reach into campuses that you might not have a relationship with right now." },
+      ]},
+      { kind:"say", group:"Pipeline", title:"Convert: your recruiters", screen:"Landing pages", beats:[
+        { cue:"Support your TA", text:"And we **support the work your TA is doing** with the local programs and residency programs. We have a team dedicated to **enabling your recruiters**. The landing pages and other marketing materials we create will help them **convert candidates they're already talking to** before the competition does." },
+        { cue:"Show landing pages", text:"Landing pages like these. We tailor it to **your message, your employer brand and value prop**. It sends the message loud and clear to the students: 'We understand what you're looking for, and **we're the right fit for you**.'" },
+      ]},
+      { kind:"say", group:"Labor cost", title:"Open", screen:"Slides 7–8", beats:[
+        { cue:"Bridge", text:"Offering a Student Loan Repayment program does more than just build pipeline. It can help you **spend less on sign-on bonuses and contract labor**." },
+        { cue:"Ask", check:"answer", text:"Do you currently spend money on either of these for **Nursing, Imaging Techs, or Rehab Therapists**?" },
+      ]},
+      { kind:"say", group:"Labor cost", title:"If they spend on sign-ons", beats:[
+        { cue:"The arms race", check:"answer", text:"Let me ask you a question, because what our partners tell us is that sign-on bonuses feel a bit like **an arms race**. That you have to offer one because everyone else is, and they keep escalating every year. **What have you seen in that regard?**" },
+        { cue:"Acknowledge, then the story", text:"It's funny, I was talking to a TA leader at a hospital and she said that healthcare is **the only place where you can get a job with a sign-on**, work there 6 months, quit, walk across the street, and **get another sign-on bonus the next day**." },
+        { cue:"Why sign-ons fail", text:"The sign-on really appeals to a **'right now' mentality**. Very often, it goes towards other expenses, and the loans just accumulate interest. It's why they're really **not effective in keeping people around**." },
+        { cue:"The cost", text:"And why you end up spending so much on sign-ons — because you have to **keep refilling the role** after the first year when 10%, 15%, 20% of the new hires leave. They really are **expensive and ineffective**. New hires leave anyway, and now you're in a **clawback situation**." },
+        { cue:"The contrast", text:"It's a real contrast to the type of person who is looking for help with their student loans. **They're thinking of the future.** They're looking for a place where they can stay and grow. So when you use that money for Student Loan Repayment instead of a sign-on, **you end up spending less**, because you don't have to refill the role as frequently, don't have to pay out another sign-on bonus." },
+        { cue:"Paid over time", text:"The payment is also made to them **over time, monthly**, as they're employed with you. So **no need for costly clawbacks**, and no paying in advance for someone who is going to leave after year 1. Spreading the payments out, and in some cases using a **ladder payment** approach, means **you're only spending to get and keep them**." },
+      ]},
+      { kind:"say", group:"Labor cost", title:"If they spend on contract labor", beats:[
+        { cue:"Ask", check:"answer", text:"We help **reduce spend on contract labor**, especially in locations, specialties, and shifts that you're finding hard to fill with a full-time employee. **What areas do you find you're using contract labor the most?**" },
+        { cue:"Acknowledge + reframe", text:"Areas like these can often be difficult to fill. Many of our partners use travelers to fill the gaps, like you're doing. But they're finding that this type of program gets the attention of candidates who are looking for help with their student loans, and are **willing to work at the location, in the specialty, or on the shift where you need it most**." },
+        { cue:"The payoff", text:"They're motivated by the Student Loan Repayment to come work for you, and now **you need fewer travelers**. And that means **thousands of dollars a week** that can be recouped." },
+      ]},
+      { kind:"say", group:"Retention", title:"Built to keep them", screen:"Slides 11–12 + landing pages", beats:[
+        { cue:"Bridge", text:"Helping you build a bigger pipeline and saving on spend are important benefits our partners see with us. But there is another area where we have a positive effect. We're also helping them **retain and grow their employees**." },
+        { cue:"Built to stay", text:"First of all, the way your Student Loan Repayment program is structured **encourages them to stay 3, 4, or 5 years**. That's because the amount is spread out monthly over that period. It's paid to them while they're employed. **It's like your 401K contribution** — an incentive to stay to get that full amount." },
+        { cue:"Proof", text:"It's why our partners see **single-digit turnover, sometimes as low as 5%**, with the clinicians and techs who are in the program." },
+      ]},
+      { kind:"say", group:"Retention", title:"Nudges", beats:[
+        { cue:"Gamification", text:"But we've also built in some **gamification, some psychological nudges**." },
+        { cue:"Sign-ons fade", text:"See, when you give someone a sign-on, they probably spend it quicker than they planned. And then **it's gone from their mind**. Now they're looking for the next thing you're going to offer them. But **we remind them** of the incredible help you're giving them with their student loan debt." },
+        { cue:"Testimonials", text:"When they first join you, we have them **record a video** that captures how excited they are to work at a place that has their back like this. Every year they're part of the program, we collect these testimonials from them." },
+        { cue:"Monthly statement", text:"Then every month we send them **a statement**. A way to remind them, 'Hey, look what you would have owed if your employer hadn't helped you out with this payment. **What would have been 10 years of payments is becoming 3.** All because you work here.' Really bonds them to you." },
+        { cue:"Financial wellness", text:"And we give them access to **financial wellness and budgeting tools** that reinforce that they have even more in their budget **because of you**!" },
+      ]},
+      { kind:"say", group:"Retention", title:"Beyond new hires", beats:[
+        { cue:"Existing staff", text:"This isn't just for new hires. This can be part of your **retention strategy**. Because so many clinicians and techs will have student loan debt for years. So they see you extend this to them, and it deepens the relationship. Reassures them that they've found **their long-term home**." },
+        { cue:"Career pathing", text:"A Student Loan Repayment program is also used by our partners as part of **career pathing**. It motivates **Medical Assistants and LPNs into RNs, PTAs into PTs, ICU nurses into CRNAs** while they work for you." },
+        { cue:"The message", text:"You're telling them, 'Go get the next level degree and come back here. Because we have a place for you, and **we're going to help you pay** for any loan you take out to upskill like this.' Now you're filling these roles with people you know already **fit your culture, fit your mission**. It builds a **stronger, more stable workforce**." },
+      ]},
+    ],
+    tips:["If they said all three, run pipeline, then spend, then retention.","Acknowledge their answer before you continue after every question.","Only run the sign-on or contract labor track if they spend on it."],
+    watch:["Reading the whole thing as a monologue — pause after each section for reactions","Running a cost track they told you doesn't apply"],
+  },
+  "summary-buyin": {
+    rule:"Reframe the outcomes we drive and get them to buy into the value.",
+    screen:"Video on, no content shared",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Thank them", text:"I appreciate you letting me share with you how we work with healthcare systems to benefit from an **innovative Student Loan Repayment and recruitment program**." },
+        { cue:"Recap the value", text:"", list:[
+          { tag:"Pipeline", text:"How our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs, Rehabilitation Therapists using our **recruitment marketing and campus recruitment** machine." },
+          { tag:"Labor cost", text:"How they're **saving money** not having to pay out sign-ons again and again, and filling roles with **full-time employees** that would have been worked by contract labor." },
+          { tag:"Retention", text:"And how they're **retaining their employees** and motivating them down career pathways, creating a **stronger, more stable workforce**. All through the power of their Student Loan Repayment program." },
+        ]},
+        { cue:"Step back", text:"At this point, it's important to take a step back and **understand where your head is at**." },
+        { cue:"Buy-in check", check:"answer", text:"How is this all feeling? On a **scale of 1 to 10**, with 10 being a heck yes — **where would you say you're at?**" },
+        { cue:"Read the reaction", text:"", list:[
+          { tag:"Negative", text:"Do discovery on why: \"That's fair. **What's giving you pause?**\"" },
+          { tag:"Positive, with questions", text:"**Answer their questions.** Then: \"What would need to be true for that to be a 10?\"" },
+          { tag:"Positive, no questions", text:"**Move to discovery on their current state** — next stage, Dig In." },
+        ]},
+      ]},
+    ],
+    tips:["Keep it to a minute. This is a reframe, not a second pitch.","Below a 10, get curious about the gap. Don't defend."],
+    watch:["Skipping the 1–10 — it's your read on whether to keep going","Answering an objection before you understand it"],
   },
   "dig-in": {
     rule:"Frame the potential value and let them point you to what matters. Acknowledge each answer and follow their lead.",
@@ -338,6 +440,7 @@ const STAGE_DATA = {
 // show only the area they picked, first, unless "all areas" is on.
 function visibleScript(stageId, area, showAll) {
   const script = STAGE_DATA[stageId]?.script || [];
+  if (area === "All three") area = "";
   if (!area || showAll || !script.some(it => it.group)) {
     if (!area) return script;
     return [...script.filter(it => !it.group), ...script.filter(it => it.group === area), ...script.filter(it => it.group && it.group !== area)];
@@ -582,6 +685,7 @@ export default function App() {
     switch (name.toLowerCase()) {
       case "names": case "name": return v(b.prospect);
       case "their company": return v(b.company);
+      case "the area they chose": return { "Pipeline":"build a bigger pipeline of soon-to-graduate talent", "Labor cost":"spend less on sign-ons and contract labor", "Retention":"retain and grow their people", "All three":"build a bigger pipeline of soon-to-graduate talent" }[c.startArea] || "";
       case "what you spotted": return v(b.signals);
 
       case "surface need": return v(c.surfaceNeed);
@@ -1153,19 +1257,24 @@ ${combinedText}` }]
         {hasGroups && (
           <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap", marginBottom:14 }}>
             <span style={{ fontSize:11, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:C.textMuted }}>Area</span>
-            {["Pipeline","Retention","Labor cost"].map(a => {
+            {["Pipeline","Labor cost","Retention","All three"].map(a => {
               const on = captures.startArea === a;
               return <button key={a} onClick={() => { setCapture("startArea", on ? "" : a); setShowAllAreas(false); }} style={{ ...B, fontSize:12, fontWeight:600, padding:"5px 12px", borderRadius:99, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textSecondary }}>{a}</button>;
             })}
-            {captures.startArea && <button onClick={() => setShowAllAreas(v => !v)} style={{ ...B, fontSize:12, color:C.textMuted, background:"none", border:"none", textDecoration:"underline" }}>{showAllAreas ? "Only their pick" : "Show all areas"}</button>}
+            {captures.startArea && captures.startArea !== "All three" && <button onClick={() => setShowAllAreas(v => !v)} style={{ ...B, fontSize:12, color:C.textMuted, background:"none", border:"none", textDecoration:"underline" }}>{showAllAreas ? "Only their pick" : "Show all areas"}</button>}
           </div>
         )}
         {script.map((item, i) => {
           if (item.kind === "say") return (
-            <div key={i} style={{ background:C.yellow, border:`1px solid ${C.yellowBorder}`, borderRadius:14, overflow:"hidden", marginBottom:14 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px 8px" }}>
+            <div key={i}>
+            {groupHeader(item)}
+            <div style={{ background:C.yellow, border:`1px solid ${C.yellowBorder}`, borderRadius:14, overflow:"hidden", marginBottom:14 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px 8px", flexWrap:"wrap" }}>
                 <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.14em", color:C.yellowText }}>SAY</span>
-                {item.beats.length > 1 && <span style={{ fontSize:11, color:C.yellowText, opacity:0.7, fontWeight:600 }}>{item.beats.length} beats</span>}
+                {item.title && <span style={{ fontSize:13, fontWeight:700, color:C.yellowText }}>{item.title}</span>}
+                {!item.title && item.beats.length > 1 && <span style={{ fontSize:11, color:C.yellowText, opacity:0.7, fontWeight:600 }}>{item.beats.length} beats</span>}
+                <div style={{ flex:1 }} />
+                {item.screen && <span style={{ fontSize:11, fontWeight:700, color:"#1d4ed8", background:"#e8eefc", borderRadius:99, padding:"3px 10px" }}>Share: {item.screen}</span>}
               </div>
               {item.beats.map((beat, b) => {
                 line++;
@@ -1201,6 +1310,7 @@ ${combinedText}` }]
                   </div>
                 );
               })}
+            </div>
             </div>
           );
 
@@ -1410,7 +1520,7 @@ const sd = STAGE_DATA[activeStage];
   const stageElapsed = now - stageStart;
   const overTime = timeboxMs && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Earn the Right: Clasp Context","dig-in":"Dig In by Area","buyer-journey":"Buyer Journey Alignment","need-behind-need":"Need Behind the Need","baseline-current":"Baseline the Current State","validate-problem":"Validate the Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Earn the Right: Clasp Context","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","dig-in":"Dig In by Area","buyer-journey":"Buyer Journey Alignment","need-behind-need":"Need Behind the Need","baseline-current":"Baseline the Current State","validate-problem":"Validate the Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Paste your prep brief. Everything downstream personalizes from this.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
@@ -1428,9 +1538,9 @@ const sd = STAGE_DATA[activeStage];
         </div>
 
         <div style={{ flex:1, padding:"6px 10px" }}>
-          {["setup","discovery","close"].map(group => {
+          {["setup","value","discovery","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
-            const groupLabel = group === "setup" ? "Setup" : group === "discovery" ? "Discovery" : "Close";
+            const groupLabel = { setup:"Setup", value:"Value", discovery:"Discovery", close:"Close" }[group];
             return (
               <div key={group} style={{ marginBottom:14 }}>
                 <div style={{ fontSize:10, fontWeight:700, color:C.textMuted, letterSpacing:"0.12em", textTransform:"uppercase", padding:"0 10px", marginBottom:4 }}>{groupLabel}</div>
@@ -1663,6 +1773,12 @@ const sd = STAGE_DATA[activeStage];
                   <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.12em", textTransform:"uppercase", color:C.emerald, flexShrink:0 }}>Goal</span>
                   <span style={{ fontSize:15, fontWeight:500, color:C.textSecondary, lineHeight:1.5 }}>{sd.rule}</span>
                 </div>
+                {sd.screen && (
+                  <div style={{ display:"flex", gap:10, alignItems:"baseline", margin:"-8px 0 16px", padding:"0 2px" }}>
+                    <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.12em", textTransform:"uppercase", color:C.textMuted, flexShrink:0 }}>Screen</span>
+                    <span style={{ fontSize:14, color:C.textMuted }}>{sd.screen}</span>
+                  </div>
+                )}
                 {renderStageScript(activeStage, activeStage !== "buyer-journey")}
               </div>
             )}
