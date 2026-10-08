@@ -16,11 +16,14 @@ const C = {
   yellow: "#fdf6dc",
   yellowBorder: "#efd98f",
   yellowText: "#7d6214",
+  yellowRule: "rgba(125,98,20,0.13)",
   coral: "#c44848",
   coralLight: "#fdf2f2",
   coralBorder: "#f3c9c9",
   coralText: "#9b2c2c",
   amber: "#b45309",
+  filledBg: "#e3f4ea",
+  filledText: "#14532d",
   sand: "#f8f9fb",
 };
 
@@ -29,22 +32,38 @@ function cleanLabel(label = "") {
   return label.replace(/^(Q\d+|Say|\d+)\s*[—–-]\s*/, "").replace(/^Say$/, "");
 }
 
-// Teleprompter text: lines within a paragraph reflow into one sentence; "\n\n" = a pause (new paragraph).
-// [Placeholder] tokens are highlighted so they read as "fill this in".
-function Script({ text, size = 19, weight = 500, color = C.textPrimary }) {
-  const paras = String(text).split(/\n\s*\n/);
-  const renderLine = (line, k) => line.split(/(\[[^\]]+\])/g).map((seg, j) =>
-    /^\[[^\]]+\]$/.test(seg)
-      ? <span key={`${k}-${j}`} style={{ background:"#e8eefc", color:"#1d4ed8", borderRadius:4, padding:"0 3px", fontWeight:600 }}>{seg}</span>
-      : <span key={`${k}-${j}`}>{seg}</span>
-  );
+// Inline markup: **bold** = words to land; [placeholder] = fill-in. If resolve() knows the
+// placeholder (from the prep brief or capture pane), their words are dropped in, marked green.
+function renderInline(str, resolve, kp = "x", sentenceStart = true) {
+  const parts = String(str).split(/(\*\*[^*]+\*\*|\[[^\]]+\])/g);
+  return parts.map((seg, j) => {
+    const atStart = sentenceStart && j === 1 && parts[0].trim() === "";
+    const key = `${kp}-${j}`;
+    if (/^\*\*[^*]+\*\*$/.test(seg)) return <strong key={key} style={{ fontWeight:700, color:C.black }}>{renderInline(seg.slice(2, -2), resolve, key, atStart)}</strong>;
+    if (/^\[[^\]]+\]$/.test(seg)) {
+      const name = seg.slice(1, -1);
+      const raw = resolve?.(name);
+      const val = raw && atStart ? raw[0].toUpperCase() + raw.slice(1) : raw;
+      return val
+        ? <span key={key} title={`From your notes: ${name}`} style={{ background:C.filledBg, color:C.filledText, borderRadius:4, padding:"0 3px", boxDecorationBreak:"clone", WebkitBoxDecorationBreak:"clone" }}>{val}</span>
+        : <span key={key} style={{ background:"#e8eefc", color:"#1d4ed8", borderRadius:4, padding:"0 3px", fontWeight:600, boxDecorationBreak:"clone", WebkitBoxDecorationBreak:"clone" }}>{seg}</span>;
+    }
+    return <span key={key}>{seg}</span>;
+  });
+}
+
+// Spoken text. Line breaks within a paragraph reflow; "\n\n" starts a new paragraph.
+// With followups, paragraphs after the first render as smaller "then" lines.
+function Script({ text, size = 19, weight = 500, color = C.textPrimary, resolve, followups = false }) {
+  const paras = String(text).split(/\n\s*\n/).map(p => p.replace(/\s*\n\s*/g, " "));
   return (
-    <div style={{ fontSize:size, lineHeight:1.5, fontWeight:weight, color, letterSpacing:"-0.005em" }}>
-      {paras.map((p, i) => (
-        <div key={i} style={{ marginTop: i ? "0.7em" : 0 }}>
-          {renderLine(p.replace(/\s*\n\s*/g, " "), i)}
-        </div>
-      ))}
+    <div style={{ fontSize:size, lineHeight:1.45, fontWeight:weight, color, letterSpacing:"-0.006em" }}>
+      {paras.map((p, i) => (followups && i > 0)
+        ? <div key={i} style={{ marginTop:8, display:"flex", gap:8, fontSize:Math.round(size * 0.86), color:C.textSecondary }}>
+            <span style={{ color:C.textMuted, fontWeight:600, flexShrink:0 }}>↳</span><span>{renderInline(p, resolve, i)}</span>
+          </div>
+        : <div key={i} style={{ marginTop: i ? "0.6em" : 0 }}>{renderInline(p, resolve, i)}</div>
+      )}
     </div>
   );
 }
@@ -82,6 +101,193 @@ const STAGE_META = {
   "future-state":     { phase:"FUTURE STATE",    timebox:"3 min" },
   "close-next-steps": { phase:"CLOSE",           timebox:"3 min" },
 };
+
+// What to write down at each stage. These feed the [placeholders] in later summaries.
+const CAPTURE = {
+  "rapport-opener":   [{ key:"vibe", label:"Read on them", hint:"Pronouns, energy, anything they volunteered" }],
+  "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
+  "buyer-journey":    [{ key:"trigger", label:"Trigger event", hint:"What set this in motion, in their words" },
+                       { key:"origin", label:"Why now", hint:"The moment it became a priority" }],
+  "need-behind-need": [{ key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
+                       { key:"businessDriver", label:"Need behind the need", hint:"The business problem. Would a CFO fund it?" }],
+  "baseline-current": [{ key:"metric", label:"Metric", hint:"e.g. first-year attrition" },
+                       { key:"current", label:"Current", hint:"Their number and unit" },
+                       { key:"target", label:"Target", hint:"Where it should be" },
+                       { key:"why", label:"Why that target" }],
+  "validate-problem": [{ key:"validated", label:"Confirmed as the anchor?", type:"choice", options:["Yes","Partly","No"] },
+                       { key:"competing", label:"Competing priorities" }],
+  "cause-analysis":   [{ key:"rootCause", label:"Root cause", hint:"Their words" },
+                       { key:"suspected", label:"Your suspected root cause", hint:"Fills Q3" },
+                       { key:"blocker", label:"What's blocking them" }],
+  "negative-impact":  [{ key:"ripple", label:"Ripple effects" },
+                       { key:"whoElse", label:"Who else is affected" },
+                       { key:"cost", label:"Cost per month" }],
+  "future-state":     [{ key:"theirSolution", label:"What they think they need" },
+                       { key:"capability", label:"Capability to test", hint:"Fills Q3" },
+                       { key:"needle", label:"How much it moves the needle" }],
+  "close-next-steps": [{ key:"read", label:"Your honest read", hint:"Fills the close script" },
+                       { key:"nextStep", label:"Next step" },
+                       { key:"who", label:"Who attends" },
+                       { key:"date", label:"Date" }],
+};
+
+// Script items per stage.
+//   say: spoken beats. cue = what the beat does; check = stop and wait for a yes; then = what you say after the yes; list = numbered points.
+//   ask: a question. "\n\n" splits it into the main ask and follow-ups.
+//   **bold** marks the words to land; [placeholders] fill from the prep brief and the capture pane.
+const STAGE_DATA = {
+  "rapport-opener": {
+    rule:"Land the opener. Read the room.",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Greet", text:"Hey [Names] — **glad we found the time** to meet today." },
+        { cue:"Small talk", text:"How's your **week** been?" },
+        { cue:"Turn to business", text:"Well, cool. We've got **a lot to get to** today." },
+        { cue:"Ask permission", check:true, text:"Mind if we talk about the **agenda**?" },
+      ]},
+    ],
+    tips:["Pronouns: I/me/my means personal stakes matter. We/us/our means team focus and consensus matter.","Energy: talkative, stay with it. Business, pivot. Don't force the wrong mode.","Complaint: if they volunteer a frustration before you ask, that's the center. Note it."],
+    watch:["Thanking the prospect for their time — immediately positions you lower","Running ROE versions back to back — pick one and commit"],
+  },
+  "rules-engagement": {
+    rule:"Align on the objective, the agenda, and the decision to be made.",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Propose the agenda", text:"Here's what I'm thinking in terms of an **agenda**. Let me know if you had something else in mind…" },
+        { cue:"Set the outcome", text:"The outcome I recommend we shoot for is to **learn enough about each other** to decide whether or not it makes sense to have a **second meeting**." },
+        { cue:"Lower the stakes", text:"Obviously, I **don't expect us to do business** on this call. So let's just learn enough about each other to determine if another call makes sense." },
+        { cue:"Check", check:true, text:"Is that **fair so far**?", then:"Perfect." },
+        { cue:"Walk the agenda", text:"Now here's the agenda I'm thinking will help us get there.", list:[
+          "First, I'll share **a little about [Company]** upfront so you have the context for the rest of the call.",
+          "I'd love to spend **most of our time** today getting clear on the different **challenges or goals** you might have as they relate to [their top initiatives].",
+          "Once we're clear on that — and if I think we can help — I'll **explain more about how it works** so you have an understanding.",
+          "Then we can **jointly decide** whether we set that next step. I'll save some time at the end for that.",
+        ]},
+        { cue:"Check", check:true, text:"Does that agenda feel **reasonable and fair**?", then:"Great. Let's take a crack at it." },
+      ]},
+    ],
+    tips:["Align on the objective, the agenda, and the decision to be made.","Pause after each fairness check and let them answer."],
+    watch:["Rushing past the fairness checks without pausing","Skipping the agenda after they agree to the objective"],
+  },
+  "buyer-journey": {
+    rule:"Choose one route, not all three. For an active buyer, go back in time. For an outbound buyer, lead with context.",
+    script:[
+      { kind:"say", beats:[{ cue:"Open", text:"To start — **take me back to the beginning**." }] },
+      { kind:"ask", label:"Origin", text:"What was going on in your business that made you **start exploring solutions** like ours in the first place?" },
+      { kind:"ask", label:"The moment", text:"Can you walk me back to **the moment this became a priority**?\n\nWhat happened?" },
+      { kind:"ask", label:"Their world", text:"It seems like [relevant company or market observation].\n\nHow are you seeing that **show up in your world**?" },
+    ],
+    tips:["Choose one route, not all three.","For an active buyer, go back in time. For an outbound buyer, lead with context."],
+  },
+  "need-behind-need": {
+    rule:"Find the need behind the need. Don't stop at the symptom.",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Acknowledge", text:"I understand why you would want [surface need]." },
+        { cue:"Dig", text:"**But what's actually going on?**" },
+      ]},
+      { kind:"ask", label:"Priority driver", text:"What's causing that to be **a priority**?" },
+      { kind:"ask", label:"Energy", text:"What's driving you to **prioritize that**?" },
+      { kind:"ask", label:"Business driver", text:"What is going on **in your business** that's driving you to put the focus and energy on that?" },
+    ],
+    tips:["Keep asking only while the answer is still a symptom, capability, or surface-level need."],
+    watch:["Stopping at the symptom and moving on","Asking all three back to back like a checklist"],
+  },
+  "baseline-current": {
+    rule:"Map where they are today. Capture their exact words and units.",
+    script:[
+      { kind:"say", beats:[{ cue:"Frame why you ask", text:"I'm asking because — if we end up doing business together, **your CFO is probably going to care** about this." }] },
+      { kind:"ask", label:"Metric", text:"What **metric** do you think would improve the most if we solved this challenge?" },
+      { kind:"ask", label:"Current state", text:"What's the **current state** of that metric?" },
+      { kind:"ask", label:"Target", text:"Where **should it be**?\n\nAnd **why** should it be there?" },
+    ],
+    tips:["Capture their exact words and units.","Do not invent a number if they do not know it yet."],
+    watch:["Moving on without a metric","Paraphrasing their numbers instead of using their exact words"],
+  },
+  "validate-problem": {
+    rule:"Get explicit agreement that this is the right problem and that it is worth solving now.",
+    script:[
+      { kind:"say", beats:[{ cue:"Pause the flow", text:"Before we go too much further — I want to make sure we're **anchoring this conversation to the right thing**." }] },
+      { kind:"ask", label:"Anchor check", text:"Is this **the challenge we should be focused on** solving together?\n\nOr are there other things that are going to overpower this?" },
+      { kind:"ask", label:"Priority test", text:"Is this going to make its way onto your **priorities slide**?\n\nOr is this a **shiny object**?" },
+    ],
+    tips:["Get explicit agreement that this is the right problem and that it is worth solving now."],
+    watch:["Happy ears — getting excited before validating it is a raging fire","Skipping this because it feels confrontational"],
+  },
+  "cause-analysis": {
+    rule:"Mutually identify the true root cause. Their perceived cause sets the buying criteria.",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Summarize", text:"Let me summarize what I've heard so far." },
+        { cue:"Play it back", text:"[business problem and current state]" },
+        { cue:"Confirm", check:true, text:"**Did I get that right?**" },
+      ]},
+      { kind:"ask", label:"Open diagnostic", text:"**Why** do you think this challenge is happening?" },
+      { kind:"ask", label:"Blocker", text:"What's **preventing you** from improving it?" },
+      { kind:"ask", label:"Suspected cause", text:"To what extent do you think [suspected root cause] is **contributing to the challenge**?" },
+    ],
+    tips:["Ask the open diagnostic first, then one or two targeted questions.","Their perceived cause sets the buying criteria."],
+    watch:["Accepting the first answer as the root cause","Leading them to your conclusion instead of letting them arrive at it"],
+  },
+  "negative-impact": {
+    rule:"Explore cost, consequences, and ripple effects. One or two negative ramifications is enough on a first call.",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Summarize", text:"All right. One more time, let me summarize what I've heard." },
+        { cue:"Play it back", text:"[business problem + root causes]" },
+        { cue:"Confirm", check:true, text:"**Did I get that right?**" },
+      ]},
+      { kind:"ask", label:"Ripple effects", text:"What **ripple effects** are you seeing this challenge have on the rest of the business?" },
+      { kind:"ask", label:"Derailed", text:"What would **get derailed** if you didn't make progress in solving these challenges?" },
+      { kind:"ask", label:"Who else", text:"**Who else** does this challenge impact within the business?\n\nAnd how?" },
+      { kind:"ask", label:"Cost", text:"What's the **financial cost** of not closing that gap **per month**?" },
+    ],
+    tips:["After they confirm the summary, explore cost, consequences, and ripple effects.","One or two negative ramifications is enough on a first call."],
+    watch:["More than 3 impact questions — diminishing returns fast","Asking about cost before they confirm the summary"],
+  },
+  "future-state": {
+    rule:"Contrast painful present with compelling future. Ask the open question first.",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Summarize", text:"Let me summarize what I've heard about the challenges so far." },
+        { cue:"Play it back", text:"[brief summary]" },
+        { cue:"Confirm", check:true, text:"**Did I get that right?**" },
+      ]},
+      { kind:"ask", label:"Open", text:"What do **you** think you need to solve this challenge?" },
+      { kind:"ask", label:"Ideas", text:"Can I try **a few additional ideas** on you?" },
+      { kind:"ask", label:"Capability test", text:"Imagine being able to [capability].\n\nTo what degree would that **move the needle** on the problem we're talking about?" },
+    ],
+    tips:["Ask the open question first.","Only then test targeted capabilities tied to the root causes they named."],
+    watch:["Pitching capabilities before asking what they think they need","Skipping the summary — the contrast is where the feeling of value lives"],
+  },
+  "close-next-steps": {
+    rule:"Call back the ROE. Leave with a concrete decision — a next step is not real until it has an owner and a date.",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Call back the agenda", text:"At the beginning of this call, we agreed we'd decide whether it makes sense to schedule a **next logical step** — or go our separate ways so we don't waste each other's time." },
+        { cue:"Give your read", text:"The sense I'm getting is [your honest read]." },
+      ]},
+      { kind:"ask", label:"Fairness check", text:"Does that **feel fair** to you?" },
+      { kind:"ask", label:"Next step", text:"What should the **next logical step** look like?\n\nAnd **who needs to be there**?" },
+      { kind:"ask", label:"Date", text:"Can we put **a specific date** on the calendar now?" },
+    ],
+    tips:["Leave with a concrete decision.","A next step is not real until it has an owner and a date."],
+    watch:["Leaving without a booked meeting — 'I'll send some times' is not a next step","Skipping the ROE callback — the ask lands cold without it"],
+  },
+};
+
+// Flat list of focusable lines for a stage: every spoken beat and every question.
+function flattenScript(stageId) {
+  const data = STAGE_DATA[stageId];
+  if (!data) return [];
+  const out = [];
+  let q = 0;
+  data.script.forEach((item, i) => {
+    if (item.kind === "say") item.beats.forEach((_, b) => out.push({ kind:"beat", item:i, beat:b }));
+    else out.push({ kind:"ask", item:i, q:++q });
+  });
+  return out;
+}
 
 const SPICED_QUESTIONS = [
   {
@@ -211,12 +417,21 @@ Be specific, brief, direct. Word-for-word scripts. Personalize using prep brief 
 
 
 
+const SESSION_KEY = "discovery-session-v1";
+function loadSession() {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "{}") || {}; } catch { return {}; }
+}
+const EMPTY_BRIEF = { yourCompany:"", prospect:"", company:"", role:"", initiatives:"", tool:"", reps:"", volume:"", timePerDoc:"", metric:"", pain:"", integrations:"", approval:"" };
+
 export default function App() {
-  const [activeStage, setActiveStage] = useState("prep");
-  const [buyerPath, setBuyerPath] = useState(null);
+  const saved = useRef(loadSession()).current;
+  const [activeStage, setActiveStage] = useState(saved.activeStage || "prep");
+  const [buyerPath, setBuyerPath] = useState(saved.buyerPath ?? null);
   const [selectedTree, setSelectedTree] = useState(null);
-  const [callSource, setCallSource] = useState(null);
-  const [notes, setNotes] = useState({});
+  const [callSource, setCallSource] = useState(saved.callSource ?? null);
+  const [notes, setNotes] = useState(saved.notes || {});
+  const [captures, setCaptures] = useState(saved.captures || {});
+  const [focus, setFocus] = useState(saved.focus || {});
   const [noteOpen, setNoteOpen] = useState({});
   const [liveMode, setLiveMode] = useState(false);
   const [liveMeetingTitle, setLiveMeetingTitle] = useState("");
@@ -225,7 +440,7 @@ export default function App() {
   const [liveLastPoll, setLiveLastPoll] = useState(null); // timestamp of last successful poll
   const liveLastLength = useRef(0);
   const cardRegistry = useRef({});
-  const [prepBrief, setPrepBrief] = useState("");
+  const [prepBrief, setPrepBrief] = useState(saved.prepBrief || "");
   const [openSpiced, setOpenSpiced] = useState(null);
   const [prepOpen, setPrepOpen] = useState(false);
   const [outputs, setOutputs] = useState({ spiced:"", email:"", score:"", whatweheard:"", debrief:"", fixplan:"" });
@@ -234,14 +449,15 @@ export default function App() {
   const [tipsOpen, setTipsOpen] = useState(false);
   const [watchOpen, setWatchOpen] = useState(false);
   const [collapsedCards, setCollapsedCards] = useState({});
-  const [briefFields, setBriefFields] = useState({ prospect:"", company:"", role:"", tool:"", reps:"", volume:"", timePerDoc:"", metric:"", pain:"", integrations:"", approval:"" });
+  const [briefFields, setBriefFields] = useState({ ...EMPTY_BRIEF, ...(saved.briefFields || {}) });
   const [coveredCards, setCoveredCards] = useState({});
   const [briefParsing, setBriefParsing] = useState(false);
   const [questionnaireText, setQuestionnaireText] = useState("");
   const [briefParseStatus, setBriefParseStatus] = useState("");
   const [roi, setRoi] = useState({ unitsPerMonth:"", minsPerUnit:"", teamSize:"", hourlyRate:"75", targetTimeMins:"15" });
-  const [rightTab, setRightTab] = useState("spiced"); // "spiced" | "enterprise" | "roi"
-  const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  const [rightTab, setRightTab] = useState("capture"); // "capture" | "spiced" | "enterprise" | "roi"
+  const [rightPanelOpen, setRightPanelOpen] = useState(() => typeof window === "undefined" || window.innerWidth >= 1200);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [coachingVisible, setCoachingVisible] = useState(false);
   const [callTranscript, setCallTranscript] = useState("");
@@ -259,7 +475,7 @@ export default function App() {
   const B = { fontFamily:"'Inter', system-ui, sans-serif", cursor:"pointer" };
 
   // Call clock starts the first time you land on the opener; stage clock resets per stage.
-  const [callStart, setCallStart] = useState(null);
+  const [callStart, setCallStart] = useState(saved.callStart ?? null);
   const [stageStart, setStageStart] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -273,23 +489,80 @@ export default function App() {
   const scrollRef = useRef(null);
   useEffect(() => { scrollRef.current?.scrollTo(0, 0); }, [activeStage]);
 
+  // Keep the call in this browser so a reload mid-call loses nothing.
+  useEffect(() => {
+    try { localStorage.setItem(SESSION_KEY, JSON.stringify({ activeStage, buyerPath, callSource, notes, captures, focus, prepBrief, briefFields, callStart })); } catch {}
+  }, [activeStage, buyerPath, callSource, notes, captures, focus, prepBrief, briefFields, callStart]);
+
+  function resetCall() {
+    setNotes({}); setCaptures({}); setFocus({}); setPrepBrief(""); setBriefFields(EMPTY_BRIEF);
+    setBuyerPath(null); setCallSource(null); setCoveredCards({}); setCallStart(null);
+    setQuestionnaireText(""); setCallTranscript(""); setBriefParseStatus("");
+    setOutputs({ spiced:"", email:"", score:"", whatweheard:"", debrief:"", fixplan:"" });
+    setActiveStage("prep"); setConfirmReset(false);
+  }
+
+  const setCapture = (key, val) => setCaptures(c => ({ ...c, [key]: val }));
+
+  // Fill [placeholders] from the prep brief and what you've captured so far.
+  function resolveToken(name) {
+    const c = captures, b = briefFields;
+    const v = x => (x || "").trim();
+    const join = parts => parts.map(v).filter(Boolean).join("; ");
+    const current = v(c.metric) && (v(c.current) || v(c.target))
+      ? `${v(c.metric)} is at ${v(c.current) || "?"}${v(c.target) ? `, and you want it at ${v(c.target)}` : ""}` : "";
+    const cause = v(c.rootCause) && `and it sounds like the root cause is ${v(c.rootCause)}`;
+    switch (name.toLowerCase()) {
+      case "names": case "name": return v(b.prospect);
+      case "company": return v(b.yourCompany);
+      case "their top initiatives": return v(b.initiatives);
+      case "surface need": case "what they said": return v(c.surfaceNeed);
+      case "suspected root cause": return v(c.suspected);
+      case "capability": return v(c.capability);
+      case "your honest read": return v(c.read);
+      case "metric they named": return v(c.metric) || v(b.metric);
+      case "business problem and current state": return join([c.businessDriver, current]);
+      case "business problem + root causes": return join([c.businessDriver, cause]);
+      case "brief summary": return join([c.businessDriver, current, cause, v(c.ripple) && `it's causing ${v(c.ripple)}`, v(c.cost) && `and it's costing about ${v(c.cost)} a month`]);
+      default: return "";
+    }
+  }
+
+  // Teleprompter cursor: one highlighted line per stage. Index == length means the stage is done.
+  const flat = flattenScript(activeStage);
+  const focusIdx = Math.min(focus[activeStage] ?? 0, flat.length);
+  const setFocusIdx = i => setFocus(f => ({ ...f, [activeStage]: Math.max(0, Math.min(i, flat.length)) }));
+  useEffect(() => {
+    if (!flat.length) return;
+    const el = document.querySelector(`[data-line="${activeStage}-${focusIdx}"]`);
+    if (el) el.scrollIntoView({ block:"center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }, [focusIdx, activeStage]);
+
   useEffect(() => { setTipsOpen(false); setWatchOpen(false); }, [activeStage]);
 
   useEffect(() => {
     function handleKey(e) {
-      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+      const tag = e.target.tagName;
+      if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT' || e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === 'ArrowRight' && currentIdx < STAGES.length - 1) setActiveStage(STAGES[currentIdx + 1].id);
       if (e.key === 'ArrowLeft' && currentIdx > 0) setActiveStage(STAGES[currentIdx - 1].id);
-      // Number keys 1-9: mark question N on this stage as asked (toggle)
+      if (!flat.length) return;
+      if (e.key === ' ' || e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        if (focusIdx >= flat.length && currentIdx < STAGES.length - 1) setActiveStage(STAGES[currentIdx + 1].id);
+        else setFocusIdx(focusIdx + 1);
+      }
+      if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); setFocusIdx(focusIdx - 1); }
+      // 1-9 jumps to that question
       const n = parseInt(e.key);
       if (n >= 1 && n <= 9) {
-        const key = `${activeStage}-${n}`;
-        setCoveredCards(s => ({ ...s, [key]: !s[key] }));
+        const i = flat.findIndex(x => x.q === n);
+        if (i >= 0) setFocusIdx(i);
       }
     }
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [currentIdx, activeStage, buyerPath]);
+  });
 
   async function generateDebrief() {
     if (!callTranscript.trim()) return;
@@ -394,7 +667,8 @@ Use their actual language from the transcript. Make every line actionable. This 
 
   async function generateOutput(type) {
     setOutputLoading(type);
-    const allNotes = Object.entries(notes).filter(([,v])=>v).map(([k,v])=>k+": "+v).join("\n");
+    const captured = Object.values(CAPTURE).flat().filter(f => (captures[f.key] || "").trim()).map(f => `${f.label}: ${captures[f.key]}`);
+    const allNotes = [...captured, ...Object.entries(notes).filter(([,v])=>v).map(([k,v])=>k+": "+v)].join("\n");
     const prompts = {
       spiced:`Filled SPICED + next step for this deal.\nPrep: ${prepBrief||"None"}\nBuyer path: ${buyerPath||"unknown"}\nNotes:\n${allNotes}\nUse their exact words. S=situation, P=need behind the need+root cause, I=metric+cost of inaction, C=timeline+trajectory+dissatisfaction, D=decision process. Recommend next step with What/Who/Why.`,
       email:`Post-discovery follow-up email for this prospect.\nPrep: ${prepBrief||"None"}\nNotes:\n${allNotes}\nRules: Reference ONE specific thing they said — not a summary. No "as discussed," no "per our conversation," no "hope this finds you well," no bullet-point next steps list. Do not open with a compliment. Do not say "excited to work together" or "looking forward to the journey." Write it the way a sharp rep messages a contact they actually like — direct, a little personality, three sentences max, one clear ask. Make them want to reply.`,
@@ -539,17 +813,6 @@ ${combinedText}` }]
     setBriefParsing(false);
   }
 
-  function fillTemplate(text) {
-    let t = text;
-    if (briefFields.prospect)   t = t.replace(/\[Names?\]/g, briefFields.prospect);
-    if (briefFields.metric)    t = t.replace(/\[metric they named\]/g, briefFields.metric);
-    if (briefFields.reps)       t = t.replace(/\[X\] reps/g, `${briefFields.reps} reps`);
-    if (briefFields.volume)     t = t.replace(/\[Y\] agreements a month/g, `${briefFields.volume} agreements a month`);
-    if (briefFields.timePerDoc) t = t.replace(/\[Z\] minutes each/g, `${briefFields.timePerDoc} minutes each`).replace(/\[X minutes\]/g, `${briefFields.timePerDoc} minutes`);
-    return t;
-  }
-
-
   function renderTreePicker() {
     return (
       <div>
@@ -691,8 +954,17 @@ ${combinedText}` }]
     };
     const typeTag = { wallow:"Wallow", segue:"Segue", summarize:"Summarize", validate:"Validate", transition:"Transition" };
     const accent = typeAccent[r.type] || C.emerald;
-    const rawText = r.text || (r.alts ? r.alts.join("\n\n— or —\n\n") : "");
-    const text = fillTemplate(rawText);
+    const text = r.text || "";
+    const body = r.alts
+      ? <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+          {r.alts.map((alt, i) => (
+            <div key={i}>
+              {i > 0 && <div style={{ display:"flex", alignItems:"center", gap:10, margin:"2px 0 10px", fontSize:10, fontWeight:800, letterSpacing:"0.14em", color:C.textMuted }}><span style={{ flex:1, height:1, background:C.border }} />OR<span style={{ flex:1, height:1, background:C.border }} /></div>}
+              <Script text={alt.replace(/^— OR —\n/, "")} size={18} resolve={resolveToken} />
+            </div>
+          ))}
+        </div>
+      : <Script text={text} size={19} resolve={resolveToken} followups />;
     const cardKey = `${prefix}-${idx}`;
     cardRegistry.current[cardKey] = r.label; // register for live transcript analysis
     const isCovered = coveredCards[cardKey] === true;
@@ -705,7 +977,7 @@ ${combinedText}` }]
           <span style={{ fontSize:10, fontWeight:800, color:C.yellowText, letterSpacing:"0.12em", textTransform:"uppercase" }}>Say</span>
           {label && <span style={{ fontSize:12, fontWeight:600, color:C.yellowText, opacity:0.8 }}>{label}</span>}
         </div>
-        <Script text={text} size={20} />
+        <Script text={text} size={20} resolve={resolveToken} />
         {r.note && coachingVisible && (
           <div style={{ marginTop:12, fontSize:13, color:C.yellowText, lineHeight:1.6, background:"rgba(255,255,255,0.6)", padding:"10px 14px", borderRadius:8 }}>{r.note}</div>
         )}
@@ -731,7 +1003,7 @@ ${combinedText}` }]
               </button>
             )}
           </div>
-          <Script text={text} size={19} />
+          {body}
           {r.note && coachingVisible && (
             <div style={{ marginTop:10, fontSize:13, color:C.textSecondary, lineHeight:1.6, background:C.sand, padding:"9px 13px", borderRadius:8, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
           )}
@@ -757,6 +1029,142 @@ ${combinedText}` }]
           )}
         </div>
       </div>
+    );
+  }
+
+  function noteControls(cardKey) {
+    return {
+      button: !noteOpen[cardKey] && (
+        <button className="ctl" onClick={e => { e.stopPropagation(); setNoteOpen(s => ({ ...s, [cardKey]: true })); }} style={{ ...B, fontSize:11, padding:"2px 8px", borderRadius:5, border:`1px solid ${C.border}`, background:C.white, color:C.textMuted, fontWeight:600 }}>
+          {notes[cardKey] ? "✎ note" : "＋ note"}
+        </button>
+      ),
+      body: <>
+        {notes[cardKey] && !noteOpen[cardKey] && (
+          <div onClick={e => { e.stopPropagation(); setNoteOpen(s => ({ ...s, [cardKey]: true })); }} style={{ marginTop:10, fontSize:14, color:"#1d4ed8", background:"#eef3ff", padding:"7px 12px", borderRadius:7, cursor:"pointer", lineHeight:1.5 }}>{notes[cardKey]}</div>
+        )}
+        {noteOpen[cardKey] && (
+          <textarea autoFocus defaultValue={notes[cardKey] || ""} onClick={e => e.stopPropagation()}
+            onBlur={e => {
+              const val = e.target.value.trim();
+              if (!val) setNotes(s => { const n = { ...s }; delete n[cardKey]; return n; });
+              else setNotes(s => ({ ...s, [cardKey]: val }));
+              setNoteOpen(s => ({ ...s, [cardKey]: false }));
+            }}
+            placeholder="What did they say?" rows={2}
+            style={{ marginTop:10, width:"100%", fontSize:14, padding:"8px 12px", border:"1.5px solid #7ba3f0", borderRadius:8, background:"#fff", color:C.textPrimary, resize:"none", fontFamily:"inherit", outline:"none" }} />
+        )}
+      </>,
+    };
+  }
+
+  // The live script for a stage: spoken beats in a "Say" pane, then question cards.
+  // One line at a time is "on" (Space advances); finished lines dim.
+  function renderStageScript(stageId, handoff = true) {
+    const data = STAGE_DATA[stageId];
+    let line = -1;
+    const lineState = i => i === focusIdx ? "now" : i < focusIdx ? "done" : "next";
+    return (
+      <div>
+        {data.script.map((item, i) => {
+          if (item.kind === "say") return (
+            <div key={i} style={{ background:C.yellow, border:`1px solid ${C.yellowBorder}`, borderRadius:14, overflow:"hidden", marginBottom:14 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px 8px" }}>
+                <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.14em", color:C.yellowText }}>SAY</span>
+                {item.beats.length > 1 && <span style={{ fontSize:11, color:C.yellowText, opacity:0.7, fontWeight:600 }}>{item.beats.length} beats</span>}
+              </div>
+              {item.beats.map((beat, b) => {
+                line++;
+                const idx = line, st = lineState(idx);
+                return (
+                  <div key={b} data-line={`${stageId}-${idx}`} onClick={() => setFocusIdx(idx)}
+                    style={{ cursor:"pointer", display:"grid", gridTemplateColumns:"124px minmax(0,1fr)", gap:18, padding:"14px 20px 14px 18px", borderTop:`1px solid ${C.yellowRule}`,
+                      background: st === "now" ? C.white : "transparent", boxShadow: st === "now" ? `inset 4px 0 0 ${C.emerald}` : "none",
+                      opacity: st === "done" ? 0.42 : 1, transition:"opacity 0.15s, background 0.15s" }}>
+                    <div style={{ paddingTop:5 }}>
+                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", lineHeight:1.3, color: st === "now" ? C.emerald : C.yellowText }}>
+                        {st === "done" ? "✓ " : ""}{beat.cue}
+                      </div>
+                      {beat.check && <div style={{ marginTop:6, display:"inline-flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:C.amber, background:"#fff3e0", border:"1px solid #fcd9a8", borderRadius:99, padding:"2px 8px" }}>Wait for yes</div>}
+                    </div>
+                    <div style={{ minWidth:0 }}>
+                      <Script text={beat.text} size={20} resolve={resolveToken} />
+                      {beat.list && (
+                        <div style={{ marginTop:12, display:"flex", flexDirection:"column", gap:10 }}>
+                          {beat.list.map((pt, k) => (
+                            <div key={k} style={{ display:"flex", gap:12, alignItems:"flex-start" }}>
+                              <span style={{ flexShrink:0, width:22, height:22, marginTop:3, borderRadius:"50%", background:C.yellowRule, color:C.yellowText, fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>{k + 1}</span>
+                              <div style={{ minWidth:0 }}><Script text={pt} size={18} resolve={resolveToken} /></div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {beat.then && <div style={{ marginTop:8, fontSize:15, color:C.textSecondary }}><span style={{ color:C.textMuted, fontWeight:600 }}>When they agree → </span>“{beat.then}”</div>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+
+          line++;
+          const idx = line, st = lineState(idx);
+          const qn = flat[idx].q;
+          const cardKey = `${stageId}-q${qn}`;
+          cardRegistry.current[`${stageId}-${qn}`] = item.label; // live transcript analysis
+          const heard = coveredCards[`${stageId}-${qn}`] === true;
+          const nc = noteControls(cardKey);
+          return (
+            <div key={i} className="card" data-line={`${stageId}-${idx}`} onClick={() => setFocusIdx(idx)}
+              style={{ cursor:"pointer", marginBottom:10, display:"flex", gap:16, padding:"16px 20px 18px 16px", background:C.white, borderRadius:12,
+                border:`1px solid ${st === "now" ? C.emerald : C.border}`,
+                boxShadow: st === "now" ? "0 0 0 3px rgba(37,99,235,0.12), 0 6px 18px rgba(16,24,40,0.06)" : "none",
+                opacity: st === "done" ? 0.45 : 1, transition:"opacity 0.15s, box-shadow 0.15s" }}>
+              <div style={{ flexShrink:0, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800,
+                background: st === "next" ? C.white : C.emerald, color: st === "next" ? C.emerald : "#fff", border:`1.5px solid ${st === "next" ? C.emeraldMid : C.emerald}` }}>
+                {st === "done" ? "✓" : qn}
+              </div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6, minHeight:20 }}>
+                  <span style={{ fontSize:11, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: st === "now" ? C.emerald : C.textMuted }}>Ask · {item.label}</span>
+                  {heard && <span style={{ fontSize:10, fontWeight:700, color:C.filledText, background:C.filledBg, borderRadius:99, padding:"1px 8px" }}>✓ heard on call</span>}
+                  <div style={{ flex:1 }} />
+                  {nc.button}
+                </div>
+                <Script text={item.text} size={20} resolve={resolveToken} followups />
+                {nc.body}
+              </div>
+            </div>
+          );
+        })}
+
+        {handoff && renderHandoff(stageId)}
+      </div>
+    );
+  }
+
+  function renderHandoff(stageId) {
+    const done = focusIdx >= flat.length;
+    const next = STAGES[currentIdx + 1];
+    const nextData = next && STAGE_DATA[next.id];
+    const nextFirst = nextData?.script[0];
+    const nextPreview = nextFirst ? (nextFirst.kind === "say" ? nextFirst.beats[0].text : nextFirst.text) : "";
+    return (
+      <>
+        {next && (
+          <button onClick={() => setActiveStage(next.id)} data-line={`${stageId}-${flat.length}`}
+            style={{ ...B, width:"100%", marginTop:8, textAlign:"left", display:"flex", alignItems:"center", gap:16, padding:"14px 18px", borderRadius:12,
+              border:`1px ${done ? "solid" : "dashed"} ${done ? C.emerald : C.border}`, background: done ? C.emeraldLight : "transparent" }}>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: done ? C.emerald : C.textMuted, marginBottom:4 }}>
+                {done ? "Stage done · Space to continue" : "Up next"} · {next.short}
+              </div>
+              {nextPreview && <div style={{ fontSize:15, color: done ? C.textPrimary : C.textMuted, lineHeight:1.45, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{renderInline(nextPreview.replace(/\n+/g, " "), resolveToken, "nx")}</div>}
+            </div>
+            <span style={{ fontSize:18, color: done ? C.emerald : C.textMuted }}>→</span>
+          </button>
+        )}
+      </>
     );
   }
 
@@ -894,104 +1302,6 @@ ${combinedText}` }]
     );
   }
 
-  const STAGE_DATA = {
-    "rules-engagement": {
-      rule:"Align on the objective, the agenda, and the decision to be made.",
-      rhythm:[
-        { type:"say", label:"Say \u2014 Rules of Engagement", text:"Here's what I'm thinking\nin terms of an agenda.\n\nLet me know if you had\nsomething else in mind\u2026\n\nThe outcome I recommend we shoot for\nis to learn enough about each other\nto decide whether or not\nit makes sense to have a second meeting.\n\nObviously, I don't expect us\nto do business on this call.\n\nSo let's just learn enough about each other\nto determine if another call makes sense.\n\nIs that fair so far?\n\nPerfect.\n\nNow here's the agenda\nI'm thinking will help us get there.\n\nFirst, I'll share a little about [Company] upfront\nso you have the context\nfor the rest of the call.\n\nI'd love to spend most of our time today\ngetting clear on the different challenges or goals\nyou might have\nas they relate to [their top initiatives].\n\nOnce we're clear on that\u2014\nand if I think we can help\u2014\nI'll explain more about how it works\nso you have an understanding.\n\nThen we can jointly decide\nwhether we set that next step.\n\nAnd I'll save some time\nat the end for that.\n\nDoes that agenda feel reasonable and fair?\n\nGreat.\n\nLet's take a crack at it." },
-      ],
-      tips:["Align on the objective, the agenda, and the decision to be made.","Pause after each fairness check and let them answer."],
-      watch:["Rushing past the fairness checks without pausing","Skipping the agenda after they agree to the objective"],
-    },
-    "buyer-journey": {
-      rule:"Choose one route, not all three. For an active buyer, go back in time. For an outbound buyer, lead with context.",
-      rhythm:[
-        { type:"say", label:"Say", text:"To start\u2014\n\ntake me back to the beginning." },
-        { type:"ask", label:"Q1 \u2014 Origin", text:"What was going on in your business\nthat made you start exploring solutions like ours\nin the first place?" },
-        { type:"ask", label:"Q2 \u2014 The moment", text:"Can you walk me back\nto the moment this became a priority?\n\nWhat happened?" },
-        { type:"ask", label:"Q3 \u2014 Their world", text:"It seems like [relevant company or market observation].\n\nHow are you seeing that\nshow up in your world?" },
-      ],
-      tips:["Choose one route, not all three.","For an active buyer, go back in time. For an outbound buyer, lead with context."],
-    },
-    "need-behind-need": {
-      rule:"Find the need behind the need. Don't stop at the symptom.",
-      rhythm:[
-        { type:"say", label:"Say", text:"I understand why you would want\n[surface need].\n\nBut what's actually going on?" },
-        { type:"ask", label:"Q1 \u2014 Priority driver", text:"What's causing that\nto be a priority?" },
-        { type:"ask", label:"Q2 \u2014 Energy", text:"What's driving you\nto prioritize that?" },
-        { type:"ask", label:"Q3 \u2014 Business driver", text:"What is going on in your business\nthat's driving you\nto put the focus and energy on that?" },
-      ],
-      tips:["Keep asking only while the answer is still a symptom, capability, or surface-level need."],
-      watch:["Stopping at the symptom and moving on","Asking all three back to back like a checklist"],
-    },
-    "baseline-current": {
-      rule:"Map where they are today. Capture their exact words and units.",
-      rhythm:[
-        { type:"say", label:"Say", text:"I'm asking because\u2014\n\nif we end up doing business together,\nyour CFO is probably going to care about this." },
-        { type:"ask", label:"Q1 \u2014 Metric", text:"What metric do you think\nwould improve the most\nif we solved this challenge?" },
-        { type:"ask", label:"Q2 \u2014 Current state", text:"What's the current state\nof that metric?" },
-        { type:"ask", label:"Q3 \u2014 Target", text:"Where should it be?\n\nAnd why should it be there?" },
-      ],
-      tips:["Capture their exact words and units.","Do not invent a number if they do not know it yet."],
-      watch:["Moving on without a metric","Paraphrasing their numbers instead of using their exact words"],
-    },
-    "validate-problem": {
-      rule:"Get explicit agreement that this is the right problem and that it is worth solving now.",
-      rhythm:[
-        { type:"say", label:"Say", text:"Before we go too much further\u2014\n\nI want to make sure\nwe're anchoring this conversation\nto the right thing." },
-        { type:"ask", label:"Q1 \u2014 Anchor check", text:"Is this the challenge\nwe should be focused on solving together?\n\nOr are there other things\nthat are going to overpower this?" },
-        { type:"ask", label:"Q2 \u2014 Priority test", text:"Is this going to make its way\nonto your priorities slide?\n\nOr is this a shiny object?" },
-      ],
-      tips:["Get explicit agreement that this is the right problem and that it is worth solving now."],
-      watch:["Happy ears \u2014 getting excited before validating it is a raging fire","Skipping this because it feels confrontational"],
-    },
-    "cause-analysis": {
-      rule:"Mutually identify the true root cause. Their perceived cause sets the buying criteria.",
-      rhythm:[
-        { type:"say", label:"Say \u2014 Summarize first", text:"Let me summarize\nwhat I've heard so far.\n\n[business problem and current state]\n\nDid I get that right?" },
-        { type:"ask", label:"Q1 \u2014 Open diagnostic", text:"Why do you think\nthis challenge is happening?" },
-        { type:"ask", label:"Q2 \u2014 Blocker", text:"What's preventing you\nfrom improving it?" },
-        { type:"ask", label:"Q3 \u2014 Suspected cause", text:"To what extent do you think\n[suspected root cause]\nis contributing to the challenge?" },
-      ],
-      tips:["Ask the open diagnostic first, then one or two targeted questions.","Their perceived cause sets the buying criteria."],
-      watch:["Accepting the first answer as the root cause","Leading them to your conclusion instead of letting them arrive at it"],
-    },
-    "negative-impact": {
-      rule:"Explore cost, consequences, and ripple effects. One or two negative ramifications is enough on a first call.",
-      rhythm:[
-        { type:"say", label:"Say \u2014 Summarize first", text:"All right.\n\nOne more time,\nlet me summarize what I've heard.\n\n[business problem + root causes]\n\nDid I get that right?" },
-        { type:"ask", label:"Q1 \u2014 Ripple effects", text:"What ripple effects\nare you seeing this challenge have\non the rest of the business?" },
-        { type:"ask", label:"Q2 \u2014 Derailed", text:"What would get derailed\nif you didn't make progress\nin solving these challenges?" },
-        { type:"ask", label:"Q3 \u2014 Who else", text:"Who else does this challenge impact\nwithin the business?\n\nAnd how?" },
-        { type:"ask", label:"Q4 \u2014 Cost", text:"What's the financial cost\nof not closing that gap\nper month?" },
-      ],
-      tips:["After they confirm the summary, explore cost, consequences, and ripple effects.","One or two negative ramifications is enough on a first call."],
-      watch:["More than 3 impact questions \u2014 diminishing returns fast","Asking about cost before they confirm the summary"],
-    },
-    "future-state": {
-      rule:"Contrast painful present with compelling future. Ask the open question first.",
-      rhythm:[
-        { type:"say", label:"Say \u2014 Summarize first", text:"Let me summarize\nwhat I've heard about the challenges so far.\n\n[brief summary]\n\nDid I get that right?" },
-        { type:"ask", label:"Q1 \u2014 Open", text:"What do you think you need\nto solve this challenge?" },
-        { type:"ask", label:"Q2 \u2014 Ideas", text:"Can I try\na few additional ideas on you?" },
-        { type:"ask", label:"Q3 \u2014 Capability test", text:"Imagine being able to [capability].\n\nTo what degree would that move the needle\non the problem we're talking about?" },
-      ],
-      tips:["Ask the open question first.","Only then test targeted capabilities tied to the root causes they named."],
-      watch:["Pitching capabilities before asking what they think they need","Skipping the summary \u2014 the contrast is where the feeling of value lives"],
-    },
-    "close-next-steps": {
-      rule:"Call back the ROE. Leave with a concrete decision \u2014 a next step is not real until it has an owner and a date.",
-      rhythm:[
-        { type:"say", label:"Say \u2014 Honest read", text:"At the beginning of this call,\nwe agreed we'd decide\nwhether it makes sense\nto schedule a next logical step\u2014\n\nor go our separate ways\nso we don't waste each other's time.\n\nThe sense I'm getting is\n[your honest read]." },
-        { type:"ask", label:"Q1 \u2014 Fairness check", text:"Does that feel fair\nto you?" },
-        { type:"ask", label:"Q2 \u2014 Next step", text:"What should the next logical step look like?\n\nAnd who needs to be there?" },
-        { type:"ask", label:"Q3 \u2014 Date", text:"Can we put a specific date\non the calendar now?" },
-      ],
-      tips:["Leave with a concrete decision.","A next step is not real until it has an owner and a date."],
-      watch:["Leaving without a booked meeting \u2014 'I'll send some times' is not a next step","Skipping the ROE callback \u2014 the ask lands cold without it"],
-    },
-  };
-
 const sd = STAGE_DATA[activeStage];
 
   const meta = STAGE_META[activeStage] || {};
@@ -1000,7 +1310,7 @@ const sd = STAGE_DATA[activeStage];
   const overTime = timeboxMs && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
   const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Rapport + Opener","rules-engagement":"Rules of Engagement","buyer-journey":"Buyer Journey Alignment","need-behind-need":"Need Behind the Need","baseline-current":"Baseline the Current State","validate-problem":"Validate the Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
-  const stageSub = {"prep":"Paste your prep brief. Everything downstream personalizes from this.","rapport-opener":"Land the opener. Read the room.","outputs":"Generate your end-of-call outputs."}[activeStage];
+  const stageSub = {"prep":"Paste your prep brief. Everything downstream personalizes from this.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
   return (
@@ -1055,14 +1365,20 @@ const sd = STAGE_DATA[activeStage];
             </div>
           </div>
         )}
+        <div style={{ padding:"12px 20px 16px", borderTop:`1px solid ${C.border}` }}>
+          <button onClick={() => confirmReset ? resetCall() : setConfirmReset(true)} onBlur={() => setConfirmReset(false)}
+            style={{ ...B, width:"100%", padding:"8px 10px", borderRadius:8, fontSize:12, fontWeight:600, border:`1px solid ${confirmReset ? C.coralBorder : C.border}`, background:confirmReset ? C.coralLight : C.white, color:confirmReset ? C.coralText : C.textSecondary }}>
+            {confirmReset ? "Click again to clear this call" : "New call"}
+          </button>
+        </div>
       </div>
 
       {/* MAIN */}
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", minWidth:0 }}>
 
         {/* TOP BAR */}
-        <div style={{ padding:"12px 24px 12px 32px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", gap:16, flexShrink:0 }}>
-          <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ padding:"12px 24px 12px 32px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", flexWrap:"wrap", gap:"8px 16px", flexShrink:0 }}>
+          <div style={{ flex:"1 1 240px", minWidth:0 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8, fontSize:11, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginBottom:3 }}>
               {isNumbered && <span>Step {STAGES[currentIdx].icon} of 10</span>}
               {meta.phase && <><span style={{ color:C.border }}>•</span><span style={{ color:C.emerald }}>{meta.phase}</span></>}
@@ -1101,7 +1417,7 @@ const sd = STAGE_DATA[activeStage];
             <div style={{ width:1, height:28, background:C.border, margin:"0 4px" }} />
             <button disabled={currentIdx === 0} onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} title="Previous (←)" style={{ ...B, fontSize:16, width:38, height:38, border:`1px solid ${C.border}`, borderRadius:8, background:C.white, color:C.textSecondary, fontWeight:600, opacity:currentIdx === 0 ? 0.4 : 1 }}>←</button>
             {nextStage && <button onClick={()=>setActiveStage(nextStage.id)} title="Next (→)" style={{ ...B, height:38, padding:"0 16px", border:"none", borderRadius:8, background:C.emerald, color:C.white, fontWeight:700, fontSize:13, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap" }}>
-              <span style={{ opacity:0.75, fontWeight:600 }}>Next</span>{nextStage.short}<span style={{ fontSize:16 }}>→</span>
+              <span style={{ opacity:0.75, fontWeight:600 }}>Next</span><span className="hide-narrow">{nextStage.short}</span><span style={{ fontSize:16 }}>→</span>
             </button>}
           </div>
         </div>
@@ -1161,9 +1477,11 @@ const sd = STAGE_DATA[activeStage];
                   <div style={{ fontSize:11, color:"#9080c8", marginBottom:16 }}>Or fill in manually below:</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                     {[
+                      { key:"yourCompany", label:"Your company",         placeholder:"Fills [Company] in the agenda" },
                       { key:"prospect",    label:"Prospect name",       placeholder:"e.g. Jane" },
                       { key:"company",     label:"Company",              placeholder:"e.g. Acme Health" },
                       { key:"role",        label:"Their role",           placeholder:"e.g. VP of Operations" },
+                      { key:"initiatives", label:"Their top initiatives", placeholder:"Fills [their top initiatives]" },
                       { key:"tool",        label:"Current state / tools", placeholder:"e.g. spreadsheets + email" },
                       { key:"reps",        label:"Team size",            placeholder:"e.g. 40" },
                       { key:"volume",      label:"Volume",               placeholder:"e.g. 200 / month" },
@@ -1238,69 +1556,17 @@ const sd = STAGE_DATA[activeStage];
 
 
 
-            {/* RAPPORT */}
-            {activeStage === "rapport-opener" && (
-              <div>
-                {/* OPENER — teleprompter */}
-                <RhythmCard r={{ type:"say", label:"Opener", text:"Hey [Names]\u2014\nglad we found the time to meet today.\n\nHow's your week been?\n\nWell, cool.\nWe've got a lot to get to today.\n\nMind if we talk about the agenda?" }} idx={0} prefix="rapport-opener" />
-
-                {/* HUGHES SIGNALS */}
-                {coachingVisible && <div style={{ marginBottom:16, background:"#eef3ff", border:"1.5px solid #bccdf5", borderRadius:10, padding:"14px 18px" }}>
-                  <div style={{ fontSize:11, fontWeight:700, color:"#2563eb", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:10 }}>Read them in the first 60 seconds — Hughes</div>
-                  {[
-                    { signal:"Pronouns", read:"I/me/my → individual, personal stakes matter. We/us/our → team focus, consensus matters." },
-                    { signal:"Energy", read:"Talkative → stay with it. Business → pivot. Don't force the wrong mode." },
-                    { signal:"Complaint", read:"If they volunteer a frustration before you ask — that's the center. Note it." },
-                  ].map((s,i)=>(
-                    <div key={i} style={{ marginBottom:i<2?8:0, display:"flex", gap:10 }}>
-                      <span style={{ fontSize:11, fontWeight:700, color:"#2563eb", flexShrink:0, minWidth:80 }}>{s.signal}</span>
-                      <span style={{ fontSize:13, color:"#1d4ed8", lineHeight:1.6 }}>{s.read}</span>
-                    </div>
-                  ))}
-                </div>}
-
-                {coachingVisible && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
-                  {["Thanking the prospect for their time — immediately positions you lower","Running ROE versions back to back — pick one and commit"].map((w,i)=>(
-                    <div key={i} style={{ display:"flex", gap:12, marginBottom:i<1?12:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#9b2c2c", lineHeight:1.7 }}>{w}</span></div>
-                  ))}
-                </Collapsible>}
-              </div>
-            )}
-
-            {/* BUYER JOURNEY ALIGNMENT */}
-                        {/* RHYTHM STAGES */}
+            {/* LIVE SCRIPT */}
             {sd && (
               <div>
-                {sd.bridgeBanner && buyerPath && (
-                  <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16, padding:"10px 16px", borderRadius:10, background: buyerPath==="evaluating"?"#eef3ff":buyerPath==="active-pain"?"#e9effe":"#fdf7e6", border:`1.5px solid ${buyerPath==="evaluating"?"#bccdf5":buyerPath==="active-pain"?"#bcd0f7":"#d4a830"}` }}>
-                    <span style={{ fontSize:16 }}>{buyerPath==="evaluating"?"⚡":buyerPath==="active-pain"?"⚠":"◎"}</span>
-                    <div style={{ flex:1 }}>
-                      <span style={{ fontSize:12, fontWeight:700, color: buyerPath==="evaluating"?"#2563eb":buyerPath==="active-pain"?C.emerald:"#7a5808" }}>
-                        {buyerPath==="evaluating"?"Evaluating buyer — they came in solution-mode. You went back in time. Now anchor to the business problem.":buyerPath==="active-pain"?"Active pain buyer — they surfaced a challenge. Now prioritize it and validate it's a raging fire.":"Latent buyer — you ran the Discovery Prompter. Now find what resonated and anchor to it."}
-                      </span>
-                    </div>
-                    <button onClick={()=>setActiveStage("buyer-journey")} style={{ ...B, fontSize:10, color:C.textMuted, background:"transparent", border:`1px solid ${C.border}`, borderRadius:5, padding:"3px 8px", flexShrink:0 }}>← back</button>
-                  </div>
-                )}
                 <div style={{ display:"flex", gap:10, alignItems:"baseline", marginBottom:16, padding:"0 2px" }}>
                   <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.12em", textTransform:"uppercase", color:C.emerald, flexShrink:0 }}>Goal</span>
                   <span style={{ fontSize:15, fontWeight:500, color:C.textSecondary, lineHeight:1.5 }}>{sd.rule}</span>
                 </div>
-                {sd.rhythm.filter(r=>!r.fallback).map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix={activeStage} />)}
-                {sd.rhythm.some(r=>r.fallback) && coachingVisible && (
-                  <Collapsible label="+ More techniques" isOpen={moreOpen} onToggle={()=>setMoreOpen(v=>!v)} accent={C.textMuted}>
-                    {sd.rhythm.filter(r=>r.fallback).map((r,i)=><RhythmCard key={i} r={r} idx={i+100} prefix={activeStage+"-more"} />)}
-                  </Collapsible>
-                )}
-                {coachingVisible && sd.tips && <Collapsible label="★ Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textSecondary}>
-                  {sd.tips.map((t,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.tips.length-1?12:0 }}><span style={{ color:C.textMuted, fontSize:14, flexShrink:0 }}>—</span><span style={{ fontSize:14, color:C.textSecondary, lineHeight:1.7 }}>{t}</span></div>))}
-                </Collapsible>}
-                {coachingVisible && sd.watch && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
-                  {sd.watch.map((w,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.watch.length-1?14:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#9b2c2c", lineHeight:1.7 }}>{w}</span></div>))}
-                </Collapsible>}
+                {renderStageScript(activeStage, activeStage !== "buyer-journey")}
               </div>
             )}
-            {activeStage === "buyer-journey" && renderBuyerType()}
+            {activeStage === "buyer-journey" && <>{renderBuyerType()}{renderHandoff(activeStage)}</>}
 
 
             {/* OUTPUTS */}
@@ -1381,42 +1647,103 @@ const sd = STAGE_DATA[activeStage];
           </div>
           </div>
 
-          {/* NOTES */}
-          <div style={{ background:C.white, borderTop:`1px solid ${C.border}`, padding:"10px 32px", flexShrink:0 }}>
-            <div style={{ maxWidth:860, margin:"0 auto", display:"flex", alignItems:"center", gap:12 }}>
-              <span style={{ fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:C.textMuted, flexShrink:0 }}>Notes</span>
-              <textarea
-                value={stageNote}
-                onChange={e=>setNotes(n=>({...n,[activeStage]:e.target.value}))}
-                placeholder="Their exact words, numbers, names…"
-                rows={2}
-                style={{ flex:1, fontSize:14, lineHeight:1.5, padding:"8px 12px", border:`1px solid ${C.border}`, borderRadius:8, background:C.sand, color:C.textPrimary, resize:"none", boxSizing:"border-box", fontFamily:"inherit", outline:"none" }}
-              />
+          {/* KEYBOARD HINTS */}
+          {flat.length > 0 && (
+            <div style={{ background:C.white, borderTop:`1px solid ${C.border}`, padding:"8px 32px", flexShrink:0, display:"flex", justifyContent:"center", gap:18, flexWrap:"wrap", fontSize:12, color:C.textMuted }}>
+              {[["Space","next line"],["↑","back"],["1–9","jump to question"],["← →","stage"]].map(([k,l]) => (
+                <span key={k} style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
+                  <kbd style={{ fontFamily:"inherit", fontSize:11, fontWeight:700, color:C.textSecondary, background:C.sand, border:`1px solid ${C.border}`, borderBottomWidth:2, borderRadius:5, padding:"1px 7px" }}>{k}</kbd>{l}
+                </span>
+              ))}
             </div>
-          </div>
+          )}
           </div>
 
-          {/* RIGHT — SPICED + COACH */}
-          <div style={{ width:rightPanelOpen?340:48, borderLeft:`1px solid ${C.border}`, display:"flex", flexDirection:"column", flexShrink:0, background:C.white, transition:"width 0.2s ease" }}>
+          {/* RIGHT — CAPTURE, QUESTION BANK, ROI */}
+          <div style={{ width:rightPanelOpen?340:44, borderLeft:`1px solid ${C.border}`, display:"flex", flexDirection:"column", flexShrink:0, background:C.white, transition:"width 0.2s ease" }}>
 
-            {/* COLLAPSE TOGGLE */}
-            <button onClick={()=>setRightPanelOpen(v=>!v)} style={{ ...B, display:"flex", alignItems:"center", justifyContent:rightPanelOpen?"flex-end":"center", padding:"14px 12px", borderBottom:`1px solid ${C.border}`, background:"transparent", border:"none", color:C.textMuted, flexShrink:0, width:"100%" }} title={rightPanelOpen?"Collapse panel":"Expand panel"}>
-              <span style={{ fontSize:16, fontWeight:700 }}>{rightPanelOpen?"→":"←"}</span>
-            </button>
+            {!rightPanelOpen && (
+              <button onClick={()=>setRightPanelOpen(true)} title="Open capture pane" style={{ ...B, flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:12, paddingTop:16, background:"transparent", border:"none", color:C.textMuted }}>
+                <span style={{ fontSize:16, fontWeight:700 }}>←</span>
+                <span style={{ writingMode:"vertical-rl", fontSize:11, fontWeight:700, letterSpacing:"0.14em", textTransform:"uppercase" }}>Capture</span>
+              </button>
+            )}
 
             {rightPanelOpen && <>
-            {/* RIGHT PANEL TABS */}
-            <div style={{ display:"flex", borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
+            <div style={{ display:"flex", alignItems:"stretch", borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
               {[
-                { id:"spiced",     label:"Questions" },
-                { id:"enterprise", label:"Enterprise" },
+                { id:"capture",    label:"Capture" },
+                { id:"spiced",     label:"Bank" },
                 { id:"roi",        label:"ROI" },
+                { id:"enterprise", label:"Qualify" },
               ].map(t => (
-                <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"12px 4px", fontSize:13, fontWeight:800, letterSpacing:"0.03em", textTransform:"uppercase", border:"none", borderBottom: rightTab===t.id ? `2px solid ${C.emerald}` : "2px solid transparent", background: "transparent", color: rightTab===t.id ? C.emerald : "#a1a1aa", marginBottom:-1 }}>
+                <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"13px 4px 11px", fontSize:12, fontWeight:700, letterSpacing:"0.04em", border:"none", borderBottom: rightTab===t.id ? `2px solid ${C.emerald}` : "2px solid transparent", background:"transparent", color: rightTab===t.id ? C.emerald : C.textMuted, marginBottom:-1 }}>
                   {t.label}
                 </button>
               ))}
+              <button onClick={()=>setRightPanelOpen(false)} title="Collapse pane" style={{ ...B, width:40, border:"none", borderLeft:`1px solid ${C.border}`, background:"transparent", color:C.textMuted, fontSize:15, fontWeight:700 }}>→</button>
             </div>
+
+            {/* CAPTURE TAB */}
+            {rightTab === "capture" && (() => {
+              const fields = CAPTURE[activeStage] || [];
+              const stageName = STAGES[currentIdx]?.short;
+              const capturedGroups = STAGES.map(st => ({ st, items:(CAPTURE[st.id] || []).filter(f => (captures[f.key] || "").trim()) })).filter(g => g.items.length && g.st.id !== activeStage);
+              const label = { fontSize:11, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:C.textMuted, marginBottom:6 };
+              const input = { width:"100%", fontSize:14, lineHeight:1.45, padding:"8px 11px", border:`1px solid ${C.border}`, borderRadius:8, background:C.sand, color:C.textPrimary, resize:"none", fontFamily:"inherit", outline:"none" };
+              return (
+                <div style={{ overflowY:"auto", flex:1, padding:"18px 18px 28px", display:"flex", flexDirection:"column", gap:20 }}>
+                  {coachingVisible && sd && (sd.tips || sd.watch) && (
+                    <div style={{ borderRadius:10, border:`1px solid ${C.emeraldMid}`, background:"#f5f8ff", padding:"12px 14px", display:"flex", flexDirection:"column", gap:10 }}>
+                      <div style={{ ...label, color:C.emerald, marginBottom:0 }}>Coach</div>
+                      {(sd.tips || []).map((t,i) => <div key={i} style={{ fontSize:13, color:C.textSecondary, lineHeight:1.5 }}>{t}</div>)}
+                      {sd.watch && <div style={{ display:"flex", flexDirection:"column", gap:6, paddingTop:8, borderTop:`1px solid ${C.emeraldMid}` }}>
+                        <div style={{ ...label, color:C.coralText, marginBottom:0 }}>Watch for</div>
+                        {sd.watch.map((w,i) => <div key={i} style={{ fontSize:13, color:C.coralText, lineHeight:1.5 }}>{w}</div>)}
+                      </div>}
+                    </div>
+                  )}
+
+                  {fields.length > 0 && (
+                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                      <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{stageName}</div>
+                      {fields.map(f => (
+                        <div key={f.key}>
+                          <label htmlFor={`cap-${f.key}`} style={{ ...label, display:"block" }}>{f.label}</label>
+                          {f.type === "choice"
+                            ? <div style={{ display:"flex", gap:6 }}>
+                                {f.options.map(o => {
+                                  const on = captures[f.key] === o;
+                                  return <button key={o} id={`cap-${f.key}-${o}`} onClick={() => setCapture(f.key, on ? "" : o)} style={{ ...B, flex:1, padding:"7px 0", borderRadius:8, fontSize:13, fontWeight:600, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textSecondary }}>{o}</button>;
+                                })}
+                              </div>
+                            : <textarea id={`cap-${f.key}`} rows={2} value={captures[f.key] || ""} onChange={e => setCapture(f.key, e.target.value)} placeholder={f.hint || ""} style={input} />}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div>
+                    <label htmlFor="stage-notes" style={{ ...label, display:"block" }}>{fields.length ? "Other notes" : "Notes"}</label>
+                    <textarea id="stage-notes" rows={fields.length ? 3 : 6} value={stageNote} onChange={e=>setNotes(n=>({...n,[activeStage]:e.target.value}))} placeholder="Their exact words, numbers, names…" style={input} />
+                  </div>
+
+                  {capturedGroups.length > 0 && (
+                    <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:16, display:"flex", flexDirection:"column", gap:12 }}>
+                      <div style={label}>Heard so far</div>
+                      {capturedGroups.map(({ st, items }) => (
+                        <button key={st.id} onClick={() => setActiveStage(st.id)} style={{ ...B, textAlign:"left", background:"transparent", border:"none", padding:0, display:"flex", flexDirection:"column", gap:4 }}>
+                          <span style={{ fontSize:11, fontWeight:700, color:C.emerald }}>{st.icon}. {st.short}</span>
+                          {items.map(f => (
+                            <span key={f.key} style={{ fontSize:13, color:C.textSecondary, lineHeight:1.45 }}><span style={{ color:C.textMuted }}>{f.label}: </span>{captures[f.key]}</span>
+                          ))}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* QUESTION BANK TAB */}
             {rightTab === "spiced" && (

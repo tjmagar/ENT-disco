@@ -15,6 +15,7 @@
       /* Per-card controls stay out of the way until you hover the card */
       .card .ctl { opacity: 0; transition: opacity 0.15s; }
       .card:hover .ctl, .card .ctl:focus { opacity: 1; }
+      @media (max-width: 1280px) { .hide-narrow { display: none; } }
       .navrow:hover { background: #eef1f5 !important; }
       ::-webkit-scrollbar { width: 10px; height: 10px; }
       ::-webkit-scrollbar-thumb { background: #d5d9df; border-radius: 99px; border: 3px solid transparent; background-clip: content-box; }
