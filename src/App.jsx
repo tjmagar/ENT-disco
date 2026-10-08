@@ -77,14 +77,14 @@ const STAGES = [
   { id:"prep",               icon:"◎",  short:"Prep Brief",               group:"setup" },
   { id:"rapport-opener",     icon:"1",  short:"Opening + Intros",         group:"setup" },
   { id:"rules-engagement",   icon:"2",  short:"Objective + Agenda",       group:"setup" },
-  { id:"context",            icon:"3",  short:"Clasp Context",            group:"setup" },
-  { id:"value-drop",         icon:"4",  short:"Value Drop",               group:"value" },
-  { id:"summary-buyin",      icon:"5",  short:"Summary + Buy-in",         group:"value" },
-  { id:"business-problem",   icon:"6",  short:"Business Problem",         group:"discovery" },
-  { id:"baseline-current",   icon:"7",  short:"Current State",            group:"discovery" },
-  { id:"cause-analysis",     icon:"8",  short:"Cause Analysis",           group:"discovery" },
-  { id:"negative-impact",    icon:"9",  short:"Negative Impact",          group:"discovery" },
-  { id:"future-state",       icon:"10", short:"Future State",             group:"discovery" },
+  { id:"context",            icon:"3",  short:"Orient to Buyer Focus",    group:"discovery" },
+  { id:"business-problem",   icon:"4",  short:"Business Problem",         group:"discovery" },
+  { id:"baseline-current",   icon:"5",  short:"Current State",            group:"discovery" },
+  { id:"cause-analysis",     icon:"6",  short:"Cause Analysis",           group:"discovery" },
+  { id:"negative-impact",    icon:"7",  short:"Negative Impact",          group:"discovery" },
+  { id:"future-state",       icon:"8",  short:"Future State",             group:"discovery" },
+  { id:"value-drop",         icon:"9",  short:"Value Drop",               group:"value" },
+  { id:"summary-buyin",      icon:"10", short:"Summary + Buy-in",         group:"value" },
   { id:"close-next-steps",   icon:"11", short:"Close + Next Steps",       group:"close" },
   { id:"outputs",            icon:"✦",  short:"Outputs",                  group:"close" },
 ];
@@ -93,7 +93,7 @@ const STAGES = [
 const STAGE_META = {
   "rapport-opener":   { phase:"OPEN",            timebox:"3 min" },
   "rules-engagement": { phase:"ALIGN",           timebox:"2 min" },
-  "context":          { phase:"CONTEXT",         timebox:"4 min" },
+  "context":          { phase:"ORIENT",          timebox:"4 min" },
   "value-drop":       { phase:"VALUE",           timebox:"12 min" },
   "summary-buyin":    { phase:"BUY-IN",          timebox:"1 min" },
   "business-problem": { phase:"BUSINESS PROBLEM",timebox:"5 min" },
@@ -187,7 +187,7 @@ const STAGE_DATA = {
     watch:["Rushing past the fairness checks without pausing","Skipping the agenda after they agree to the objective"],
   },
   "context": {
-    rule:"Share context first to earn the right to ask questions. Then let them pick where to start.",
+    rule:"Give quick context to earn the right to ask questions, then let them choose where to focus. Their pick steers discovery.",
     script:[
       { kind:"say", title:"Who we are", beats:[
         { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
@@ -204,7 +204,7 @@ const STAGE_DATA = {
         { cue:"Hand it to them", check:"answer", text:"I have an idea where you might fit in given [what you spotted], and in general, the industry norm of **first-year nurse retention**. But given your current situation, **where would be the most relevant place for us to start** our conversation?", then:"Okay great, that makes sense." },
       ]},
     ],
-    tips:["Keep it to a few slides. The point is to earn the right to ask questions, not to pitch.","Mark the area they pick in the capture pane. Value Drop and discovery follow it."],
+    tips:["Keep it to a few slides. The point is to earn the right to ask questions, not to pitch.","Mark the area they pick in the capture pane. Discovery and the Value Drop follow it."],
     watch:["Turning the context into a full pitch","Picking the area for them — let them choose"],
   },
   "value-drop": {
@@ -293,7 +293,7 @@ const STAGE_DATA = {
         { cue:"Read the reaction", text:"", list:[
           { tag:"Negative", text:"Do discovery on why: \"That's fair. **What's giving you pause?**\"" },
           { tag:"Positive, with questions", text:"**Answer their questions.** Then: \"What would need to be true for that to be a 10?\"" },
-          { tag:"Positive, no questions", text:"**Move into discovery** — next stage, Business Problem." },
+          { tag:"Positive, no questions", text:"**Do discovery on their current state.**" },
         ]},
       ]},
     ],
@@ -1499,7 +1499,7 @@ const sd = STAGE_DATA[activeStage];
   const stageElapsed = now - stageStart;
   const overTime = timeboxMs && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Earn the Right: Clasp Context","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Identify + Validate the Business Problem","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Identify + Validate the Business Problem","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Paste your prep brief. Everything downstream personalizes from this.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
@@ -1517,7 +1517,7 @@ const sd = STAGE_DATA[activeStage];
         </div>
 
         <div style={{ flex:1, padding:"6px 10px" }}>
-          {["setup","value","discovery","close"].map(group => {
+          {["setup","discovery","value","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
             const groupLabel = { setup:"Setup", value:"Value", discovery:"Discovery", close:"Close" }[group];
             return (
