@@ -1258,7 +1258,7 @@ ${combinedText}` }]
                       <div style={{ fontSize:11, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", lineHeight:1.3, color: st === "now" ? C.emerald : C.yellowText }}>
                         {st === "done" ? "✓ " : ""}{beat.cue}
                       </div>
-                      {beat.check && <div style={{ marginTop:6, display:"inline-flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:C.amber, background:"#fff3e0", border:"1px solid #fcd9a8", borderRadius:99, padding:"2px 8px", whiteSpace:"nowrap" }}>{beat.check === "answer" ? "Let them answer" : "Wait for yes"}</div>}
+                      {beat.check === "answer" && <div style={{ marginTop:6, display:"inline-flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:C.amber, background:"#fff3e0", border:"1px solid #fcd9a8", borderRadius:99, padding:"2px 8px", whiteSpace:"nowrap" }}>Let them answer</div>}
                     </div>
                     <div style={{ minWidth:0 }}>
                       {beat.text && <Script text={beat.text} size={20} resolve={resolveToken} />}
@@ -1275,7 +1275,9 @@ ${combinedText}` }]
                           ))}
                         </div>
                       )}
-                      {beat.then && <div style={{ marginTop:8, fontSize:15, color:C.textSecondary }}><span style={{ color:C.textMuted, fontWeight:600 }}>{beat.check === "answer" ? "After they answer → " : "When they agree → "}</span>“{beat.then}”</div>}
+                      {beat.then && (beat.check === "answer"
+                        ? <div style={{ marginTop:8, fontSize:15, color:C.textSecondary }}><span style={{ color:C.textMuted, fontWeight:600 }}>After they answer → </span>“{beat.then}”</div>
+                        : <div style={{ marginTop:"0.6em" }}><Script text={beat.then} size={20} resolve={resolveToken} /></div>)}
                     </div>
                   </div>
                 );
