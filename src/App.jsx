@@ -79,13 +79,13 @@ const STAGES = [
   { id:"rules-engagement",   icon:"2",  short:"Objective + Agenda",       group:"setup" },
   { id:"context",            icon:"3",  short:"Clasp Context",            group:"setup" },
   { id:"orient",             icon:"4",  short:"Orient to Buyer Focus",    group:"orient" },
-  { id:"business-problem",   icon:"5",  short:"Business Problem",         group:"discovery" },
-  { id:"baseline-current",   icon:"6",  short:"Current State",            group:"discovery" },
-  { id:"cause-analysis",     icon:"7",  short:"Cause Analysis",           group:"discovery" },
-  { id:"negative-impact",    icon:"8",  short:"Negative Impact",          group:"discovery" },
-  { id:"future-state",       icon:"9",  short:"Future State",             group:"discovery" },
-  { id:"value-drop",         icon:"10", short:"Value Drop",               group:"value" },
-  { id:"summary-buyin",      icon:"11", short:"Summary + Buy-in",         group:"value" },
+  { id:"value-drop",         icon:"5",  short:"Value Drop",               group:"value" },
+  { id:"summary-buyin",      icon:"6",  short:"Summary + Buy-in",         group:"value" },
+  { id:"business-problem",   icon:"7",  short:"Business Problem",         group:"discovery" },
+  { id:"baseline-current",   icon:"8",  short:"Current State",            group:"discovery" },
+  { id:"cause-analysis",     icon:"9",  short:"Cause Analysis",           group:"discovery" },
+  { id:"negative-impact",    icon:"10", short:"Negative Impact",          group:"discovery" },
+  { id:"future-state",       icon:"11", short:"Future State",             group:"discovery" },
   { id:"close-next-steps",   icon:"12", short:"Close + Next Steps",       group:"close" },
   { id:"outputs",            icon:"✦",  short:"Outputs",                  group:"close" },
 ];
@@ -213,7 +213,7 @@ const STAGE_DATA = {
         { cue:"Hand it to them", check:"answer", text:"I have an idea where you might fit in given [what you spotted], and in general, the industry norm of **first-year nurse retention**. But given your current situation, **where would be the most relevant place for us to start** our conversation?" },
       ]},
     ],
-    tips:["Mark the area they pick in the capture pane. Discovery and the Value Drop follow it."],
+    tips:["Click the area they pick. The Value Drop and discovery follow it."],
     watch:["Picking the area for them — let them choose"],
   },
   "value-drop": {
@@ -302,7 +302,7 @@ const STAGE_DATA = {
         { cue:"Read the reaction", text:"", list:[
           { tag:"Negative", text:"Do discovery on why: \"That's fair. **What's giving you pause?**\"" },
           { tag:"Positive, with questions", text:"**Answer their questions.** Then: \"What would need to be true for that to be a 10?\"" },
-          { tag:"Positive, no questions", text:"**Do discovery on their current state.**" },
+          { tag:"Positive, no questions", text:"**Do discovery on their current state** — next stage, Business Problem." },
         ]},
       ]},
     ],
@@ -1548,7 +1548,7 @@ const sd = STAGE_DATA[activeStage];
         </div>
 
         <div style={{ flex:1, padding:"6px 10px" }}>
-          {["setup","orient","discovery","value","close"].map(group => {
+          {["setup","orient","value","discovery","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
             const groupLabel = { setup:"Setup", orient:"Orient", value:"Value", discovery:"Discovery", close:"Close" }[group];
             return (
