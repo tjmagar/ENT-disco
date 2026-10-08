@@ -78,7 +78,7 @@ const STAGES = [
   { id:"rapport-opener",     icon:"1",  short:"Opening + Intros",         group:"setup" },
   { id:"rules-engagement",   icon:"2",  short:"Objective + Agenda",       group:"setup" },
   { id:"context",            icon:"3",  short:"Clasp Context",            group:"setup" },
-  { id:"orient",             icon:"4",  short:"Orient to Buyer Focus",    group:"discovery" },
+  { id:"orient",             icon:"4",  short:"Orient to Buyer Focus",    group:"orient" },
   { id:"business-problem",   icon:"5",  short:"Business Problem",         group:"discovery" },
   { id:"baseline-current",   icon:"6",  short:"Current State",            group:"discovery" },
   { id:"cause-analysis",     icon:"7",  short:"Cause Analysis",           group:"discovery" },
@@ -1526,9 +1526,9 @@ const sd = STAGE_DATA[activeStage];
         </div>
 
         <div style={{ flex:1, padding:"6px 10px" }}>
-          {["setup","discovery","value","close"].map(group => {
+          {["setup","orient","discovery","value","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
-            const groupLabel = { setup:"Setup", value:"Value", discovery:"Discovery", close:"Close" }[group];
+            const groupLabel = { setup:"Setup", orient:"Orient", value:"Value", discovery:"Discovery", close:"Close" }[group];
             return (
               <div key={group} style={{ marginBottom:14 }}>
                 <div style={{ fontSize:10, fontWeight:700, color:C.textMuted, letterSpacing:"0.12em", textTransform:"uppercase", padding:"0 10px", marginBottom:4 }}>{groupLabel}</div>
