@@ -188,6 +188,7 @@ const STAGE_DATA = {
   },
   "context": {
     rule:"Share context first to earn the right to ask questions. Then let them pick where to start.",
+    screen:"Slides 1–2 · title, the three ways we help",
     script:[
       { kind:"say", beats:[
         { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
@@ -214,14 +215,14 @@ const STAGE_DATA = {
       { kind:"say", beats:[
         { cue:"Acknowledge + start", text:"Okay, let's start with how we help our partners [the area they chose]." },
       ]},
-      { kind:"say", group:"Pipeline", title:"The outcome", screen:"Slides 6–9", beats:[
+      { kind:"say", group:"Pipeline", title:"The outcome", screen:"Slide 3 · 4 channels", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
         { cue:"The outcome", text:"The biggest outcome we drive for our partners is building them a **bigger pipeline of soon-to-graduate talent**. We do this through a number of channels.", list:[
           { tag:"Educate", text:"Channels that **educate the students** on the possibilities and benefits of this type of program." },
           { tag:"Awareness", text:"Channels that **generate awareness** of this type of program as a reason to join your system after graduation." },
           { tag:"Convert", text:"And channels to **convert them into applicants** — to get them to raise their hand and say, \"When I graduate, I want to come work for you!\"" },
         ]},
       ]},
-      { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", screen:"TikTok search + example video", beats:[
+      { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", screen:"Slide 4 · influencers, then your TikTok search + a video", proof:["Curated influencer network reaches 4.6M+ engaged followers"], beats:[
         { cue:"Get the word out", text:"First we have to get the word out — if you're becoming a Nurse, an Imaging Tech, a Rehab Therapist, there are healthcare systems that will **help repay part of your student loans** so that you'll want to work with them." },
         { cue:"Influencers", text:"One of the most effective ways we've found to do this is through **social media influencers**. We have a whole curated network of **TikTok influencers who are clinicians and techs**. We've really cracked the code on this. I know it may sound funny, but it really works and it's so important for this generation." },
         { cue:"Where they talk", text:"This is where they go to talk to each other, and **their student loan debt is what they're talking about**. Matter of fact, let me show you something." },
@@ -229,21 +230,21 @@ const STAGE_DATA = {
         { cue:"Creative + compliance", text:"That's why we have a **creative team** working with influencers who are clinicians and techs to make content that lets these students know about these programs. We have a **compliance team** that makes sure it's buttoned up — not boring, but buttoned up." },
         { cue:"Show a video", text:"Videos like this one. We can see the **level of engagement** — the views, the comments, the reshares. It gets these students **thinking about what's possible**." },
       ]},
-      { kind:"say", group:"Pipeline", title:"Schools + campus", beats:[
+      { kind:"say", group:"Pipeline", title:"Schools + campus", screen:"Slides 5–6 · school partnerships, ambassadors", proof:["Active school partnerships: 70+ nursing, 90+ imaging, 70+ rehab therapy, 110+ RT","Ambassadors: we recruit, onboard, track referrals and pay out. Low lift for your team","Virtual career fair: 187 PT, OT and SLP students from 88 schools"], beats:[
         { cue:"School network", text:"To really engage with the students, we've built out a **nationwide network of school relationships** that drive applicants into the top of your funnel. We talk with **Program Directors and Career Services** to spread the word that there are healthcare systems, like yourself, that will help their students pay part of their loans when they come to work for you." },
         { cue:"Why schools care", text:"This is an appealing message to these leaders, one that resonates with them in a way **offering a sign-on bonus doesn't**. It motivates them to share this information with their students, and gets us **access to their students** in a way that many employers don't have." },
         { cue:"Campus ambassadors", text:"We also have a network of **campus ambassadors**, boots on the ground, to engage the students on campus. They're talking to soon-to-graduate nurses, imaging techs, and rehab therapists about our partners who are offering these programs." },
         { cue:"Wider reach", text:"These channels are what we use to **fill the top of your funnel** with applicants. And since we have relationships with schools across the country, this **widens your talent pool**. It allows you to pull in students from beyond your immediate area. Gives you reach into campuses that you might not have a relationship with right now." },
       ]},
-      { kind:"say", group:"Pipeline", title:"Convert: your recruiters", screen:"Landing pages", beats:[
+      { kind:"say", group:"Pipeline", title:"Convert: your recruiters", screen:"Slide 7 · results, then landing pages", proof:["One system hit >200% of its rad tech applicant goal, with applicants from 6 states","Northwestern Medicine: \"we did not ever have 32 RT applicants at a time prior to Clasp\"","Partners see applicants from 10+ states on average"], beats:[
         { cue:"Support your TA", text:"And we **support the work your TA is doing** with the local programs and residency programs. We have a team dedicated to **enabling your recruiters**. The landing pages and other marketing materials we create will help them **convert candidates they're already talking to** before the competition does." },
         { cue:"Show landing pages", text:"Landing pages like these. We tailor it to **your message, your employer brand and value prop**. It sends the message loud and clear to the students: 'We understand what you're looking for, and **we're the right fit for you**.'" },
       ]},
-      { kind:"say", group:"Labor cost", title:"Open", screen:"Slides 7–8", beats:[
+      { kind:"say", group:"Labor cost", title:"Open", screen:"Slides 8–9 · sign-ons, contract labor", beats:[
         { cue:"Bridge", text:"Offering a Student Loan Repayment program does more than just build pipeline. It can help you **spend less on sign-on bonuses and contract labor**." },
         { cue:"Ask", check:"answer", text:"Do you currently spend money on either of these for **Nursing, Imaging Techs, or Rehab Therapists**?" },
       ]},
-      { kind:"say", group:"Labor cost", title:"If they spend on sign-ons", beats:[
+      { kind:"say", group:"Labor cost", title:"If they spend on sign-ons", screen:"Slide 8 · sign-on bonuses", proof:["Every $10k in sign-ons creates about $2,800 of value: −72% ROI (Laudio)","Upfront cash hit, nearly impossible to claw back, re-paid with every backfill"], beats:[
         { cue:"The arms race", check:"answer", text:"Let me ask you a question, because what our partners tell us is that sign-on bonuses feel a bit like **an arms race**. That you have to offer one because everyone else is, and they keep escalating every year. **What have you seen in that regard?**" },
         { cue:"Acknowledge, then the story", text:"It's funny, I was talking to a TA leader at a hospital and she said that healthcare is **the only place where you can get a job with a sign-on**, work there 6 months, quit, walk across the street, and **get another sign-on bonus the next day**." },
         { cue:"Why sign-ons fail", text:"The sign-on really appeals to a **'right now' mentality**. Very often, it goes towards other expenses, and the loans just accumulate interest. It's why they're really **not effective in keeping people around**." },
@@ -251,24 +252,24 @@ const STAGE_DATA = {
         { cue:"The contrast", text:"It's a real contrast to the type of person who is looking for help with their student loans. **They're thinking of the future.** They're looking for a place where they can stay and grow. So when you use that money for Student Loan Repayment instead of a sign-on, **you end up spending less**, because you don't have to refill the role as frequently, don't have to pay out another sign-on bonus." },
         { cue:"Paid over time", text:"The payment is also made to them **over time, monthly**, as they're employed with you. So **no need for costly clawbacks**, and no paying in advance for someone who is going to leave after year 1. Spreading the payments out, and in some cases using a **ladder payment** approach, means **you're only spending to get and keep them**." },
       ]},
-      { kind:"say", group:"Labor cost", title:"If they spend on contract labor", beats:[
+      { kind:"say", group:"Labor cost", title:"If they spend on contract labor", screen:"Slide 9 · contract labor", proof:["Travelers cost ~2.2x","Weekly averages: RN $2,190 · Rad Tech $2,291 · PT $2,231 · RT $2,015 (about $8–9k a month each)"], beats:[
         { cue:"Ask", check:"answer", text:"We help **reduce spend on contract labor**, especially in locations, specialties, and shifts that you're finding hard to fill with a full-time employee. **What areas do you find you're using contract labor the most?**" },
         { cue:"Acknowledge + reframe", text:"Areas like these can often be difficult to fill. Many of our partners use travelers to fill the gaps, like you're doing. But they're finding that this type of program gets the attention of candidates who are looking for help with their student loans, and are **willing to work at the location, in the specialty, or on the shift where you need it most**." },
         { cue:"The payoff", text:"They're motivated by the Student Loan Repayment to come work for you, and now **you need fewer travelers**. And that means **thousands of dollars a week** that can be recouped." },
       ]},
-      { kind:"say", group:"Retention", title:"Built to keep them", screen:"Slides 11–12 + landing pages", beats:[
+      { kind:"say", group:"Retention", title:"Built to keep them", screen:"Slide 10 · structured to keep them past year 3", proof:["Partners' year-1 turnover is ~5% vs an industry average above 20%","Paid monthly once they're an employee; payments can step up in year 2"], beats:[
         { cue:"Bridge", text:"Helping you build a bigger pipeline and saving on spend are important benefits our partners see with us. But there is another area where we have a positive effect. We're also helping them **retain and grow their employees**." },
         { cue:"Built to stay", text:"First of all, the way your Student Loan Repayment program is structured **encourages them to stay 3, 4, or 5 years**. That's because the amount is spread out monthly over that period. It's paid to them while they're employed. **It's like your 401K contribution** — an incentive to stay to get that full amount." },
         { cue:"Proof", text:"It's why our partners see **single-digit turnover, sometimes as low as 5%**, with the clinicians and techs who are in the program." },
       ]},
-      { kind:"say", group:"Retention", title:"Nudges", beats:[
+      { kind:"say", group:"Retention", title:"Nudges", screen:"Slide 11 · reinforce your value", proof:["Early affinity, testimonials, psychological nudges: \"Your employer had your back this month\""], beats:[
         { cue:"Gamification", text:"But we've also built in some **gamification, some psychological nudges**." },
         { cue:"Sign-ons fade", text:"See, when you give someone a sign-on, they probably spend it quicker than they planned. And then **it's gone from their mind**. Now they're looking for the next thing you're going to offer them. But **we remind them** of the incredible help you're giving them with their student loan debt." },
         { cue:"Testimonials", text:"When they first join you, we have them **record a video** that captures how excited they are to work at a place that has their back like this. Every year they're part of the program, we collect these testimonials from them." },
         { cue:"Monthly statement", text:"Then every month we send them **a statement**. A way to remind them, 'Hey, look what you would have owed if your employer hadn't helped you out with this payment. **What would have been 10 years of payments is becoming 3.** All because you work here.' Really bonds them to you." },
         { cue:"Financial wellness", text:"And we give them access to **financial wellness and budgeting tools** that reinforce that they have even more in their budget **because of you**!" },
       ]},
-      { kind:"say", group:"Retention", title:"Beyond new hires", beats:[
+      { kind:"say", group:"Retention", title:"Beyond new hires", screen:"Slide 12 · career pathways", proof:["Pathways: MAs and LPNs → RNs · PTAs → PTs · ICU nurses → CRNAs"], beats:[
         { cue:"Existing staff", text:"This isn't just for new hires. This can be part of your **retention strategy**. Because so many clinicians and techs will have student loan debt for years. So they see you extend this to them, and it deepens the relationship. Reassures them that they've found **their long-term home**." },
         { cue:"Career pathing", text:"A Student Loan Repayment program is also used by our partners as part of **career pathing**. It motivates **Medical Assistants and LPNs into RNs, PTAs into PTs, ICU nurses into CRNAs** while they work for you." },
         { cue:"The message", text:"You're telling them, 'Go get the next level degree and come back here. Because we have a place for you, and **we're going to help you pay** for any loan you take out to upskill like this.' Now you're filling these roles with people you know already **fit your culture, fit your mission**. It builds a **stronger, more stable workforce**." },
@@ -1246,6 +1247,16 @@ ${combinedText}` }]
                 <div style={{ flex:1 }} />
                 {item.screen && <span style={{ fontSize:11, fontWeight:700, color:"#1d4ed8", background:"#e8eefc", borderRadius:99, padding:"3px 10px" }}>Share: {item.screen}</span>}
               </div>
+              {item.proof && (
+                <div style={{ margin:"0 18px 10px", padding:"8px 12px", borderRadius:8, background:"rgba(255,255,255,0.65)", display:"flex", flexDirection:"column", gap:4 }}>
+                  {item.proof.map((pf, k) => (
+                    <div key={k} style={{ display:"flex", gap:8, fontSize:13, lineHeight:1.45, color:C.textSecondary }}>
+                      {k === 0 ? <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.1em", color:C.emerald, flexShrink:0, paddingTop:2, width:42 }}>PROOF</span> : <span style={{ width:42, flexShrink:0 }} />}
+                      <span>{pf}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
               {item.beats.map((beat, b) => {
                 line++;
                 const idx = line, st = lineState(idx);
