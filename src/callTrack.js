@@ -25,75 +25,21 @@ export const STAGES = [
 // Timeboxes add up to a 30-minute call.
 export const STAGE_META = {
   "rapport-opener":   { phase:"OPEN",             timebox:"2 min" },
-  "rules-engagement": { phase:"ALIGN",            timebox:"1 min" },
-  "context":          { phase:"CONTEXT",          timebox:"1 min" },
-  "orient":           { phase:"ORIENT",           timebox:"2 min" },
-  "value-drop":       { phase:"VALUE",            timebox:"8 min" },
-  "summary-buyin":    { phase:"BUY-IN",           timebox:"1 min" },
-  "business-problem": { phase:"BUSINESS PROBLEM", timebox:"3 min" },
-  "baseline-current": { phase:"CURRENT STATE",    timebox:"3 min" },
-  "cause-analysis":   { phase:"CAUSE ANALYSIS",   timebox:"2 min" },
-  "negative-impact":  { phase:"NEGATIVE IMPACT",  timebox:"2 min" },
-  "future-state":     { phase:"FUTURE STATE",     timebox:"2 min" },
-  "close-next-steps": { phase:"CLOSE",            timebox:"3 min" },
-};
-
-// What to jot down at each stage — kept to what you can type live.
-// Several of these fill [placeholders] in later scripts.
-export const CAPTURE = {
-  "rapport-opener":   [{ key:"win", label:"What would make today a win", hint:"Each person's answer" }],
-  "orient":           [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
-                       { key:"startWhy", label:"What they said", hint:"Their words. Fills \"You mentioned…\" and \"It sounds like…\"" }],
-  "value-drop":       [{ key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
-  "summary-buyin":    [{ key:"buyIn", label:"Buy-in score (1–10)", hint:"And what would make it a 10" }],
-  "business-problem": [{ key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
-                       { key:"businessDriver", label:"Need behind the need", hint:"The business problem. Would a CFO fund it?" },
-                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" }],
-  "baseline-current": [{ key:"metric", label:"Metric", hint:"e.g. first-year turnover" },
-                       { key:"current", label:"Today", hint:"Their number and unit" },
-                       { key:"target", label:"Target", hint:"Where it should be, and why" }],
-  "cause-analysis":   [{ key:"rootCause", label:"Root cause", hint:"Their words" },
-                       { key:"suspected", label:"Your suspected cause", hint:"Fills the last question" }],
-  "negative-impact":  [{ key:"ripple", label:"Ripple effects" },
-                       { key:"cost", label:"Cost", hint:"Their rough estimate" }],
-  "future-state":     [{ key:"theirSolution", label:"What they think they need" },
-                       { key:"capability", label:"Capability to test", hint:"Fills the last question" }],
-  "close-next-steps": [{ key:"nextStep", label:"Recommended next step", hint:"Fills your recommendation" },
-                       { key:"who", label:"Who should join", hint:"Fills \"It'd be helpful to include…\"" },
-                       { key:"date", label:"Date" }],
-};
-
-// Script items per stage.
-//   say:  spoken beats. cue = what the beat does. check = pause for their answer.
-//         then = what you say once they answer. list = numbered points (optional tag).
-//         title / group / proof on the item itself.
-//   ask:  a question card. group = only shown for that area.
-export const STAGE_DATA = {
-  "rapport-opener": {
-    script:[
-      { kind:"say", beats:[
-        { cue:"Greet, then pause", check:"answer", text:"Hi [Names], I'm **glad we found the time** today." },
-        { cue:"If they're chatty", text:"How's your **week** been?" },
-        { cue:"Ask permission", text:"Great, well mind if we talk about the **agenda**?\n\nPerfect. Quick intros before we dive in." },
-        { cue:"Your intro", text:"My name is **TJ Magar**, I'm a Director of Healthcare Partnerships here at Clasp." },
-        { cue:"Why you care", text:"I'm super passionate about this work because **I'm an agitated borrower myself** — I know how it feels to have that barrier to education. And I love that we're **breaking it down** for the most important workforce there is: **healthcare**." },
-        { cue:"Hand off", check:"answer", text:"I've brought my colleague **Altara** as well — and then I'd love to hear from you both, maybe just **what would make today a win**. Altara, mind sharing a quick intro first?" },
-      ]},
-    ],
-  },
-
   "rules-engagement": {
     script:[
       { kind:"say", beats:[
-        { cue:"Propose", text:"Perfect, that leads into what I had in mind for today. Here's what I'm thinking in terms of **how we spend our time** — let me know if you had something else in mind…" },
-        { cue:"Objective", check:true, text:"The outcome I'd suggest is to **learn enough about each other** to decide whether a **second meeting** makes sense. Obviously I don't expect us to do business today. **Fair?**", then:"Great." },
-        { cue:"Agenda", text:"Here's the agenda I'm thinking will get us there:", list:[
-          "I'll share **a little about Clasp** so you have context.",
-          "Then I'd love to spend **most of our time** on what's important to [their company] — your goals around **recruiting, developing and retaining** clinical talent.",
-          "If it looks like we can help, I'll **explain how it works**.",
-          "And I'll save a few minutes at the end so we can **jointly decide** on a next step.",
+        { cue:"Bridge from intros", text:"Perfect, that leads into what I had in mind for today." },
+        { cue:"Propose the agenda", text:"Here's what I'm thinking in terms of **how we spend our time**. Let me know if you had something else in mind…" },
+        { cue:"Set the outcome", text:"But the outcome I recommend we shoot for is to **learn enough about each other** to decide whether or not it makes sense to have a **second meeting**." },
+        { cue:"Lower the stakes", text:"Obviously, I **don't expect us to do business** on this call. So let's just learn enough about each other to determine if another call makes sense." },
+        { cue:"Check", check:true, text:"Is that **fair so far**?", then:"Perfect." },
+        { cue:"Walk the agenda", text:"Now here's the agenda I'm thinking will help us get there.", list:[
+          "First, I'll share **a little about Clasp** upfront so you have the context for the rest of the call.",
+          "But I'd love to spend **most of our time** today getting clear on **what's important to [their company]** — maybe the different challenges or goals you might have as they relate to **workforce recruitment, development, or retention**.",
+          "Once we're clear on that — and if I think we can help — I'll **explain more about how it works** so you have an understanding.",
+          "Then we can **jointly decide** whether we set that next step. And I'll save some time at the end for that.",
         ]},
-        { cue:"Check", check:true, text:"Does that agenda **feel fair**?", then:"Great — let's take a crack at it." },
+        { cue:"Check", check:true, text:"Does that all feel **reasonable and fair**?", then:"Great. Let's take a crack at it." },
       ]},
     ],
   },
