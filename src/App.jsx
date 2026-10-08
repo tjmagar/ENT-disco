@@ -75,23 +75,27 @@ const fmtClock = ms => {
 
 const STAGES = [
   { id:"prep",               icon:"◎",  short:"Prep Brief",               group:"setup" },
-  { id:"rapport-opener",     icon:"1",  short:"Rapport + Opener",         group:"setup" },
-  { id:"rules-engagement",   icon:"2",  short:"Rules of Engagement",      group:"setup" },
-  { id:"buyer-journey",      icon:"3",  short:"Buyer Journey",            group:"setup" },
-  { id:"need-behind-need",   icon:"4",  short:"Need Behind the Need",     group:"discovery" },
-  { id:"baseline-current",   icon:"5",  short:"Baseline Current State",   group:"discovery" },
-  { id:"validate-problem",   icon:"6",  short:"Validate the Problem",     group:"discovery" },
-  { id:"cause-analysis",     icon:"7",  short:"Cause Analysis",           group:"discovery" },
-  { id:"negative-impact",    icon:"8",  short:"Negative Impact",          group:"discovery" },
-  { id:"future-state",       icon:"9",  short:"Future State",             group:"discovery" },
-  { id:"close-next-steps",   icon:"10", short:"Close + Next Steps",       group:"close" },
+  { id:"rapport-opener",     icon:"1",  short:"Opening + Intros",         group:"setup" },
+  { id:"rules-engagement",   icon:"2",  short:"Objective + Agenda",       group:"setup" },
+  { id:"context",            icon:"3",  short:"Clasp Context",            group:"setup" },
+  { id:"dig-in",             icon:"4",  short:"Dig In by Area",           group:"discovery" },
+  { id:"buyer-journey",      icon:"5",  short:"Buyer Journey",            group:"discovery" },
+  { id:"need-behind-need",   icon:"6",  short:"Need Behind the Need",     group:"discovery" },
+  { id:"baseline-current",   icon:"7",  short:"Baseline Current State",   group:"discovery" },
+  { id:"validate-problem",   icon:"8",  short:"Validate the Problem",     group:"discovery" },
+  { id:"cause-analysis",     icon:"9",  short:"Cause Analysis",           group:"discovery" },
+  { id:"negative-impact",    icon:"10", short:"Negative Impact",          group:"discovery" },
+  { id:"future-state",       icon:"11", short:"Future State",             group:"discovery" },
+  { id:"close-next-steps",   icon:"12", short:"Close + Next Steps",       group:"close" },
   { id:"outputs",            icon:"✦",  short:"Outputs",                  group:"close" },
 ];
 
 // Phase + timebox per stage (from the designed template)
 const STAGE_META = {
-  "rapport-opener":   { phase:"OPEN",            timebox:"2 min" },
-  "rules-engagement": { phase:"ALIGN",           timebox:"3 min" },
+  "rapport-opener":   { phase:"OPEN",            timebox:"3 min" },
+  "rules-engagement": { phase:"ALIGN",           timebox:"2 min" },
+  "context":          { phase:"CONTEXT",         timebox:"4 min" },
+  "dig-in":           { phase:"CURRENT STATE",   timebox:"8 min" },
   "buyer-journey":    { phase:"BUSINESS PROBLEM",timebox:"2 min" },
   "need-behind-need": { phase:"BUSINESS PROBLEM",timebox:"3 min" },
   "baseline-current": { phase:"CURRENT STATE",   timebox:"4 min" },
@@ -104,8 +108,17 @@ const STAGE_META = {
 
 // What to write down at each stage. These feed the [placeholders] in later summaries.
 const CAPTURE = {
-  "rapport-opener":   [{ key:"vibe", label:"Read on them", hint:"Pronouns, energy, anything they volunteered" }],
+  "rapport-opener":   [{ key:"win", label:"What would make today a win", hint:"Each person's answer" },
+                       { key:"vibe", label:"Read on them", hint:"Pronouns, energy, anything they volunteered" }],
   "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
+  "context":          [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Retention","Labor cost"] },
+                       { key:"startWhy", label:"What they said", hint:"Fills \"It sounds like…\" in Dig In" }],
+  "dig-in":           [{ key:"roles", label:"Roles they hire new grads in" },
+                       { key:"schools", label:"School relationships", hint:"Who owns them, how well they work" },
+                       { key:"turnover", label:"First-year turnover", hint:"Number + department" },
+                       { key:"signOns", label:"Sign-on bonuses", hint:"Type, amount, how much they matter" },
+                       { key:"contract", label:"Contract labor", hint:"How much, where" },
+                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" }],
   "buyer-journey":    [{ key:"trigger", label:"Trigger event", hint:"What set this in motion, in their words" },
                        { key:"origin", label:"Why now", hint:"The moment it became a priority" }],
   "need-behind-need": [{ key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
@@ -137,37 +150,82 @@ const CAPTURE = {
 //   **bold** marks the words to land; [placeholders] fill from the prep brief and the capture pane.
 const STAGE_DATA = {
   "rapport-opener": {
-    rule:"Land the opener. Read the room.",
+    rule:"Land the opener, get permission for the agenda, then intros — yours, your colleague's, then theirs.",
     script:[
       { kind:"say", beats:[
-        { cue:"Greet", text:"Hey [Names] — **glad we found the time** to meet today." },
-        { cue:"Small talk", text:"How's your **week** been?" },
-        { cue:"Turn to business", text:"Well, cool. We've got **a lot to get to** today." },
-        { cue:"Ask permission", check:true, text:"Mind if we talk about the **agenda**?" },
+        { cue:"Greet", text:"Hi [Names], I'm **glad we found the time** today. How's your **week** been?" },
+        { cue:"Ask permission", check:true, text:"Great, well mind if we talk about the **agenda**?", then:"Perfect. Quick intros before we dive in." },
+        { cue:"Your intro", text:"My name is **TJ Magar**, I'm a Director of Healthcare Partnerships here at Clasp." },
+        { cue:"Why you care", text:"I'm super passionate about the work we do here because **I'm an agitated borrower myself**, so I know how it feels to have that barrier to education. And I love that we are **breaking that down**, especially for the most important workforce and industry: **healthcare**." },
+        { cue:"Hand off", check:"answer", text:"I've brought my colleague **Altara** here as well — and then would love to hear about you both, maybe just **what would make today a win**. But Altara — mind sharing a quick intro first?" },
       ]},
     ],
-    tips:["Pronouns: I/me/my means personal stakes matter. We/us/our means team focus and consensus matter.","Energy: talkative, stay with it. Business, pivot. Don't force the wrong mode.","Complaint: if they volunteer a frustration before you ask, that's the center. Note it."],
-    watch:["Thanking the prospect for their time — immediately positions you lower","Running ROE versions back to back — pick one and commit"],
+    tips:["Pronouns: I/me/my means personal stakes matter. We/us/our means team focus and consensus matter.","Energy: talkative, stay with it. Business, pivot. Don't force the wrong mode.","Write down what would make today a win for each person. It sets up the agenda."],
+    watch:["Thanking the prospect for their time — immediately positions you lower","Letting intros run long — keep yours to two sentences"],
   },
   "rules-engagement": {
     rule:"Align on the objective, the agenda, and the decision to be made.",
     script:[
       { kind:"say", beats:[
+        { cue:"Bridge from intros", text:"Perfect, that leads into what I was thinking." },
         { cue:"Propose the agenda", text:"Here's what I'm thinking in terms of an **agenda**. Let me know if you had something else in mind…" },
-        { cue:"Set the outcome", text:"The outcome I recommend we shoot for is to **learn enough about each other** to decide whether or not it makes sense to have a **second meeting**." },
+        { cue:"Set the outcome", text:"But the outcome I recommend we shoot for is to **learn enough about each other** to decide whether or not it makes sense to have a **second meeting**." },
         { cue:"Lower the stakes", text:"Obviously, I **don't expect us to do business** on this call. So let's just learn enough about each other to determine if another call makes sense." },
         { cue:"Check", check:true, text:"Is that **fair so far**?", then:"Perfect." },
         { cue:"Walk the agenda", text:"Now here's the agenda I'm thinking will help us get there.", list:[
-          "First, I'll share **a little about [Company]** upfront so you have the context for the rest of the call.",
-          "I'd love to spend **most of our time** today getting clear on the different **challenges or goals** you might have as they relate to [their top initiatives].",
+          "First, I'll share **a little about Clasp** upfront so you have the context for the rest of the call.",
+          "But I'd love to spend **most of our time** today getting clear on **what's important to [their company]** — maybe the different challenges or goals you might have as they relate to **workforce recruitment, development, or retention**.",
           "Once we're clear on that — and if I think we can help — I'll **explain more about how it works** so you have an understanding.",
-          "Then we can **jointly decide** whether we set that next step. I'll save some time at the end for that.",
+          "Then we can **jointly decide** whether we set that next step. And I'll save some time at the end for that.",
         ]},
-        { cue:"Check", check:true, text:"Does that agenda feel **reasonable and fair**?", then:"Great. Let's take a crack at it." },
+        { cue:"Check", check:true, text:"Does that all feel **reasonable and fair**?", then:"Great. Let's take a crack at it." },
       ]},
     ],
     tips:["Align on the objective, the agenda, and the decision to be made.","Pause after each fairness check and let them answer."],
     watch:["Rushing past the fairness checks without pausing","Skipping the agenda after they agree to the objective"],
+  },
+  "context": {
+    rule:"Share context first to earn the right to ask questions. Then let them pick where to start.",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
+        { cue:"Who we are", text:"So at Clasp, we work **exclusively in healthcare** (full stop)… and within that, we exist to support HR and talent acquisition teams **attract and retain hard-to-fill clinical talent**." },
+        { cue:"Proof", text:"Our partners include major systems such as **Novant Health, Northwestern Medicine and Boston Children's**, as well as smaller systems like **Saint Alphonsus**. And even outpatient clinics like **Confluent Health**, specialty clinics, the whole gamut." },
+      ]},
+      { kind:"say", beats:[
+        { cue:"Who we talk to", text:"So we talk to a lot of HR leaders across the country — talent acquisition, L&D, workforce development, ops and business leaders — **a lot of smart folks**. And we talk to them about a lot of things, but **the three areas where we're able to drive the most value**, and where it often makes sense to work together, are here on your screen." },
+        { cue:"Three areas", text:"", list:[
+          { tag:"Pipeline", text:"Our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
+          { tag:"Labor cost", text:"Others are **bleeding money** on sign-on bonuses and contract labor, and recruitment costs just to fill and keep roles filled." },
+          { tag:"Retention", text:"And some are **losing good people** they already have to a competitor for more money — so they're motivating them to stay by offering **career pathways** and internal development opportunities — MAs into RNs, PTAs into PTs — instead of watching them walk out the door." },
+        ]},
+        { cue:"Hand it to them", check:"answer", text:"I have an idea where you might fit in given [what you spotted], and in general, the industry norm of **first-year nurse retention**. But given your current situation, **where would be the most relevant place for us to start** our conversation?", then:"Okay great, that makes sense." },
+      ]},
+    ],
+    tips:["Keep it to a few slides. The point is to earn the right to ask questions, not to pitch.","Mark the area they pick in the capture pane. Dig In opens on it."],
+    watch:["Turning the context into a full pitch","Picking the area for them — let them choose"],
+  },
+  "dig-in": {
+    rule:"Frame the potential value and let them point you to what matters. Acknowledge each answer and follow their lead.",
+    script:[
+      { kind:"say", beats:[
+        { cue:"Reflect + permission", check:"answer", text:"It sounds like [what they said]. **Can we dig into that some more?**" },
+      ]},
+      { kind:"ask", group:"Pipeline", label:"Roles", text:"What **clinical and allied health roles** do you hire new grads in the most?" },
+      { kind:"ask", group:"Pipeline", label:"Department heads", text:"Which **department heads** do you work with the most to fill their new grad needs?" },
+      { kind:"ask", group:"Pipeline", label:"School relationships", text:"What existing relationships do you have with the **local college programs** to funnel students in these fields your way?\n\nWho works on those relationships?" },
+      { kind:"ask", group:"Pipeline", label:"Fit", text:"**How well** is that meeting your needs?" },
+      { kind:"ask", group:"Pipeline", label:"Loan debt", text:"How often have you had these students **ask about help with their student loan debt**?" },
+      { kind:"ask", group:"Retention", label:"Replacement hires", text:"How many **replacement hires** do you make in these departments?" },
+      { kind:"ask", group:"Retention", label:"First-year turnover", text:"What is the **first-year turnover** there?" },
+      { kind:"ask", group:"Retention", label:"Priority", text:"How often have you **spoken internally** about reducing that number?\n\nWho **cares the most** about the turnover number?" },
+      { kind:"ask", group:"Labor cost", label:"Sign-ons", text:"What type of **sign-on bonuses** are you offering for these roles?\n\nHow important do you find them to be in **getting a commitment**?" },
+      { kind:"ask", group:"Labor cost", label:"Sign-on priority", text:"How often have you **spoken internally** about reducing the amount you spend on sign-ons?\n\nWho **cares the most** about how much you spend on sign-ons?" },
+      { kind:"ask", group:"Labor cost", label:"Contract labor", text:"How much **contract labor** do you use to fill the gaps for these roles?" },
+      { kind:"ask", group:"Labor cost", label:"Contract priority", text:"How often have you **spoken internally** about reducing the amount of contract labor you use in these departments?\n\nWho **cares the most** about what you spend on contract labor?" },
+    ],
+    tips:["Acknowledge every answer before the next question.","Follow their lead into the areas they want to discuss in more detail.","\"Who cares the most\" tells you who else needs to be in the next meeting."],
+    watch:["Running the list like a survey — pick the questions that follow what they just said","Moving on without a number for turnover, sign-ons or contract labor"],
   },
   "buyer-journey": {
     rule:"Choose one route, not all three. For an active buyer, go back in time. For an outbound buyer, lead with context.",
@@ -276,13 +334,22 @@ const STAGE_DATA = {
   },
 };
 
+// Script items to show. Questions tagged with a group (Pipeline / Retention / Labor cost)
+// show only the area they picked, first, unless "all areas" is on.
+function visibleScript(stageId, area, showAll) {
+  const script = STAGE_DATA[stageId]?.script || [];
+  if (!area || showAll || !script.some(it => it.group)) {
+    if (!area) return script;
+    return [...script.filter(it => !it.group), ...script.filter(it => it.group === area), ...script.filter(it => it.group && it.group !== area)];
+  }
+  return script.filter(it => !it.group || it.group === area);
+}
+
 // Flat list of focusable lines for a stage: every spoken beat and every question.
-function flattenScript(stageId) {
-  const data = STAGE_DATA[stageId];
-  if (!data) return [];
+function flattenScript(script) {
   const out = [];
   let q = 0;
-  data.script.forEach((item, i) => {
+  script.forEach((item, i) => {
     if (item.kind === "say") item.beats.forEach((_, b) => out.push({ kind:"beat", item:i, beat:b }));
     else out.push({ kind:"ask", item:i, q:++q });
   });
@@ -421,7 +488,7 @@ const SESSION_KEY = "discovery-session-v1";
 function loadSession() {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "{}") || {}; } catch { return {}; }
 }
-const EMPTY_BRIEF = { yourCompany:"", prospect:"", company:"", role:"", initiatives:"", tool:"", reps:"", volume:"", timePerDoc:"", metric:"", pain:"", integrations:"", approval:"" };
+const EMPTY_BRIEF = { prospect:"", company:"", signals:"", role:"", tool:"", reps:"", volume:"", timePerDoc:"", metric:"", pain:"", integrations:"", approval:"" };
 
 export default function App() {
   const saved = useRef(loadSession()).current;
@@ -514,9 +581,11 @@ export default function App() {
     const cause = v(c.rootCause) && `and it sounds like the root cause is ${v(c.rootCause)}`;
     switch (name.toLowerCase()) {
       case "names": case "name": return v(b.prospect);
-      case "company": return v(b.yourCompany);
-      case "their top initiatives": return v(b.initiatives);
-      case "surface need": case "what they said": return v(c.surfaceNeed);
+      case "their company": return v(b.company);
+      case "what you spotted": return v(b.signals);
+
+      case "surface need": return v(c.surfaceNeed);
+      case "what they said": return v(c.startWhy) || v(c.surfaceNeed);
       case "suspected root cause": return v(c.suspected);
       case "capability": return v(c.capability);
       case "your honest read": return v(c.read);
@@ -529,7 +598,9 @@ export default function App() {
   }
 
   // Teleprompter cursor: one highlighted line per stage. Index == length means the stage is done.
-  const flat = flattenScript(activeStage);
+  const [showAllAreas, setShowAllAreas] = useState(false);
+  const script = visibleScript(activeStage, captures.startArea, showAllAreas);
+  const flat = flattenScript(script);
   const focusIdx = Math.min(focus[activeStage] ?? 0, flat.length);
   const setFocusIdx = i => setFocus(f => ({ ...f, [activeStage]: Math.max(0, Math.min(i, flat.length)) }));
   useEffect(() => {
@@ -1061,12 +1132,35 @@ ${combinedText}` }]
   // The live script for a stage: spoken beats in a "Say" pane, then question cards.
   // One line at a time is "on" (Space advances); finished lines dim.
   function renderStageScript(stageId, handoff = true) {
-    const data = STAGE_DATA[stageId];
     let line = -1;
+    let lastGroup = null;
+    const hasGroups = script.some(it => it.group);
+    const groupHeader = item => {
+      if (!item.group || item.group === lastGroup) return null;
+      lastGroup = item.group;
+      const chosen = item.group === captures.startArea;
+      return (
+        <div key={`g-${item.group}`} style={{ display:"flex", alignItems:"center", gap:10, margin:"18px 2px 10px" }}>
+          <span style={{ fontSize:12, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color: chosen ? C.emerald : C.textSecondary }}>{item.group}</span>
+          {chosen && <span style={{ fontSize:10, fontWeight:700, color:C.emerald, background:C.emeraldLight, borderRadius:99, padding:"2px 8px" }}>Their pick</span>}
+          <span style={{ flex:1, height:1, background:C.border }} />
+        </div>
+      );
+    };
     const lineState = i => i === focusIdx ? "now" : i < focusIdx ? "done" : "next";
     return (
       <div>
-        {data.script.map((item, i) => {
+        {hasGroups && (
+          <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap", marginBottom:14 }}>
+            <span style={{ fontSize:11, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:C.textMuted }}>Area</span>
+            {["Pipeline","Retention","Labor cost"].map(a => {
+              const on = captures.startArea === a;
+              return <button key={a} onClick={() => { setCapture("startArea", on ? "" : a); setShowAllAreas(false); }} style={{ ...B, fontSize:12, fontWeight:600, padding:"5px 12px", borderRadius:99, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textSecondary }}>{a}</button>;
+            })}
+            {captures.startArea && <button onClick={() => setShowAllAreas(v => !v)} style={{ ...B, fontSize:12, color:C.textMuted, background:"none", border:"none", textDecoration:"underline" }}>{showAllAreas ? "Only their pick" : "Show all areas"}</button>}
+          </div>
+        )}
+        {script.map((item, i) => {
           if (item.kind === "say") return (
             <div key={i} style={{ background:C.yellow, border:`1px solid ${C.yellowBorder}`, borderRadius:14, overflow:"hidden", marginBottom:14 }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px 8px" }}>
@@ -1085,21 +1179,24 @@ ${combinedText}` }]
                       <div style={{ fontSize:11, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", lineHeight:1.3, color: st === "now" ? C.emerald : C.yellowText }}>
                         {st === "done" ? "✓ " : ""}{beat.cue}
                       </div>
-                      {beat.check && <div style={{ marginTop:6, display:"inline-flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:C.amber, background:"#fff3e0", border:"1px solid #fcd9a8", borderRadius:99, padding:"2px 8px" }}>Wait for yes</div>}
+                      {beat.check && <div style={{ marginTop:6, display:"inline-flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:C.amber, background:"#fff3e0", border:"1px solid #fcd9a8", borderRadius:99, padding:"2px 8px", whiteSpace:"nowrap" }}>{beat.check === "answer" ? "Let them answer" : "Wait for yes"}</div>}
                     </div>
                     <div style={{ minWidth:0 }}>
-                      <Script text={beat.text} size={20} resolve={resolveToken} />
+                      {beat.text && <Script text={beat.text} size={20} resolve={resolveToken} />}
                       {beat.list && (
-                        <div style={{ marginTop:12, display:"flex", flexDirection:"column", gap:10 }}>
+                        <div style={{ marginTop:beat.text ? 12 : 2, display:"flex", flexDirection:"column", gap:12 }}>
                           {beat.list.map((pt, k) => (
                             <div key={k} style={{ display:"flex", gap:12, alignItems:"flex-start" }}>
                               <span style={{ flexShrink:0, width:22, height:22, marginTop:3, borderRadius:"50%", background:C.yellowRule, color:C.yellowText, fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>{k + 1}</span>
-                              <div style={{ minWidth:0 }}><Script text={pt} size={18} resolve={resolveToken} /></div>
+                              <div style={{ minWidth:0 }}>
+                                {pt.tag && <div style={{ fontSize:11, fontWeight:800, letterSpacing:"0.08em", textTransform:"uppercase", color:C.yellowText, marginBottom:2 }}>{pt.tag}</div>}
+                                <Script text={pt.text ?? pt} size={18} resolve={resolveToken} />
+                              </div>
                             </div>
                           ))}
                         </div>
                       )}
-                      {beat.then && <div style={{ marginTop:8, fontSize:15, color:C.textSecondary }}><span style={{ color:C.textMuted, fontWeight:600 }}>When they agree → </span>“{beat.then}”</div>}
+                      {beat.then && <div style={{ marginTop:8, fontSize:15, color:C.textSecondary }}><span style={{ color:C.textMuted, fontWeight:600 }}>{beat.check === "answer" ? "After they answer → " : "When they agree → "}</span>“{beat.then}”</div>}
                     </div>
                   </div>
                 );
@@ -1114,8 +1211,11 @@ ${combinedText}` }]
           cardRegistry.current[`${stageId}-${qn}`] = item.label; // live transcript analysis
           const heard = coveredCards[`${stageId}-${qn}`] === true;
           const nc = noteControls(cardKey);
+          const header = groupHeader(item);
           return (
-            <div key={i} className="card" data-line={`${stageId}-${idx}`} onClick={() => setFocusIdx(idx)}
+            <div key={i}>
+            {header}
+            <div className="card" data-line={`${stageId}-${idx}`} onClick={() => setFocusIdx(idx)}
               style={{ cursor:"pointer", marginBottom:10, display:"flex", gap:16, padding:"16px 20px 18px 16px", background:C.white, borderRadius:12,
                 border:`1px solid ${st === "now" ? C.emerald : C.border}`,
                 boxShadow: st === "now" ? "0 0 0 3px rgba(37,99,235,0.12), 0 6px 18px rgba(16,24,40,0.06)" : "none",
@@ -1134,6 +1234,7 @@ ${combinedText}` }]
                 <Script text={item.text} size={20} resolve={resolveToken} followups />
                 {nc.body}
               </div>
+            </div>
             </div>
           );
         })}
@@ -1309,7 +1410,7 @@ const sd = STAGE_DATA[activeStage];
   const stageElapsed = now - stageStart;
   const overTime = timeboxMs && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Rapport + Opener","rules-engagement":"Rules of Engagement","buyer-journey":"Buyer Journey Alignment","need-behind-need":"Need Behind the Need","baseline-current":"Baseline the Current State","validate-problem":"Validate the Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Earn the Right: Clasp Context","dig-in":"Dig In by Area","buyer-journey":"Buyer Journey Alignment","need-behind-need":"Need Behind the Need","baseline-current":"Baseline the Current State","validate-problem":"Validate the Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Paste your prep brief. Everything downstream personalizes from this.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
@@ -1380,7 +1481,7 @@ const sd = STAGE_DATA[activeStage];
         <div style={{ padding:"12px 24px 12px 32px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", flexWrap:"wrap", gap:"8px 16px", flexShrink:0 }}>
           <div style={{ flex:"1 1 240px", minWidth:0 }}>
             <div style={{ display:"flex", alignItems:"center", gap:8, fontSize:11, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginBottom:3 }}>
-              {isNumbered && <span>Step {STAGES[currentIdx].icon} of 10</span>}
+              {isNumbered && <span>Step {STAGES[currentIdx].icon} of {STAGES.filter(st => /^\d+$/.test(st.icon)).length}</span>}
               {meta.phase && <><span style={{ color:C.border }}>•</span><span style={{ color:C.emerald }}>{meta.phase}</span></>}
               {(briefFields.prospect || briefFields.company) && activeStage !== "prep" && (
                 <><span style={{ color:C.border }}>•</span><span style={{ color:C.textSecondary, textTransform:"none", letterSpacing:0, fontWeight:600 }}>{[briefFields.prospect, briefFields.company].filter(Boolean).join(" @ ")}</span></>
@@ -1477,11 +1578,10 @@ const sd = STAGE_DATA[activeStage];
                   <div style={{ fontSize:11, color:"#9080c8", marginBottom:16 }}>Or fill in manually below:</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                     {[
-                      { key:"yourCompany", label:"Your company",         placeholder:"Fills [Company] in the agenda" },
-                      { key:"prospect",    label:"Prospect name",       placeholder:"e.g. Jane" },
-                      { key:"company",     label:"Company",              placeholder:"e.g. Acme Health" },
+                      { key:"prospect",    label:"Prospect name(s)",     placeholder:"Fills [Names], e.g. Jane, Sam" },
+                      { key:"company",     label:"Their organization",   placeholder:"Fills [their company]" },
+                      { key:"signals",     label:"What you spotted",     placeholder:"Fills [what you spotted], e.g. a new site opening, sign-ons on their careers page" },
                       { key:"role",        label:"Their role",           placeholder:"e.g. VP of Operations" },
-                      { key:"initiatives", label:"Their top initiatives", placeholder:"Fills [their top initiatives]" },
                       { key:"tool",        label:"Current state / tools", placeholder:"e.g. spreadsheets + email" },
                       { key:"reps",        label:"Team size",            placeholder:"e.g. 40" },
                       { key:"volume",      label:"Volume",               placeholder:"e.g. 200 / month" },
@@ -1491,7 +1591,7 @@ const sd = STAGE_DATA[activeStage];
                       { key:"approval",    label:"Approval process",     placeholder:"e.g. CFO signs off over $50k" },
                       { key:"pain",        label:"Known pain",           placeholder:"e.g. losing new hires in year one" },
                     ].map(f => (
-                      <div key={f.key} style={f.key === "pain" ? { gridColumn:"1 / -1" } : {}}>
+                      <div key={f.key} style={f.key === "pain" || f.key === "signals" ? { gridColumn:"1 / -1" } : {}}>
                         <div style={{ fontSize:10, color:"#2b4fa3", fontWeight:700, marginBottom:4, textTransform:"uppercase", letterSpacing:"0.07em" }}>{f.label}</div>
                         <input
                           value={briefFields[f.key]}
