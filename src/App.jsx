@@ -87,7 +87,6 @@ const STAGES = [
   { id:"negative-impact",    icon:"10", short:"Negative Impact",          group:"discovery" },
   { id:"future-state",       icon:"11", short:"Future State",             group:"discovery" },
   { id:"close-next-steps",   icon:"12", short:"Close + Next Steps",       group:"close" },
-  { id:"outputs",            icon:"✦",  short:"Outputs",                  group:"close" },
 ];
 
 // Phase + timebox per stage (from the designed template)
@@ -572,7 +571,7 @@ const EMPTY_BRIEF = { prospect:"", company:"", signals:"", role:"", systemSize:"
 
 export default function App() {
   const saved = useRef(loadSession()).current;
-  const [activeStage, setActiveStage] = useState(saved.activeStage || "prep");
+  const [activeStage, setActiveStage] = useState(STAGES.some(st => st.id === saved.activeStage) ? saved.activeStage : "prep");
   const [buyerPath, setBuyerPath] = useState(saved.buyerPath ?? null);
   const [selectedTree, setSelectedTree] = useState(null);
   const [callSource, setCallSource] = useState(saved.callSource ?? null);
@@ -691,30 +690,6 @@ export default function App() {
   }, [focusIdx, activeStage]);
 
   useEffect(() => { setTipsOpen(false); setWatchOpen(false); }, [activeStage]);
-
-  useEffect(() => {
-    function handleKey(e) {
-      const tag = e.target.tagName;
-      if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT' || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key === 'ArrowRight' && currentIdx < STAGES.length - 1) setActiveStage(STAGES[currentIdx + 1].id);
-      if (e.key === 'ArrowLeft' && currentIdx > 0) setActiveStage(STAGES[currentIdx - 1].id);
-      if (!flat.length) return;
-      if (e.key === ' ' || e.key === 'ArrowDown' || e.key === 'j') {
-        e.preventDefault();
-        if (focusIdx >= flat.length && currentIdx < STAGES.length - 1) setActiveStage(STAGES[currentIdx + 1].id);
-        else setFocusIdx(focusIdx + 1);
-      }
-      if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); setFocusIdx(focusIdx - 1); }
-      // 1-9 jumps to that question
-      const n = parseInt(e.key);
-      if (n >= 1 && n <= 9) {
-        const i = flat.findIndex(x => x.q === n);
-        if (i >= 0) setFocusIdx(i);
-      }
-    }
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  });
 
   async function generateDebrief() {
     if (!callTranscript.trim()) return;
@@ -1349,7 +1324,7 @@ ${combinedText}` }]
               ].map(({ a, sub }) => {
                 const on = captures.startArea === a;
                 return (
-                  <button key={a} onClick={() => { setCapture("startArea", on ? "" : a); setShowAllAreas(false); }}
+                  <button key={a} onClick={() => { setCapture("startArea", a); setShowAllAreas(false); setFocus(f => ({ ...f, "value-drop": 0 })); setActiveStage("value-drop"); }}
                     style={{ ...B, textAlign:"left", padding:"14px 16px", borderRadius:12, border:`1.5px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textPrimary, boxShadow:on ? "0 4px 14px rgba(37,99,235,0.25)" : "none" }}>
                     <div style={{ fontSize:17, fontWeight:700, marginBottom:3 }}>{on ? "✓ " : ""}{a}</div>
                     <div style={{ fontSize:13, color:on ? "rgba(255,255,255,0.85)" : C.textMuted, lineHeight:1.4 }}>{sub}</div>
@@ -1378,7 +1353,7 @@ ${combinedText}` }]
               border:`1px ${done ? "solid" : "dashed"} ${done ? C.emerald : C.border}`, background: done ? C.emeraldLight : "transparent" }}>
             <div style={{ flex:1, minWidth:0 }}>
               <div style={{ fontSize:11, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color: done ? C.emerald : C.textMuted, marginBottom:4 }}>
-                {done ? "Stage done · Space to continue" : "Up next"} · {next.short}
+                {done ? "Stage done" : "Up next"} · {next.short}
               </div>
               {nextPreview && <div style={{ fontSize:15, color: done ? C.textPrimary : C.textMuted, lineHeight:1.45, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{renderInline(nextPreview.replace(/\n+/g, " "), resolveToken, "nx")}</div>}
             </div>
@@ -1626,18 +1601,8 @@ const sd = STAGE_DATA[activeStage];
           )}
 
           <div style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
-            <button
-              onClick={() => { setLiveMode(v => !v); liveLastLength.current = 0; }}
-              style={{ ...B, fontSize:12, padding:"8px 12px", border:`1px solid ${liveMode ? "#f3c9c9" : C.border}`, borderRadius:8, background:liveMode ? "#fdf2f2" : C.white, color:liveMode ? C.coral : C.textSecondary, fontWeight:600, display:"flex", alignItems:"center", gap:6 }}
-            >
-              <span style={{ width:7, height:7, borderRadius:"50%", background:liveMode ? C.coral : C.textMuted, display:"inline-block", animation: liveMode ? "pulse 1.5s infinite" : "none" }} />
-              {liveAnalyzing ? "Analyzing…" : liveMode ? `Live${liveMeetingTitle ? ` — ${liveMeetingTitle.slice(0,20)}` : ""}` : "Go live"}
-            </button>
-            <button onClick={()=>setCoachingVisible(v=>!v)} title="Show coaching notes, tips and watch-outs" style={{ ...B, fontSize:12, padding:"8px 12px", border:`1px solid ${coachingVisible ? C.emeraldMid : C.border}`, borderRadius:8, background:coachingVisible?C.emeraldLight:C.white, color:coachingVisible?"#1d4ed8":C.textSecondary, fontWeight:600 }}>Coaching {coachingVisible ? "on" : "off"}</button>
-            {showOutputsShortcut && <button onClick={()=>setActiveStage("outputs")} style={{ ...B, fontSize:12, padding:"8px 12px", border:`1px solid ${C.border}`, borderRadius:8, background:C.white, color:C.textSecondary, fontWeight:600 }}>✦ Outputs</button>}
-            <div style={{ width:1, height:28, background:C.border, margin:"0 4px" }} />
-            <button disabled={currentIdx === 0} onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} title="Previous (←)" style={{ ...B, fontSize:16, width:38, height:38, border:`1px solid ${C.border}`, borderRadius:8, background:C.white, color:C.textSecondary, fontWeight:600, opacity:currentIdx === 0 ? 0.4 : 1 }}>←</button>
-            {nextStage && <button onClick={()=>setActiveStage(nextStage.id)} title="Next (→)" style={{ ...B, height:38, padding:"0 16px", border:"none", borderRadius:8, background:C.emerald, color:C.white, fontWeight:700, fontSize:13, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap" }}>
+            <button disabled={currentIdx === 0} onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} title="Previous" style={{ ...B, fontSize:16, width:38, height:38, border:`1px solid ${C.border}`, borderRadius:8, background:C.white, color:C.textSecondary, fontWeight:600, opacity:currentIdx === 0 ? 0.4 : 1 }}>←</button>
+            {nextStage && <button onClick={()=>setActiveStage(nextStage.id)} title="Next" style={{ ...B, height:38, padding:"0 16px", border:"none", borderRadius:8, background:C.emerald, color:C.white, fontWeight:700, fontSize:13, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap" }}>
               <span style={{ opacity:0.75, fontWeight:600 }}>Next</span><span className="hide-narrow">{nextStage.short}</span><span style={{ fontSize:16 }}>→</span>
             </button>}
           </div>
@@ -1780,16 +1745,6 @@ const sd = STAGE_DATA[activeStage];
             {/* LIVE SCRIPT */}
             {sd && (
               <div>
-                <div style={{ display:"flex", gap:10, alignItems:"baseline", marginBottom:16, padding:"0 2px" }}>
-                  <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.12em", textTransform:"uppercase", color:C.emerald, flexShrink:0 }}>Goal</span>
-                  <span style={{ fontSize:15, fontWeight:500, color:C.textSecondary, lineHeight:1.5 }}>{sd.rule}</span>
-                </div>
-                {sd.screen && (
-                  <div style={{ display:"flex", gap:10, alignItems:"baseline", margin:"-8px 0 16px", padding:"0 2px" }}>
-                    <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.12em", textTransform:"uppercase", color:C.textMuted, flexShrink:0 }}>Screen</span>
-                    <span style={{ fontSize:14, color:C.textMuted }}>{sd.screen}</span>
-                  </div>
-                )}
                 {renderStageScript(activeStage, activeStage !== "business-problem")}
               </div>
             )}
@@ -1879,16 +1834,6 @@ const sd = STAGE_DATA[activeStage];
           </div>
           </div>
 
-          {/* KEYBOARD HINTS */}
-          {flat.length > 0 && (
-            <div style={{ background:C.white, borderTop:`1px solid ${C.border}`, padding:"8px 32px", flexShrink:0, display:"flex", justifyContent:"center", gap:18, flexWrap:"wrap", fontSize:12, color:C.textMuted }}>
-              {[["Space","next line"],["↑","back"],["1–9","jump to question"],["← →","stage"]].map(([k,l]) => (
-                <span key={k} style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
-                  <kbd style={{ fontFamily:"inherit", fontSize:11, fontWeight:700, color:C.textSecondary, background:C.sand, border:`1px solid ${C.border}`, borderBottomWidth:2, borderRadius:5, padding:"1px 7px" }}>{k}</kbd>{l}
-                </span>
-              ))}
-            </div>
-          )}
           </div>
 
           {/* RIGHT — CAPTURE, QUESTION BANK, ROI */}
