@@ -1,37 +1,71 @@
 import { useState, useRef, useEffect } from "react";
 
 const C = {
-  pageBg: "#f3f4f6",
+  pageBg: "#f4f5f7",
   panelBg: "#ffffff",
   border: "#e3e6ea",
-  textPrimary: "#1c2733",
+  textPrimary: "#16202b",
   textSecondary: "#4b5a6a",
-  textMuted: "#8a94a3",
-  black: "#1c2733",
+  textMuted: "#7d8794",
+  black: "#16202b",
   white: "#ffffff",
-  sidebar: "#1e40af",
+  sidebar: "#ffffff",
   emerald: "#2563eb",
   emeraldLight: "#e9effe",
   emeraldMid: "#bccdf5",
-  yellow: "#fef6d8",
-  yellowBorder: "#eed88a",
-  yellowText: "#8a6d1a",
+  yellow: "#fdf6dc",
+  yellowBorder: "#efd98f",
+  yellowText: "#7d6214",
   coral: "#c44848",
+  coralLight: "#fdf2f2",
+  coralBorder: "#f3c9c9",
+  coralText: "#9b2c2c",
+  amber: "#b45309",
   sand: "#f8f9fb",
+};
+
+// Strip "Q1 — " / "Say — " / "3 — " prefixes: the card's badge already carries that.
+function cleanLabel(label = "") {
+  return label.replace(/^(Q\d+|Say|\d+)\s*[—–-]\s*/, "").replace(/^Say$/, "");
+}
+
+// Teleprompter text: lines within a paragraph reflow into one sentence; "\n\n" = a pause (new paragraph).
+// [Placeholder] tokens are highlighted so they read as "fill this in".
+function Script({ text, size = 19, weight = 500, color = C.textPrimary }) {
+  const paras = String(text).split(/\n\s*\n/);
+  const renderLine = (line, k) => line.split(/(\[[^\]]+\])/g).map((seg, j) =>
+    /^\[[^\]]+\]$/.test(seg)
+      ? <span key={`${k}-${j}`} style={{ background:"#e8eefc", color:"#1d4ed8", borderRadius:4, padding:"0 3px", fontWeight:600 }}>{seg}</span>
+      : <span key={`${k}-${j}`}>{seg}</span>
+  );
+  return (
+    <div style={{ fontSize:size, lineHeight:1.5, fontWeight:weight, color, letterSpacing:"-0.005em" }}>
+      {paras.map((p, i) => (
+        <div key={i} style={{ marginTop: i ? "0.7em" : 0 }}>
+          {renderLine(p.replace(/\s*\n\s*/g, " "), i)}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const fmtClock = ms => {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 };
 
 const STAGES = [
   { id:"prep",               icon:"◎",  short:"Prep Brief",               group:"setup" },
-  { id:"rapport-opener",     icon:"①",  short:"Rapport + Opener",         group:"setup" },
-  { id:"rules-engagement",   icon:"②",  short:"Rules of Engagement",      group:"setup" },
-  { id:"buyer-journey",      icon:"③",  short:"Buyer Journey Alignment",  group:"setup" },
-  { id:"need-behind-need",   icon:"④",  short:"Need Behind the Need",     group:"discovery" },
-  { id:"baseline-current",   icon:"⑤",  short:"Baseline the Current State", group:"discovery" },
-  { id:"validate-problem",   icon:"⑥",  short:"Validate the Business Problem", group:"discovery" },
-  { id:"cause-analysis",     icon:"⑦",  short:"Cause Analysis",           group:"discovery" },
-  { id:"negative-impact",    icon:"⑧",  short:"Build Negative Impact",    group:"discovery" },
-  { id:"future-state",       icon:"⑨",  short:"Future State",             group:"discovery" },
-  { id:"close-next-steps",   icon:"⑩",  short:"Close + Next Steps",       group:"close" },
+  { id:"rapport-opener",     icon:"1",  short:"Rapport + Opener",         group:"setup" },
+  { id:"rules-engagement",   icon:"2",  short:"Rules of Engagement",      group:"setup" },
+  { id:"buyer-journey",      icon:"3",  short:"Buyer Journey",            group:"setup" },
+  { id:"need-behind-need",   icon:"4",  short:"Need Behind the Need",     group:"discovery" },
+  { id:"baseline-current",   icon:"5",  short:"Baseline Current State",   group:"discovery" },
+  { id:"validate-problem",   icon:"6",  short:"Validate the Problem",     group:"discovery" },
+  { id:"cause-analysis",     icon:"7",  short:"Cause Analysis",           group:"discovery" },
+  { id:"negative-impact",    icon:"8",  short:"Negative Impact",          group:"discovery" },
+  { id:"future-state",       icon:"9",  short:"Future State",             group:"discovery" },
+  { id:"close-next-steps",   icon:"10", short:"Close + Next Steps",       group:"close" },
   { id:"outputs",            icon:"✦",  short:"Outputs",                  group:"close" },
 ];
 
@@ -224,6 +258,21 @@ export default function App() {
   const showOutputsShortcut = activeStage !== "outputs";
   const B = { fontFamily:"'Inter', system-ui, sans-serif", cursor:"pointer" };
 
+  // Call clock starts the first time you land on the opener; stage clock resets per stage.
+  const [callStart, setCallStart] = useState(null);
+  const [stageStart, setStageStart] = useState(() => Date.now());
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    setStageStart(Date.now());
+    if (!callStart && activeStage !== "prep" && activeStage !== "outputs") setCallStart(Date.now());
+  }, [activeStage]);
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const scrollRef = useRef(null);
+  useEffect(() => { scrollRef.current?.scrollTo(0, 0); }, [activeStage]);
+
   useEffect(() => { setTipsOpen(false); setWatchOpen(false); }, [activeStage]);
 
   useEffect(() => {
@@ -231,18 +280,11 @@ export default function App() {
       if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
       if (e.key === 'ArrowRight' && currentIdx < STAGES.length - 1) setActiveStage(STAGES[currentIdx + 1].id);
       if (e.key === 'ArrowLeft' && currentIdx > 0) setActiveStage(STAGES[currentIdx - 1].id);
-      // Number keys 1-9: toggle that card open/closed
+      // Number keys 1-9: mark question N on this stage as asked (toggle)
       const n = parseInt(e.key);
       if (n >= 1 && n <= 9) {
-        const cardIdx = n - 1;
-        const prefix = activeStage === "buyer-journey"
-          ? (buyerPath === "evaluating" ? "eval" : buyerPath === "active-pain" ? "active" : "latent")
-          : activeStage;
-        const key = `${prefix}-${cardIdx}`;
-        setCollapsedCards(s => {
-          const currentOpen = s[key] !== undefined ? !s[key] : cardIdx === 0;
-          return { ...s, [key]: currentOpen };
-        });
+        const key = `${activeStage}-${n}`;
+        setCoveredCards(s => ({ ...s, [key]: !s[key] }));
       }
     }
     window.addEventListener('keydown', handleKey);
@@ -499,7 +541,8 @@ ${combinedText}` }]
 
   function fillTemplate(text) {
     let t = text;
-    if (briefFields.metric)     t = t.replace(/\[metric they named\]/g, briefFields.metric);
+    if (briefFields.prospect)   t = t.replace(/\[Names?\]/g, briefFields.prospect);
+    if (briefFields.metric)    t = t.replace(/\[metric they named\]/g, briefFields.metric);
     if (briefFields.reps)       t = t.replace(/\[X\] reps/g, `${briefFields.reps} reps`);
     if (briefFields.volume)     t = t.replace(/\[Y\] agreements a month/g, `${briefFields.volume} agreements a month`);
     if (briefFields.timePerDoc) t = t.replace(/\[Z\] minutes each/g, `${briefFields.timePerDoc} minutes each`).replace(/\[X minutes\]/g, `${briefFields.timePerDoc} minutes`);
@@ -627,9 +670,9 @@ ${combinedText}` }]
   }
 
   const Collapsible = ({ label, isOpen, onToggle, accent, children }) => (
-    <div style={{ marginBottom:16, borderRadius:12, border:`1.5px solid ${accent}30`, overflow:"hidden" }}>
-      <button onClick={onToggle} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"13px 18px", background:`${accent}12`, border:"none", textAlign:"left" }}>
-        <span style={{ fontSize:13, fontWeight:700, color:accent, letterSpacing:"0.05em", textTransform:"uppercase" }}>{label}</span>
+    <div style={{ marginTop:12, marginBottom:10, borderRadius:12, border:`1px solid ${C.border}`, overflow:"hidden", background:C.white }}>
+      <button onClick={onToggle} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"11px 18px", background:C.white, border:"none", textAlign:"left" }}>
+        <span style={{ fontSize:12, fontWeight:700, color:accent, letterSpacing:"0.08em", textTransform:"uppercase" }}>{label}</span>
         <span style={{ fontSize:18, color:accent, fontWeight:700 }}>{isOpen?"−":"+"}</span>
       </button>
       {isOpen && <div style={{ padding:"16px 18px 18px", background:C.white }}>{children}</div>}
@@ -646,78 +689,73 @@ ${combinedText}` }]
       validate: "#2563eb",
       transition: "#2563eb",
     };
-    const typeTag = { say:"Say", ask:"Question", wallow:"Wallow", segue:"Segue", summarize:"Summarize", validate:"Validate", transition:"Transition" };
+    const typeTag = { wallow:"Wallow", segue:"Segue", summarize:"Summarize", validate:"Validate", transition:"Transition" };
     const accent = typeAccent[r.type] || C.emerald;
-    const tag = typeTag[r.type] || "Question";
     const rawText = r.text || (r.alts ? r.alts.join("\n\n— or —\n\n") : "");
     const text = fillTemplate(rawText);
     const cardKey = `${prefix}-${idx}`;
     cardRegistry.current[cardKey] = r.label; // register for live transcript analysis
-    const cardState = coveredCards[cardKey]; // true = manually marked, false = dismissed
-    const isCovered = cardState === true;
-
-    if (isCovered) return (
-      <div style={{ marginBottom:8, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 12px", borderRadius:8, background:"#e6f4ec", border:"1px solid #7ba3f0" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:99, background:"#2563eb", color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>✓</span>
-          <span style={{ fontSize:13, fontWeight:700, color:"#2563eb", fontStyle:"italic" }}>{r.label}</span>
-        </div>
-        <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: false }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:"1px solid #7ba3f0", background:"transparent", color:"#1d4ed8", fontWeight:600, flexShrink:0 }}>↩ unmark</button>
-      </div>
-    );
+    const isCovered = coveredCards[cardKey] === true;
+    const label = cleanLabel(r.label);
+    const toggleCovered = () => setCoveredCards(s => ({ ...s, [cardKey]: !s[cardKey] }));
 
     if (r.type === "say") return (
-      <div style={{ marginBottom:20, background:C.yellow, border:`1.5px solid ${C.yellowBorder}`, borderRadius:12, padding:"20px 22px" }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
-          <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background:C.yellowText, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>Say</span>
-          <span style={{ fontSize:13, fontWeight:700, color:C.yellowText, fontStyle:"italic" }}>{r.label}</span>
+      <div className="card" style={{ marginBottom:14, background:C.yellow, border:`1px solid ${C.yellowBorder}`, borderRadius:12, padding:"18px 22px 20px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+          <span style={{ fontSize:10, fontWeight:800, color:C.yellowText, letterSpacing:"0.12em", textTransform:"uppercase" }}>Say</span>
+          {label && <span style={{ fontSize:12, fontWeight:600, color:C.yellowText, opacity:0.8 }}>{label}</span>}
         </div>
-        <div style={{ fontSize:17, color:C.textPrimary, lineHeight:2.1, whiteSpace:"pre-wrap", fontWeight:500 }}>{text}</div>
+        <Script text={text} size={20} />
         {r.note && coachingVisible && (
-          <div style={{ marginTop:12, fontSize:12, color:C.yellowText, lineHeight:1.65, background:"rgba(255,255,255,0.55)", padding:"10px 14px", borderRadius:7 }}>{r.note}</div>
+          <div style={{ marginTop:12, fontSize:13, color:C.yellowText, lineHeight:1.6, background:"rgba(255,255,255,0.6)", padding:"10px 14px", borderRadius:8 }}>{r.note}</div>
         )}
       </div>
     );
 
+    const qNum = /^Q(\d+)/.exec(r.label || "")?.[1] || /^(\d+)\s*[—-]/.exec(r.label || "")?.[1];
+    const tag = typeTag[r.type];
     return (
-      <div style={{ marginBottom:20, paddingLeft:14, borderLeft:`2px solid ${accent}50` }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <span style={{ fontSize:10, fontWeight:700, padding:"2px 9px", borderRadius:99, background:accent, color:"#fff", letterSpacing:"0.06em", textTransform:"uppercase", flexShrink:0 }}>{tag}</span>
-            <span style={{ fontSize:15, fontWeight:800, color:"#1c2733", letterSpacing:"-0.02em", fontStyle:"italic" }}>{r.label}</span>
+      <div className="card" style={{ marginBottom:10, display:"flex", gap:14, padding:"16px 18px", background:C.white, border:`1px solid ${C.border}`, borderRadius:12, opacity: isCovered ? 0.45 : 1, transition:"opacity 0.15s" }}>
+        <button onClick={toggleCovered} title={isCovered ? "Mark as not asked" : `Mark as asked${qNum ? ` (key ${qNum})` : ""}`}
+          style={{ ...B, flexShrink:0, width:30, height:30, borderRadius:"50%", marginTop:1, border:`1.5px solid ${isCovered ? C.emerald : accent+"55"}`, background:isCovered ? C.emerald : C.white, color:isCovered ? "#fff" : accent, fontSize:13, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", padding:0 }}>
+          {isCovered ? "✓" : (qNum || "•")}
+        </button>
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6, minHeight:18 }}>
+            {tag && <span style={{ fontSize:10, fontWeight:800, color:accent, letterSpacing:"0.1em", textTransform:"uppercase" }}>{tag}</span>}
+            {label && <span style={{ fontSize:11, fontWeight:700, color:C.textMuted, letterSpacing:"0.06em", textTransform:"uppercase" }}>{label}</span>}
+            <div style={{ flex:1 }} />
+            {!noteOpen[cardKey] && (
+              <button className="ctl" onClick={() => setNoteOpen(s => ({ ...s, [cardKey]: true }))} style={{ ...B, fontSize:11, padding:"2px 8px", borderRadius:5, border:`1px solid ${C.border}`, background:C.white, color:C.textMuted, fontWeight:600 }}>
+                {notes[cardKey] ? "✎ note" : "＋ note"}
+              </button>
+            )}
           </div>
-          <button onClick={() => setCoveredCards(s => ({ ...s, [cardKey]: true }))} style={{ ...B, fontSize:10, padding:"2px 8px", borderRadius:5, border:`1px solid ${C.border}`, background:"transparent", color:C.textMuted, fontWeight:600, flexShrink:0 }}>✓ mark covered</button>
+          <Script text={text} size={19} />
+          {r.note && coachingVisible && (
+            <div style={{ marginTop:10, fontSize:13, color:C.textSecondary, lineHeight:1.6, background:C.sand, padding:"9px 13px", borderRadius:8, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
+          )}
+          {notes[cardKey] && !noteOpen[cardKey] && (
+            <div onClick={() => setNoteOpen(s => ({ ...s, [cardKey]: true }))} style={{ marginTop:10, fontSize:13, color:"#1d4ed8", background:"#eef3ff", padding:"7px 12px", borderRadius:7, cursor:"pointer", lineHeight:1.5 }}>
+              {notes[cardKey]}
+            </div>
+          )}
+          {noteOpen[cardKey] && (
+            <textarea
+              autoFocus
+              defaultValue={notes[cardKey] || ""}
+              onBlur={e => {
+                const val = e.target.value.trim();
+                if (!val) setNotes(s => { const n={...s}; delete n[cardKey]; return n; });
+                else setNotes(s => ({ ...s, [cardKey]: val }));
+                setNoteOpen(s => ({ ...s, [cardKey]: false }));
+              }}
+              placeholder="What did they say?"
+              rows={2}
+              style={{ marginTop:10, width:"100%", fontSize:14, padding:"8px 12px", border:"1.5px solid #7ba3f0", borderRadius:8, background:"#fff", color:C.textPrimary, resize:"none", boxSizing:"border-box", fontFamily:"inherit", outline:"none" }}
+            />
+          )}
         </div>
-        <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.9, whiteSpace:"pre-wrap", fontWeight:400 }}>{text}</div>
-        {r.note && coachingVisible && (
-          <div style={{ marginTop:10, fontSize:12, color:C.textSecondary, lineHeight:1.65, background:"#f7f8fa", padding:"10px 14px", borderRadius:7, borderLeft:`2px solid ${accent}60` }}>{r.note}</div>
-        )}
-        {/* Per-card context note */}
-        {notes[cardKey] && !noteOpen[cardKey] && (
-          <div style={{ marginTop:8, fontSize:12, color:"#2563eb", background:"#eef3ff", padding:"7px 12px", borderRadius:7, borderLeft:"2px solid #7ba3f0", cursor:"pointer" }} onClick={() => setNoteOpen(s => ({ ...s, [cardKey]: true }))}>
-            📝 {notes[cardKey]}
-          </div>
-        )}
-        {noteOpen[cardKey] && (
-          <textarea
-            autoFocus
-            defaultValue={notes[cardKey] || ""}
-            onBlur={e => {
-              const val = e.target.value.trim();
-              if (!val) setNotes(s => { const n={...s}; delete n[cardKey]; return n; });
-              else setNotes(s => ({ ...s, [cardKey]: val }));
-              setNoteOpen(s => ({ ...s, [cardKey]: false }));
-            }}
-            placeholder="Add context or edit your approach for this card..."
-            rows={2}
-            style={{ marginTop:8, width:"100%", fontSize:12, padding:"8px 12px", border:"1.5px solid #7ba3f0", borderRadius:7, background:"#f7f8fa", color:C.textPrimary, resize:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
-          />
-        )}
-        {!noteOpen[cardKey] && (
-          <button onClick={() => setNoteOpen(s => ({ ...s, [cardKey]: true }))} style={{ ...B, marginTop:6, fontSize:10, padding:"2px 8px", borderRadius:5, border:`1px solid ${C.border}`, background:"transparent", color:C.textMuted, fontWeight:600 }}>
-            {notes[cardKey] ? "✎ edit note" : "＋ note"}
-          </button>
-        )}
       </div>
     );
   }
@@ -725,7 +763,7 @@ ${combinedText}` }]
   function renderBuyerType() {
     const allPaths = [
       { path:"evaluating", border:"#bccdf5", bg:"#eef3ff", titleColor:"#2563eb", bodyColor:"#1d4ed8", badge:"#bccdf5", badgeText:"#1d4ed8", icon:"⚡", title:"Solution language", sub:'"We\'re looking for a product that can do X..." — Actively evaluating. Comparing solutions.', technique:"→ Go Back In Time" },
-      { path:"active-pain", border:"#bcd0f7", bg:"#e9effe", titleColor:"#2563eb", bodyColor:"#2a7850", badge:"#2563eb", badgeText:"#fff", icon:"⚠", title:"Problem language", sub:'"We have a challenge with Y... Z is not where we want it..." — Active pain. Not yet solution-focused.', technique:"→ Symptoms → Problems" },
+      { path:"active-pain", border:"#bcd0f7", bg:"#e9effe", titleColor:"#2563eb", bodyColor:"#1d4ed8", badge:"#2563eb", badgeText:"#fff", icon:"⚠", title:"Problem language", sub:'"We have a challenge with Y... Z is not where we want it..." — Active pain. Not yet solution-focused.', technique:"→ Symptoms → Problems" },
       { path:"latent", border:"#d4a830", bg:"#fdf7e6", titleColor:"#7a5808", bodyColor:"#6a4a08", badge:"#d4a830", badgeText:"#7a5808", icon:"◎", title:"Vague or can\'t remember", sub:'"You said something that caught my attention..." — Latent pain. Dormant. Not top of mind.', technique:"→ Discovery Prompter" },
     ];
     const visiblePaths = callSource === "inbound" ? allPaths.filter(p=>p.path!=="latent") : allPaths;
@@ -734,20 +772,20 @@ ${combinedText}` }]
       <div style={{ marginBottom:28 }}>
         {!callSource ? (
           <div style={{ marginBottom:24 }}>
-            <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:12 }}>How did this call originate?</div>
-            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-              <button onClick={()=>setCallSource("inbound")} style={{ ...B, width:"100%", padding:"24px 28px", border:"2px solid #2563eb", borderRadius:14, background:"#e9effe", textAlign:"left" }}>
-                <div style={{ fontSize:22, fontWeight:800, color:"#2563eb", marginBottom:10 }}>Inbound</div>
-                <div style={{ fontSize:17, color:"#2a7850", lineHeight:1.7, fontWeight:500 }}>"So what brought you to the table today — what made this worth exploring?"</div>
+            <div style={{ fontSize:11, fontWeight:700, color:C.textMuted, letterSpacing:"0.12em", textTransform:"uppercase", margin:"28px 0 10px", paddingTop:20, borderTop:`1px solid ${C.border}` }}>Diagnose the buyer — how did this call originate?</div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+              <button onClick={()=>setCallSource("inbound")} style={{ ...B, width:"100%", padding:"14px 18px", border:`1px solid ${C.border}`, borderRadius:12, background:C.white, textAlign:"left" }}>
+                <div style={{ fontSize:12, fontWeight:800, color:C.emerald, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Inbound</div>
+                <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.5, fontWeight:500 }}>"So what brought you to the table today — what made this worth exploring?"</div>
               </button>
-              <button onClick={()=>setCallSource("outbound")} style={{ ...B, width:"100%", padding:"24px 28px", border:"2px solid #2563eb", borderRadius:14, background:"#eef3ff", textAlign:"left" }}>
-                <div style={{ fontSize:22, fontWeight:800, color:"#2563eb", marginBottom:10 }}>Outbound</div>
-                <div style={{ fontSize:17, color:"#2563eb", lineHeight:1.7, fontWeight:500 }}>"I know we reached out to you first, so this might sound like a funny question — but I'm curious, what made you agree to take the call?"</div>
+              <button onClick={()=>setCallSource("outbound")} style={{ ...B, width:"100%", padding:"14px 18px", border:`1px solid ${C.border}`, borderRadius:12, background:C.white, textAlign:"left" }}>
+                <div style={{ fontSize:12, fontWeight:800, color:C.emerald, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:6 }}>Outbound</div>
+                <div style={{ fontSize:15, color:C.textPrimary, lineHeight:1.5, fontWeight:500 }}>"I know we reached out to you first, so this might sound like a funny question — but I'm curious, what made you agree to take the call?"</div>
               </button>
             </div>
           </div>
         ) : (
-          <div style={{ marginBottom:20, padding:"12px 16px", borderRadius:10, background:callSource==="inbound"?"#e9effe":"#eef3ff", border:`1.5px solid ${callSource==="inbound"?"#2563eb":"#2563eb"}`, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div style={{ margin:"28px 0 16px", padding:"10px 16px", borderRadius:10, background:C.emeraldLight, border:`1px solid ${C.emeraldMid}`, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div style={{ fontSize:14, fontWeight:600, color:callSource==="inbound"?"#2563eb":"#2563eb" }}>
               {callSource==="inbound" ? "Inbound — What motivated you to reach out?" : "Outbound — What made you agree to take this call?"}
             </div>
@@ -756,12 +794,12 @@ ${combinedText}` }]
         )}
         {callSource && (
           <div>
-            <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:12 }}>What did their response sound like?</div>
-            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            <div style={{ fontSize:11, fontWeight:700, color:C.textMuted, letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>What did their answer sound like?</div>
+            <div style={{ display:"grid", gridTemplateColumns:`repeat(${visiblePaths.length}, 1fr)`, gap:10 }}>
               {visiblePaths.map(opt=>(
-                <button key={opt.path} onClick={()=>setBuyerPath(opt.path)} style={{ ...B, padding:"18px 22px", border:`2px solid ${opt.border}`, borderRadius:12, background:opt.bg, textAlign:"left" }}>
-                  <div style={{ fontSize:15, fontWeight:700, color:opt.titleColor, marginBottom:6 }}>{opt.icon} {opt.title}</div>
-                  <div style={{ fontSize:13, color:opt.bodyColor, lineHeight:1.65, marginBottom:8 }}>{opt.sub}</div>
+                <button key={opt.path} onClick={()=>setBuyerPath(opt.path)} style={{ ...B, padding:"14px 16px", border:`1px solid ${C.border}`, borderTop:`3px solid ${opt.border}`, borderRadius:12, background:C.white, textAlign:"left" }}>
+                  <div style={{ fontSize:14, fontWeight:700, color:opt.titleColor, marginBottom:6 }}>{opt.icon} {opt.title}</div>
+                  <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.55, marginBottom:10 }}>{opt.sub}</div>
                   <div style={{ fontSize:12, fontWeight:600, color:opt.titleColor, background:opt.badge, padding:"3px 10px", borderRadius:6, display:"inline-block" }}>{opt.technique}</div>
                 </button>
               ))}
@@ -776,9 +814,9 @@ ${combinedText}` }]
 
     return (
       <div style={{ marginBottom:28 }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", margin:"28px 0 14px", paddingTop:20, borderTop:`1px solid ${C.border}` }}>
           <div style={{ fontSize:13, fontWeight:700, color:pathColor, letterSpacing:"0.06em", textTransform:"uppercase" }}>{pathLabel}</div>
-          <button onClick={()=>{setBuyerPath(null);setCallSource(null);}} style={{ ...B, fontSize:12, color:C.white, background:C.coral, border:"none", borderRadius:6, padding:"5px 14px", fontWeight:600 }}>← Change</button>
+          <button onClick={()=>{setBuyerPath(null);setCallSource(null);}} style={{ ...B, fontSize:12, color:C.textSecondary, background:C.white, border:`1px solid ${C.border}`, borderRadius:8, padding:"5px 12px", fontWeight:600 }}>Change path</button>
         </div>
 
         {buyerPath === "evaluating" && <>
@@ -791,14 +829,14 @@ ${combinedText}` }]
             { type:"ask", label:"6 — Go back in time", text:"This is going to sound like an odd pivot — but bear with me for a second.\n\nCan I go back in time with you for a second? It's clear you know what you want more than most people I talk to — which usually means something specific set this in motion. What was that moment for you?", note:"Always ask permission first. Short, no examples, no anchoring. Let them fill it." },
             { type:"summarize", label:"7 — Summarize before Current Process", text:"Let me see if I have this right so far. [Their exact words — what they're looking for, what they want to accomplish, and the original challenge.] Did I get that right?", note:"Their words — not yours. When they say that's right you have alignment." },
           ].map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix="eval" />)}
-          {coachingVisible && <div style={{ marginTop:16, background:"#1e1010", border:"1.5px solid #f0a8a8", borderRadius:10, padding:"14px 18px" }}>
-            <div style={{ fontSize:11, fontWeight:700, color:"#e07070", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>⚠ Watch For</div>
+          {coachingVisible && <div style={{ marginTop:16, background:"#fdf2f2", border:"1.5px solid #f3c9c9", borderRadius:10, padding:"14px 18px" }}>
+            <div style={{ fontSize:11, fontWeight:700, color:"#9b2c2c", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>⚠ Watch For</div>
             {["Asking about challenges before wallowing — they're in solution mode, don't fight it","Checking the box on wallow and rushing forward — stay there, 2-3 follow-ups minimum","Skipping 'can I go back in time' — that permission phrase must be said every time"].map((w,i)=>(
-              <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
+              <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#9b2c2c", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize, then find the need behind the need</span><span style={{ fontSize:18 }}>→</span>
           </button>
         </>}
 
@@ -811,14 +849,14 @@ ${combinedText}` }]
             { type:"ask", label:"5 — Cost of inaction", text:"And I don't want to be doom and gloom here — but I'm curious, what happens if other priorities pop up and this doesn't get fixed? I ask because it happens a lot — fires come up. What does that look like for you?", note:"Makes the invisible cost visible. Soften it first." },
             { type:"summarize", label:"6 — Summarize before Current Process", text:"Let me see if I have this right so far. [Their exact words — problem + business driver + what's at stake.] Did I get that right?", note:"Their words — not yours. When they say that's right you have alignment." },
           ].map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix="active" />)}
-          {coachingVisible && <div style={{ marginTop:16, background:"#1e1010", border:"1.5px solid #f0a8a8", borderRadius:10, padding:"14px 18px" }}>
-            <div style={{ fontSize:11, fontWeight:700, color:"#e07070", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>⚠ Watch For</div>
+          {coachingVisible && <div style={{ marginTop:16, background:"#fdf2f2", border:"1.5px solid #f3c9c9", borderRadius:10, padding:"14px 18px" }}>
+            <div style={{ fontSize:11, fontWeight:700, color:"#9b2c2c", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>⚠ Watch For</div>
             {["Jumping to process mapping before you have the business driver","Using both T-up versions back to back — pick one","Stopping at the symptom — the first answer is almost never the real problem"].map((w,i)=>(
-              <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
+              <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#9b2c2c", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize, then find the need behind the need</span><span style={{ fontSize:18 }}>→</span>
           </button>
         </>}
 
@@ -842,14 +880,14 @@ ${combinedText}` }]
             ], note:"This is a PAIN story — not a success story. Step 3 (failed attempts) is the step most people skip and it's often the most important one — latent buyers have usually tried to solve this before. When you name it, they identify with it. Practice this 5-6 times before going live. It needs to feel conversational, not recited." },
             { type:"ask", label:"If it doesn't land — diagnose why", text:"If they don't respond with anything useful: either they don't have pain (not qualified), your narrative needs work (not hitting the mark), or you misdiagnosed — they might be in the evaluating path. Don't double down. Pivot to a direct question.", note:"Ask: 'Help me understand what's going on in your world when it comes to [area].' If still nothing — they may not be qualified. Better to know now." },
           ].map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix="latent" />)}
-          <div style={{ marginTop:16, background:"#1e1010", border:"1.5px solid #f0a8a8", borderRadius:10, padding:"14px 18px" }}>
-            <div style={{ fontSize:11, fontWeight:700, color:"#e07070", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>⚠ Watch For</div>
+          <div style={{ marginTop:16, background:"#fdf2f2", border:"1.5px solid #f3c9c9", borderRadius:10, padding:"14px 18px" }}>
+            <div style={{ fontSize:11, fontWeight:700, color:"#9b2c2c", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:8 }}>⚠ Watch For</div>
             {["Telling a success story instead of a pain story — they need to see themselves in the struggle, not the outcome","Skipping Step 3 (failed attempts) — this is the step that makes them say 'that's exactly us'","Using the prompter on a warm buyer — you're overcomplicating it, go direct instead"].map((w,i)=>(
-              <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#e07070", lineHeight:1.65 }}>{w}</span></div>
+              <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#9b2c2c", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>
-          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:18, padding:"16px 22px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <span>Summarize + pick the raging fire →</span><span style={{ fontSize:20 }}>→</span>
+          <button onClick={()=>setActiveStage("need-behind-need")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span>Summarize, then find the need behind the need</span><span style={{ fontSize:18 }}>→</span>
           </button>
         </>}
       </div>
@@ -956,35 +994,48 @@ ${combinedText}` }]
 
 const sd = STAGE_DATA[activeStage];
 
+  const meta = STAGE_META[activeStage] || {};
+  const timeboxMs = (parseInt(meta.timebox) || 0) * 60000;
+  const stageElapsed = now - stageStart;
+  const overTime = timeboxMs && stageElapsed > timeboxMs;
+  const nextStage = STAGES[currentIdx + 1];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Rapport + Opener","rules-engagement":"Rules of Engagement","buyer-journey":"Buyer Journey Alignment","need-behind-need":"Need Behind the Need","baseline-current":"Baseline the Current State","validate-problem":"Validate the Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageSub = {"prep":"Paste your prep brief. Everything downstream personalizes from this.","rapport-opener":"Land the opener. Read the room.","outputs":"Generate your end-of-call outputs."}[activeStage];
+  const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
+
   return (
-    <div style={{ display:"flex", height:"100vh", fontFamily:"'Inter', system-ui, sans-serif", background:C.pageBg, overflow:"hidden" }}>
+    <div style={{ display:"flex", height:"100vh", fontFamily:"'Inter', system-ui, sans-serif", background:C.pageBg, color:C.textPrimary, overflow:"hidden" }}>
 
       {/* SIDEBAR */}
-      <div style={{ width:200, background:C.sidebar, display:"flex", flexDirection:"column", flexShrink:0, overflowY:"auto" }}>
-        <div style={{ padding:"22px 18px 14px" }}>
-          <div style={{ fontSize:9, fontWeight:700, color:"#8fb0f2", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:3 }}>Enterprise</div>
-          <div style={{ fontSize:16, fontWeight:700, color:"#fafafa", letterSpacing:"0.01em" }}>Discovery</div>
+      <div style={{ width:232, background:C.sidebar, borderRight:`1px solid ${C.border}`, display:"flex", flexDirection:"column", flexShrink:0, overflowY:"auto" }}>
+        <div style={{ padding:"20px 20px 14px", display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ width:28, height:28, borderRadius:8, background:C.emerald, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:800 }}>D</div>
+          <div>
+            <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary, lineHeight:1.1 }}>Discovery</div>
+            <div style={{ fontSize:11, color:C.textMuted, fontWeight:500 }}>Enterprise call track</div>
+          </div>
         </div>
 
-        <div style={{ flex:1, padding:"4px 8px" }}>
-          {/* Setup group */}
+        <div style={{ flex:1, padding:"6px 10px" }}>
           {["setup","discovery","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
             const groupLabel = group === "setup" ? "Setup" : group === "discovery" ? "Discovery" : "Close";
             return (
-              <div key={group} style={{ marginBottom: group === "close" ? 0 : 16, display: groupStages.length ? "block" : "none" }}>
-                <div style={{ fontSize:9, fontWeight:700, color:"#9db9f6", letterSpacing:"0.15em", textTransform:"uppercase", padding:"0 8px", marginBottom:6 }}>{groupLabel}</div>
+              <div key={group} style={{ marginBottom:14 }}>
+                <div style={{ fontSize:10, fontWeight:700, color:C.textMuted, letterSpacing:"0.12em", textTransform:"uppercase", padding:"0 10px", marginBottom:4 }}>{groupLabel}</div>
                 {groupStages.map(s => {
                   const isActive = s.id === activeStage;
-                  const isFramework = s.group === "discovery";
+                  const idx = STAGES.findIndex(x => x.id === s.id);
+                  const isPast = idx < currentIdx;
+                  const tb = (STAGE_META[s.id] || {}).timebox;
                   return (
-                    <button key={s.id} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:10, padding:"11px 10px", borderRadius:8, background:isActive?"rgba(90,154,112,0.15)":"transparent", border:"none", borderLeft:isActive?"2px solid #1d4ed8":"2px solid transparent", textAlign:"left", marginBottom:2 }}>
-                      {isFramework ? (
-                        <span style={{ fontSize:11, fontWeight:800, width:22, height:22, borderRadius:6, background:isActive?"#2563eb":"#e9effe", color:isActive?"#fff":"#8fb0f2", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{s.icon}</span>
-                      ) : (
-                        <span style={{ fontSize:14, color:isActive?"#2563eb":"#8fb0f2", fontWeight:700, minWidth:22, textAlign:"center" }}>{s.icon}</span>
-                      )}
-                      <span style={{ fontSize:13, color:isActive?"#fafafa":"#8fb0f2", fontWeight:isActive?600:400, lineHeight:1.3 }}>{s.short}</span>
+                    <button key={s.id} className={isActive ? "" : "navrow"} onClick={() => setActiveStage(s.id)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", gap:10, padding:"7px 10px", borderRadius:8, background:isActive ? C.emeraldLight : "transparent", border:"none", textAlign:"left", marginBottom:1 }}>
+                      <span style={{ width:22, height:22, borderRadius:"50%", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:s.icon.length > 1 ? 10 : 11, fontWeight:700,
+                        background: isActive ? C.emerald : isPast ? "#dde3ea" : "transparent",
+                        border: isActive || isPast ? "none" : `1.5px solid ${C.border}`,
+                        color: isActive ? "#fff" : isPast ? C.textSecondary : C.textMuted }}>{s.icon}</span>
+                      <span style={{ flex:1, fontSize:13, color:isActive ? "#1d4ed8" : isPast ? C.textSecondary : C.textPrimary, fontWeight:isActive ? 700 : 500, lineHeight:1.3 }}>{s.short}</span>
+                      {tb && <span style={{ fontSize:10, color:isActive ? "#1d4ed8" : C.textMuted, fontWeight:600, flexShrink:0 }}>{tb.replace(" min","m")}</span>}
                     </button>
                   );
                 })}
@@ -994,63 +1045,81 @@ const sd = STAGE_DATA[activeStage];
         </div>
 
         {buyerPath && (
-          <div style={{ padding:"14px 16px", borderTop:"1px solid #e3e6ea" }}>
-            <div style={{ fontSize:9, color:"#9db9f6", marginBottom:5, textTransform:"uppercase", letterSpacing:"0.1em" }}>Buyer Path</div>
-            <div style={{ display:"inline-flex", fontSize:11, fontWeight:600, padding:"3px 10px", borderRadius:99, background:buyerPath==="evaluating"?"#bccdf5":buyerPath==="active-pain"?"#e9effe":"#fdf0d0", color:buyerPath==="evaluating"?"#1d4ed8":buyerPath==="active-pain"?"#2563eb":"#7a5808" }}>
-              {buyerPath==="evaluating"?"⚡ Evaluating":buyerPath==="active-pain"?"⚠ Active Pain":"◎ Latent"}
+          <div style={{ padding:"12px 20px 16px", borderTop:`1px solid ${C.border}` }}>
+            <div style={{ fontSize:10, fontWeight:700, color:C.textMuted, marginBottom:6, textTransform:"uppercase", letterSpacing:"0.12em" }}>Buyer path</div>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <span style={{ fontSize:12, fontWeight:700, padding:"3px 10px", borderRadius:99, background:buyerPath==="latent"?"#fdf0d0":C.emeraldLight, color:buyerPath==="latent"?"#7a5808":"#1d4ed8" }}>
+                {buyerPath==="evaluating"?"⚡ Evaluating":buyerPath==="active-pain"?"⚠ Active pain":"◎ Latent"}
+              </span>
+              <button onClick={()=>setBuyerPath(null)} style={{ ...B, fontSize:11, color:C.textMuted, background:"none", border:"none", textDecoration:"underline" }}>change</button>
             </div>
-            <button onClick={()=>setBuyerPath(null)} style={{ ...B, display:"block", marginTop:5, fontSize:10, color:"#8fb0f2", background:"none", border:"1px solid #dfe3e8", borderRadius:5, padding:"3px 8px" }}>← change</button>
           </div>
         )}
       </div>
 
       {/* MAIN */}
-      <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", minWidth:0 }}>
 
         {/* TOP BAR */}
-        <div style={{ padding:"16px 28px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
-          <div style={{ flex:1 }}>
-            <div style={{ display:"flex", alignItems:"baseline", gap:10 }}>
-              <div style={{ fontSize:20, fontWeight:700, color:C.textPrimary, letterSpacing:"-0.02em", lineHeight:1.2 }}>
-                {{"prep":"Pre-Call Prep Brief","rapport-opener":"Rapport + Opener","rules-engagement":"Rules of Engagement","buyer-journey":"Buyer Journey Alignment","need-behind-need":"Need Behind the Need","baseline-current":"Baseline the Current State","validate-problem":"Validate the Business Problem","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage]}
-              </div>
+        <div style={{ padding:"12px 24px 12px 32px", borderBottom:`1px solid ${C.border}`, background:C.white, display:"flex", alignItems:"center", gap:16, flexShrink:0 }}>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8, fontSize:11, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginBottom:3 }}>
+              {isNumbered && <span>Step {STAGES[currentIdx].icon} of 10</span>}
+              {meta.phase && <><span style={{ color:C.border }}>•</span><span style={{ color:C.emerald }}>{meta.phase}</span></>}
               {(briefFields.prospect || briefFields.company) && activeStage !== "prep" && (
-                <span style={{ fontSize:13, color:"#2563eb", fontWeight:500 }}>
-                  {[briefFields.prospect, briefFields.company].filter(Boolean).join(" @ ")}
-                </span>
+                <><span style={{ color:C.border }}>•</span><span style={{ color:C.textSecondary, textTransform:"none", letterSpacing:0, fontWeight:600 }}>{[briefFields.prospect, briefFields.company].filter(Boolean).join(" @ ")}</span></>
               )}
             </div>
-            <div style={{ fontSize:13, color:C.textMuted, marginTop:3 }}>
-              {{"prep":"Paste your prep brief. Everything downstream personalizes from this.","rapport-opener":"Land the opener. Read the room.","rules-engagement":"Align on objective, agenda, and the decision to be made.","buyer-journey":"Listen for their language. Meet them where they are.","need-behind-need":"Peel past the symptom. Find the real driver.","baseline-current":"Map where they are today and where they want to be.","validate-problem":"Summarize, prioritize, validate it is a raging fire.","cause-analysis":"Mutually identify the true root cause.","negative-impact":"Quantify what this is actually costing.","future-state":"Contrast painful present with compelling future.","close-next-steps":"Call back the ROE. Make the recommendation.","outputs":"Generate your end-of-call outputs."}[activeStage]}
-            </div>
+            <div style={{ fontSize:22, fontWeight:700, color:C.textPrimary, letterSpacing:"-0.02em", lineHeight:1.2, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{stageTitle}</div>
+            {stageSub && <div style={{ fontSize:13, color:C.textMuted, marginTop:2 }}>{stageSub}</div>}
           </div>
-          <div style={{ display:"flex", gap:8, alignItems:"center", flexShrink:0 }}>
+
+          {/* CLOCKS */}
+          {timeboxMs > 0 && (
+            <div title="Time on this stage vs. timebox" style={{ textAlign:"right", padding:"4px 12px", borderRadius:8, background:overTime ? "#fff7ed" : C.sand, border:`1px solid ${overTime ? "#fed7aa" : C.border}` }}>
+              <div style={{ fontSize:10, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:overTime ? C.amber : C.textMuted }}>{overTime ? "Over" : "Stage"}</div>
+              <div style={{ fontSize:16, fontWeight:700, fontVariantNumeric:"tabular-nums", color:overTime ? C.amber : C.textPrimary }}>{fmtClock(stageElapsed)}<span style={{ color:C.textMuted, fontWeight:500 }}> / {fmtClock(timeboxMs)}</span></div>
+            </div>
+          )}
+          {callStart && (
+            <button onClick={() => setCallStart(Date.now())} title="Call clock — click to restart" style={{ ...B, textAlign:"right", padding:"4px 12px", borderRadius:8, background:C.sand, border:`1px solid ${C.border}` }}>
+              <div style={{ fontSize:10, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted }}>Call</div>
+              <div style={{ fontSize:16, fontWeight:700, fontVariantNumeric:"tabular-nums", color:C.textPrimary }}>{fmtClock(now - callStart)}</div>
+            </button>
+          )}
+
+          <div style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
             <button
               onClick={() => { setLiveMode(v => !v); liveLastLength.current = 0; }}
-              style={{ ...B, fontSize:11, padding:"6px 12px", border:`1px solid ${liveMode ? "#e05c5c" : C.border}`, borderRadius:6, background:liveMode ? "#fff0f0" : C.white, color:liveMode ? "#e05c5c" : C.textMuted, fontWeight:700, display:"flex", alignItems:"center", gap:5 }}
+              style={{ ...B, fontSize:12, padding:"8px 12px", border:`1px solid ${liveMode ? "#f3c9c9" : C.border}`, borderRadius:8, background:liveMode ? "#fdf2f2" : C.white, color:liveMode ? C.coral : C.textSecondary, fontWeight:600, display:"flex", alignItems:"center", gap:6 }}
             >
-              <span style={{ width:7, height:7, borderRadius:"50%", background:liveMode ? "#e05c5c" : C.textMuted, display:"inline-block", animation: liveMode ? "pulse 1.5s infinite" : "none" }} />
-              {liveAnalyzing ? "Analyzing..." : liveMode ? `Live${liveMeetingTitle ? ` — ${liveMeetingTitle.slice(0,20)}` : ""}` : "Go Live"}
+              <span style={{ width:7, height:7, borderRadius:"50%", background:liveMode ? C.coral : C.textMuted, display:"inline-block", animation: liveMode ? "pulse 1.5s infinite" : "none" }} />
+              {liveAnalyzing ? "Analyzing…" : liveMode ? `Live${liveMeetingTitle ? ` — ${liveMeetingTitle.slice(0,20)}` : ""}` : "Go live"}
             </button>
-            <button onClick={()=>setCoachingVisible(v=>!v)} style={{ ...B, fontSize:11, padding:"6px 12px", border:`1px solid ${C.border}`, borderRadius:6, background:coachingVisible?C.emeraldLight:C.white, color:coachingVisible?C.emerald:C.textMuted, fontWeight:600 }}>{coachingVisible?"Hide notes":"Show notes"}</button>
-            {showOutputsShortcut && <button onClick={()=>setActiveStage("outputs")} style={{ ...B, fontSize:12, padding:"8px 16px", border:`2px solid ${C.emerald}`, borderRadius:7, background:"transparent", color:C.emerald, fontWeight:700 }}>✦ Outputs</button>}
-            {currentIdx > 0 && <button onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} style={{ ...B, fontSize:22, padding:"6px 14px", border:`1px solid ${C.border}`, borderRadius:7, background:C.white, color:C.textMuted, fontWeight:500, lineHeight:1 }}>←</button>}
-            {currentIdx < STAGES.length-1 && <button onClick={()=>setActiveStage(STAGES[currentIdx+1].id)} style={{ ...B, fontSize:22, padding:"6px 16px", border:"none", borderRadius:7, background:C.emerald, color:C.white, fontWeight:700, lineHeight:1 }}>→</button>}
+            <button onClick={()=>setCoachingVisible(v=>!v)} title="Show coaching notes, tips and watch-outs" style={{ ...B, fontSize:12, padding:"8px 12px", border:`1px solid ${coachingVisible ? C.emeraldMid : C.border}`, borderRadius:8, background:coachingVisible?C.emeraldLight:C.white, color:coachingVisible?"#1d4ed8":C.textSecondary, fontWeight:600 }}>Coaching {coachingVisible ? "on" : "off"}</button>
+            {showOutputsShortcut && <button onClick={()=>setActiveStage("outputs")} style={{ ...B, fontSize:12, padding:"8px 12px", border:`1px solid ${C.border}`, borderRadius:8, background:C.white, color:C.textSecondary, fontWeight:600 }}>✦ Outputs</button>}
+            <div style={{ width:1, height:28, background:C.border, margin:"0 4px" }} />
+            <button disabled={currentIdx === 0} onClick={()=>setActiveStage(STAGES[currentIdx-1].id)} title="Previous (←)" style={{ ...B, fontSize:16, width:38, height:38, border:`1px solid ${C.border}`, borderRadius:8, background:C.white, color:C.textSecondary, fontWeight:600, opacity:currentIdx === 0 ? 0.4 : 1 }}>←</button>
+            {nextStage && <button onClick={()=>setActiveStage(nextStage.id)} title="Next (→)" style={{ ...B, height:38, padding:"0 16px", border:"none", borderRadius:8, background:C.emerald, color:C.white, fontWeight:700, fontSize:13, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap" }}>
+              <span style={{ opacity:0.75, fontWeight:600 }}>Next</span>{nextStage.short}<span style={{ fontSize:16 }}>→</span>
+            </button>}
           </div>
         </div>
 
         {/* LIVE STATUS BAR */}
         {liveMode && (
-          <div style={{ padding:"6px 28px", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#fff0f0" : "#f0faf5", borderBottom:`1px solid ${liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#f0a8a8" : "#7ba3f0"}`, display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
-            <span style={{ width:6, height:6, borderRadius:"50%", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#e05c5c" : "#2563eb", display:"inline-block", flexShrink:0, animation:"pulse 1.5s infinite" }} />
-            <span style={{ fontSize:11, color: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#e05c5c" : "#2563eb", fontWeight:500 }}>{liveStatus}</span>
-            {liveLastPoll && !liveStatus.startsWith("Can't") && <span style={{ fontSize:10, color:"#1d4ed8", marginLeft:"auto" }}>Last checked {liveLastPoll.toLocaleTimeString()}</span>}
+          <div style={{ padding:"6px 32px", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#fdf2f2" : "#f0f5ff", borderBottom:`1px solid ${liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#f3c9c9" : "#bccdf5"}`, display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
+            <span style={{ width:6, height:6, borderRadius:"50%", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? C.coral : "#2563eb", display:"inline-block", flexShrink:0, animation:"pulse 1.5s infinite" }} />
+            <span style={{ fontSize:12, color: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? C.coralText : "#1d4ed8", fontWeight:500 }}>{liveStatus}</span>
+            {liveLastPoll && !liveStatus.startsWith("Can't") && <span style={{ fontSize:11, color:"#1d4ed8", marginLeft:"auto" }}>Last checked {liveLastPoll.toLocaleTimeString()}</span>}
           </div>
         )}
 
         {/* BODY */}
         <div style={{ flex:1, display:"flex", overflow:"hidden" }}>
-          <div style={{ flex:1, overflowY:"auto", padding:"32px 36px 0" }}>
+          <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0 }}>
+          <div ref={scrollRef} style={{ flex:1, overflowY:"auto", padding:"24px 32px 40px" }}>
+          <div style={{ maxWidth:860, margin:"0 auto" }}>
 
             {/* PREP */}
             {activeStage === "prep" && (
@@ -1116,7 +1185,7 @@ const sd = STAGE_DATA[activeStage];
                     ))}
                   </div>
                   {briefParseStatus === "ok" && <div style={{ marginTop:12, padding:"7px 14px", background:"#e9effe", borderRadius:8, border:"1px solid #2563eb", fontSize:12, color:"#2563eb", fontWeight:600 }}>✓ Fields populated from brief</div>}
-                  {briefParseStatus.startsWith("error") && <div style={{ marginTop:12, padding:"7px 14px", background:"#1e1010", borderRadius:8, border:"1px solid #e05c5c", fontSize:11, color:"#e05c5c", fontWeight:500, wordBreak:"break-all" }}>{briefParseStatus}</div>}
+                  {briefParseStatus.startsWith("error") && <div style={{ marginTop:12, padding:"7px 14px", background:"#fdf2f2", borderRadius:8, border:"1px solid #e05c5c", fontSize:11, color:"#e05c5c", fontWeight:500, wordBreak:"break-all" }}>{briefParseStatus}</div>}
                   {Object.values(briefFields).some(v => v) && briefParseStatus !== "ok" && (
                     <div style={{ marginTop:14, padding:"8px 14px", background:"#e9effe", borderRadius:8, border:"1px solid #2563eb", fontSize:12, color:"#2563eb", fontWeight:600 }}>
                       ✓ Intel loaded — matching cards will show pre-answered during the call
@@ -1173,13 +1242,7 @@ const sd = STAGE_DATA[activeStage];
             {activeStage === "rapport-opener" && (
               <div>
                 {/* OPENER — teleprompter */}
-                <div style={{ marginBottom:20, background:C.yellow, border:`1.5px solid ${C.yellowBorder}`, borderRadius:14, padding:26 }}>
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
-                    <span style={{ fontSize:11, fontWeight:700, color:C.yellowText, letterSpacing:"0.08em", textTransform:"uppercase" }}>Say — opener</span>
-                    <span style={{ fontSize:11, fontWeight:700, color:C.yellowText }}>OPEN · 2 min</span>
-                  </div>
-                  <div style={{ fontSize:21, color:C.textPrimary, lineHeight:2.1, fontWeight:500, whiteSpace:"pre-wrap" }}>{"Hey [Names]\u2014\n\nglad we found the time\nto meet today.\n\nHow's your week been?\n\nWell, cool.\n\nWe've got a lot to get to today.\n\nMind if we talk about the agenda?"}</div>
-                </div>
+                <RhythmCard r={{ type:"say", label:"Opener", text:"Hey [Names]\u2014\nglad we found the time to meet today.\n\nHow's your week been?\n\nWell, cool.\nWe've got a lot to get to today.\n\nMind if we talk about the agenda?" }} idx={0} prefix="rapport-opener" />
 
                 {/* HUGHES SIGNALS */}
                 {coachingVisible && <div style={{ marginBottom:16, background:"#eef3ff", border:"1.5px solid #bccdf5", borderRadius:10, padding:"14px 18px" }}>
@@ -1198,7 +1261,7 @@ const sd = STAGE_DATA[activeStage];
 
                 {coachingVisible && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
                   {["Thanking the prospect for their time — immediately positions you lower","Running ROE versions back to back — pick one and commit"].map((w,i)=>(
-                    <div key={i} style={{ display:"flex", gap:12, marginBottom:i<1?12:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#e07070", lineHeight:1.7 }}>{w}</span></div>
+                    <div key={i} style={{ display:"flex", gap:12, marginBottom:i<1?12:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#9b2c2c", lineHeight:1.7 }}>{w}</span></div>
                   ))}
                 </Collapsible>}
               </div>
@@ -1219,11 +1282,10 @@ const sd = STAGE_DATA[activeStage];
                     <button onClick={()=>setActiveStage("buyer-journey")} style={{ ...B, fontSize:10, color:C.textMuted, background:"transparent", border:`1px solid ${C.border}`, borderRadius:5, padding:"3px 8px", flexShrink:0 }}>← back</button>
                   </div>
                 )}
-                <div style={{ marginBottom:16, paddingBottom:12, borderBottom:`1px solid ${C.border}`, display:"flex", alignItems:"baseline", gap:10, flexWrap:"wrap" }}>
-                  <span style={{ fontSize:11, fontWeight:800, color:C.emerald, letterSpacing:"0.08em" }}>{(STAGE_META[activeStage]||{}).phase||""}</span>
-                  <span style={{ fontSize:11, fontWeight:700, color:C.textMuted }}>{(STAGE_META[activeStage]||{}).timebox||""}</span>
+                <div style={{ display:"flex", gap:10, alignItems:"baseline", marginBottom:16, padding:"0 2px" }}>
+                  <span style={{ fontSize:10, fontWeight:800, letterSpacing:"0.12em", textTransform:"uppercase", color:C.emerald, flexShrink:0 }}>Goal</span>
+                  <span style={{ fontSize:15, fontWeight:500, color:C.textSecondary, lineHeight:1.5 }}>{sd.rule}</span>
                 </div>
-                <div style={{ fontSize:13, fontWeight:700, color:C.textMuted, letterSpacing:"0.06em", marginBottom:16 }}>{sd.rule}</div>
                 {sd.rhythm.filter(r=>!r.fallback).map((r,i)=><RhythmCard key={i} r={r} idx={i} prefix={activeStage} />)}
                 {sd.rhythm.some(r=>r.fallback) && coachingVisible && (
                   <Collapsible label="+ More techniques" isOpen={moreOpen} onToggle={()=>setMoreOpen(v=>!v)} accent={C.textMuted}>
@@ -1233,8 +1295,8 @@ const sd = STAGE_DATA[activeStage];
                 {coachingVisible && sd.tips && <Collapsible label="★ Coaching Tips" isOpen={tipsOpen} onToggle={()=>setTipsOpen(v=>!v)} accent={C.textSecondary}>
                   {sd.tips.map((t,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.tips.length-1?12:0 }}><span style={{ color:C.textMuted, fontSize:14, flexShrink:0 }}>—</span><span style={{ fontSize:14, color:C.textSecondary, lineHeight:1.7 }}>{t}</span></div>))}
                 </Collapsible>}
-                {coachingVisible && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
-                  {sd.watch.map((w,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.watch.length-1?14:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#e07070", lineHeight:1.7 }}>{w}</span></div>))}
+                {coachingVisible && sd.watch && <Collapsible label="⚠ Watch For" isOpen={watchOpen} onToggle={()=>setWatchOpen(v=>!v)} accent={C.coral}>
+                  {sd.watch.map((w,i)=>(<div key={i} style={{ display:"flex", gap:12, marginBottom:i<sd.watch.length-1?14:0 }}><span style={{ background:C.coral, color:C.white, fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:4, flexShrink:0, marginTop:3 }}>!</span><span style={{ fontSize:14, color:"#9b2c2c", lineHeight:1.7 }}>{w}</span></div>))}
                 </Collapsible>}
               </div>
             )}
@@ -1316,15 +1378,21 @@ const sd = STAGE_DATA[activeStage];
             )}
 
 
+          </div>
+          </div>
+
           {/* NOTES */}
-          <div style={{ position:"sticky", bottom:0, background:C.white, borderTop:`1px solid ${C.border}`, padding:"12px 36px", flexShrink:0 }}>
-            <textarea
-              value={stageNote}
-              onChange={e=>setNotes(n=>({...n,[activeStage]:e.target.value}))}
-              placeholder="Notes for this stage..."
-              rows={2}
-              style={{ width:"100%", fontSize:13, lineHeight:1.7, padding:"8px 12px", border:`1.5px solid ${C.border}`, borderRadius:8, background:"#f7f8fa", color:C.textPrimary, resize:"none", boxSizing:"border-box", fontFamily:"'Inter', system-ui, sans-serif", outline:"none" }}
-            />
+          <div style={{ background:C.white, borderTop:`1px solid ${C.border}`, padding:"10px 32px", flexShrink:0 }}>
+            <div style={{ maxWidth:860, margin:"0 auto", display:"flex", alignItems:"center", gap:12 }}>
+              <span style={{ fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:C.textMuted, flexShrink:0 }}>Notes</span>
+              <textarea
+                value={stageNote}
+                onChange={e=>setNotes(n=>({...n,[activeStage]:e.target.value}))}
+                placeholder="Their exact words, numbers, names…"
+                rows={2}
+                style={{ flex:1, fontSize:14, lineHeight:1.5, padding:"8px 12px", border:`1px solid ${C.border}`, borderRadius:8, background:C.sand, color:C.textPrimary, resize:"none", boxSizing:"border-box", fontFamily:"inherit", outline:"none" }}
+              />
+            </div>
           </div>
           </div>
 
@@ -1433,7 +1501,7 @@ const sd = STAGE_DATA[activeStage];
                   return (
                     <div>
                       {[
-                        { label:"Current cost / yr",    value:fmt(costNowYear),   sub:`${fmtH(hoursNowYear)} on the process today`,        color:C.coral,    bg:"#1e1010",    border:`${C.coral}50` },
+                        { label:"Current cost / yr",    value:fmt(costNowYear),   sub:`${fmtH(hoursNowYear)} on the process today`,        color:C.coral,    bg:"#fdf2f2",    border:`${C.coral}50` },
                         { label:"With solution / yr",   value:fmt(costTgtYear),   sub:`${fmtH(hoursTgtYear)} at ${tm} min/unit`,    color:C.emerald,  bg:C.emeraldLight, border:C.emeraldMid },
                         { label:"Annual value delta",   value:fmt(savedDollars),  sub:`${fmtH(savedHours)} reclaimed — ${savePct}% saved`, color:"#2563eb", bg:"#eef3ff", border:"#bccdf5" },
                       ].map((m,i)=>(
