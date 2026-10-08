@@ -25,6 +25,63 @@ export const STAGES = [
 // Timeboxes add up to a 30-minute call.
 export const STAGE_META = {
   "rapport-opener":   { phase:"OPEN",             timebox:"2 min" },
+  "rules-engagement": { phase:"ALIGN",            timebox:"2 min" },
+  "context":          { phase:"CONTEXT",          timebox:"1 min" },
+  "orient":           { phase:"ORIENT",           timebox:"2 min" },
+  "value-drop":       { phase:"VALUE",            timebox:"7 min" },
+  "summary-buyin":    { phase:"BUY-IN",           timebox:"1 min" },
+  "business-problem": { phase:"BUSINESS PROBLEM", timebox:"3 min" },
+  "baseline-current": { phase:"CURRENT STATE",    timebox:"3 min" },
+  "cause-analysis":   { phase:"CAUSE ANALYSIS",   timebox:"2 min" },
+  "negative-impact":  { phase:"NEGATIVE IMPACT",  timebox:"2 min" },
+  "future-state":     { phase:"FUTURE STATE",     timebox:"2 min" },
+  "close-next-steps": { phase:"CLOSE",            timebox:"3 min" },
+};
+
+// What to jot down at each stage — kept to what you can type live.
+// Several of these fill [placeholders] in later scripts.
+export const CAPTURE = {
+  "rapport-opener":   [{ key:"win", label:"What would make today a win", hint:"Each person's answer" }],
+  "orient":           [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
+                       { key:"startWhy", label:"What they said", hint:"Their words. Fills \"You mentioned…\" and \"It sounds like…\"" }],
+  "value-drop":       [{ key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
+  "summary-buyin":    [{ key:"buyIn", label:"Buy-in score (1–10)", hint:"And what would make it a 10" }],
+  "business-problem": [{ key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
+                       { key:"businessDriver", label:"Need behind the need", hint:"The business problem. Would a CFO fund it?" },
+                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" }],
+  "baseline-current": [{ key:"metric", label:"Metric", hint:"e.g. first-year turnover" },
+                       { key:"current", label:"Today", hint:"Their number and unit" },
+                       { key:"target", label:"Target", hint:"Where it should be, and why" }],
+  "cause-analysis":   [{ key:"rootCause", label:"Root cause", hint:"Their words" },
+                       { key:"suspected", label:"Your suspected cause", hint:"Fills the last question" }],
+  "negative-impact":  [{ key:"ripple", label:"Ripple effects" },
+                       { key:"cost", label:"Cost", hint:"Their rough estimate" }],
+  "future-state":     [{ key:"theirSolution", label:"What they think they need" },
+                       { key:"capability", label:"Capability to test", hint:"Fills the last question" }],
+  "close-next-steps": [{ key:"nextStep", label:"Recommended next step", hint:"Fills your recommendation" },
+                       { key:"who", label:"Who should join", hint:"Fills \"It'd be helpful to include…\"" },
+                       { key:"date", label:"Date" }],
+};
+
+// Script items per stage.
+//   say:  spoken beats. cue = what the beat does. check = pause for their answer.
+//         then = what you say once they answer. list = numbered points (optional tag).
+//         title / group / proof on the item itself.
+//   ask:  a question card. group = only shown for that area.
+export const STAGE_DATA = {
+  "rapport-opener": {
+    script:[
+      { kind:"say", beats:[
+        { cue:"Greet, then pause", check:"answer", text:"Hi [Names], I'm **glad we found the time** today." },
+        { cue:"If they're chatty", text:"How's your **week** been?" },
+        { cue:"Ask permission", text:"Great, well mind if we talk about the **agenda**?\n\nPerfect. Quick intros before we dive in." },
+        { cue:"Your intro", text:"My name is **TJ Magar**, I'm a Director of Healthcare Partnerships here at Clasp." },
+        { cue:"Why you care", text:"I'm super passionate about this work because **I'm an agitated borrower myself** — I know how it feels to have that barrier to education. And I love that we're **breaking it down** for the most important workforce there is: **healthcare**." },
+        { cue:"Hand off", check:"answer", text:"I've brought my colleague **Altara** as well — and then I'd love to hear from you both, maybe just **what would make today a win**. Altara, mind sharing a quick intro first?" },
+      ]},
+    ],
+  },
+
   "rules-engagement": {
     script:[
       { kind:"say", beats:[
@@ -47,9 +104,9 @@ export const STAGE_META = {
   "context": {
     script:[
       { kind:"say", title:"Who we are", beats:[
-        { cue:"Set up", text:"So like I said, to give you some context, I've got **a few short slides**. Feel free to **interrupt me** anytime." },
-        { cue:"Who we are", text:"At Clasp, we work **exclusively in healthcare**. Within that, we help HR and talent acquisition teams **attract and retain hard-to-fill clinical talent**." },
-        { cue:"Who we work with", text:"Partners range from major systems like **Novant Health, Northwestern Medicine and Boston Children's**, to smaller systems like **Saint Alphonsus**, to outpatient groups like **Confluent Health**." },
+        { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
+        { cue:"Who we are", text:"So at Clasp, we work **exclusively in healthcare** (full stop)… and within that, we exist to support HR and talent acquisition teams **attract and retain hard-to-fill clinical talent**." },
+        { cue:"Proof", text:"Our partners include major systems such as **Novant Health, Northwestern Medicine and Boston Children's**, as well as smaller systems like **Saint Alphonsus**. And even outpatient clinics like **Confluent Health**, specialty clinics, the whole gamut." },
       ]},
     ],
   },
@@ -57,10 +114,11 @@ export const STAGE_META = {
   "orient": {
     script:[
       { kind:"say", title:"Three outcomes", beats:[
-        { cue:"Who we talk to", text:"We talk to a lot of HR leaders — talent acquisition, L&D, workforce development, ops. And the **three areas where we tend to drive the most value** are here on your screen:", list:[
-          { tag:"Pipeline", text:"Some partners use this to build a **bigger, stronger pipeline** of soon-to-graduate RNs, imaging techs, rehab therapists and other clinical roles — **before they hit the open market**." },
-          { tag:"Labor cost", text:"Others are **bleeding money** on sign-on bonuses, contract labor and recruitment costs just to keep roles filled." },
-          { tag:"Retention", text:"And some are **losing good people** to competitors — so they use it to offer **career pathways**, like MAs into RNs or PTAs into PTs, instead of watching them walk out the door." },
+        { cue:"Who we talk to", text:"So we talk to a lot of HR leaders across the country — talent acquisition, L&D, workforce development, ops and business leaders — **a lot of smart folks**. And we talk to them about a lot of things, but **the three areas where we're able to drive the most value**, and where it often makes sense to work together, are here on your screen." },
+        { cue:"Three areas", text:"", list:[
+          { tag:"Pipeline", text:"Our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
+          { tag:"Labor cost", text:"Others are **bleeding money** on sign-on bonuses and contract labor, and recruitment costs just to fill and keep roles filled." },
+          { tag:"Retention", text:"And some are **losing good people** they already have to a competitor for more money — so they're motivating them to stay by offering **career pathways** and internal development opportunities — MAs into RNs, PTAs into PTs — instead of watching them walk out the door." },
         ]},
         { cue:"Hand it to them", check:"answer", text:"I have a hunch where you might fit, given [what you spotted] and the industry norm on **first-year nurse retention**. But given your situation, **where would be the most relevant place for us to start?**" },
       ]},
