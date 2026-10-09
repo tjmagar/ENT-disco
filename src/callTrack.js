@@ -158,7 +158,7 @@ export const STAGE_DATA = {
         { cue:"Acknowledge + start", text:"Okay, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't feel relevant**." },
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
-        { cue:"The outcome", text:"So this is an area where we **really excel** and produce great outcomes for our partners. For example, [pipeline customer story]." },
+        { cue:"The outcome", text:"So this is an area where we **really excel** and produce great outcomes for our partners." },
         { cue:"Three ways", text:"And the way we build a **bigger, more sustainable pipeline** of talent is really three main ways:", list:[
           { tag:"Educate", text:"We tap into channels in unique and innovative ways to actually **educate the students** on the possibilities and benefits of this type of program." },
           { tag:"Awareness", text:"By having built out programs, partnerships and relationships within these **four channels**, we're able to **generate awareness** of this type of program as a reason to join your system instead of another once they graduate." },
@@ -170,7 +170,7 @@ export const STAGE_DATA = {
         { cue:"Get the word out", text:"First we have to get the word out — if you're becoming a Nurse, an Imaging Tech, a Rehab Therapist, there are healthcare systems that will **help repay part of your student loans** so that you'll want to work with them." },
         { cue:"Influencers", text:"One of the most effective ways we've found to do this is through **social media influencers**. We have a whole curated network of **TikTok influencers who are clinicians and techs**. We've **really cracked the code** on this. I know it may sound funny, but it really works — and it's **so important for this generation**." },
         { cue:"Where they talk", text:"From what we're seeing, this is where they go to talk to each other — and **their student loan debt is a lot of what they're talking about**." },
-        { cue:"Ask to show", check:"answer", text:"**Mind if I show you something quick?**" },
+        { cue:"Ask to show", check:"answer", text:"Matter of fact, **mind if I show you something?**" },
         { cue:"Show the search", text:"I did a simple search for TikTok videos about nursing student loan debt / PT debt / Rad Tech debt, and look at the results. **Video after video** of nurses and nursing students talking about their debt — how they'll pay it off, whether they regret taking on that much. **This seems to be on their minds**, and they go to TikTok to ask each other about it." },
         { cue:"Creative + compliance", text:"That's why we have a **creative team** working with influencers who are clinicians and techs to make content that lets these students know about these programs. And a **compliance team** that makes sure it's buttoned up — not boring, but buttoned up." },
         { cue:"Show a video", text:"Videos like this one. You can see the **level of engagement** — the views, the comments, the reshares. It tends to get these students **thinking about what's possible**." },
