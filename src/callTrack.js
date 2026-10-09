@@ -106,18 +106,17 @@ export const STAGE_DATA = {
     rule:"Align on the objective, the agenda, and the decision to be made.",
     script:[
       { kind:"say", beats:[
-        { cue:"Bridge from intros", text:"Perfect, that leads into what I had in mind for today." },
-        { cue:"Propose the agenda", text:"Here's what I'm thinking in terms of **how we spend our time**. Let me know if you had something else in mind…" },
-        { cue:"Set the outcome", text:"But the outcome I recommend we shoot for is to **learn enough about each other** to decide whether or not it makes sense to have a **second meeting**." },
+        { cue:"Propose the agenda", text:"Perfect, that leads into what I had in mind for today. Here's what I'm thinking in terms of **how we spend our time** — let me know if you had something else in mind…" },
+        { cue:"Set the outcome", text:"The outcome I recommend we shoot for is to **learn enough about each other** to decide whether or not it makes sense to have a **second meeting**." },
         { cue:"Lower the stakes", text:"Obviously, I **don't expect us to do business** on this call. So let's just learn enough about each other to determine if another call makes sense." },
         { cue:"Check", check:true, text:"Is that **fair so far**?", then:"Perfect." },
-        { cue:"Walk the agenda", text:"Now here's the agenda I'm thinking will help us get there.", list:[
+        { cue:"Walk the agenda", text:"And here's the agenda I'm thinking will help us get there:", list:[
           "First, I'll share **a little about Clasp** upfront so you have the context for the rest of the call.",
           "But I'd love to spend **most of our time** today getting clear on **what's important to [their company]** — maybe the different challenges or goals you might have as they relate to **workforce recruitment, development, or retention**.",
-          "Once we're clear on that — and if I think we can help — I'll **explain more about how it works** so you have an understanding.",
+          "If it looks like we can help, I'll **explain how it works**.",
           "Then we can **jointly decide** whether we set that next step. And I'll save some time at the end for that.",
         ]},
-        { cue:"Check", check:true, text:"Does that all feel **reasonable and fair**?", then:"Great. Let's take a crack at it." },
+        { cue:"Check", check:true, text:"Does that agenda feel **reasonable enough**?", then:"Great — let's take a crack at it." },
       ]},
     ],
     tips:["Align on the objective, the agenda, and the decision to be made.","Pause after each fairness check and let them answer."],
