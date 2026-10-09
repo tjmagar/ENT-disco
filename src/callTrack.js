@@ -243,11 +243,10 @@ export const STAGE_DATA = {
       { kind:"say", beats:[
         { cue:"Thank them", text:"I really appreciate you letting me share a bit about how we work with healthcare systems on an **innovative Student Loan Repayment and recruitment program**." },
         { cue:"Recap the value", text:"Just to bring it back together — here's how our partners **tend to use** the program:", list:[
-          { tag:"Pipeline", text:"Building a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs and Rehabilitation Therapists, through our **recruitment marketing and campus recruitment** machine." },
-          { tag:"Labor cost", text:"**Saving money** by not paying out sign-ons again and again, and filling roles with **full-time employees** that would otherwise be worked by contract labor." },
-          { tag:"Retention", text:"And **retaining their people** and motivating them down career pathways — a **stronger, more stable workforce**. All through the power of their Student Loan Repayment program." },
+          { tag:"Pipeline", text:"Building a **bigger, stronger pipeline** of soon-to-graduate clinical talent." },
+          { tag:"Labor cost", text:"**Spending less** on sign-ons and contract labor." },
+          { tag:"Retention", text:"And **keeping their people** longer, with real career pathways." },
         ]},
-        { cue:"Tie it to them", check:"answer", text:"I may be off here, so correct me — but it sounds like **[the area they chose]** is where this could matter most for you. **Does that sound right?**" },
         { cue:"Step back", text:"At this point, I'd love to take a step back and **understand where your head is at**. The reason I ask is I'd rather not keep going if this isn't a fit for you — so I want your **honest read, not the polite one**." },
         { cue:"Buy-in check", check:"answer", text:"How is this all feeling? On a **scale of 1 to 10**, with 10 being a heck yes — **where would you say you're at?** No wrong answer." },
         { cue:"Read the reaction", text:"", list:[
