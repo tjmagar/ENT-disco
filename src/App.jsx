@@ -88,7 +88,7 @@ function flattenScript(script) {
   let q = 0;
   script.forEach((item, i) => {
     if (item.kind === "say") item.beats.forEach((_, b) => out.push({ kind:"beat", item:i, beat:b }));
-    else out.push({ kind:"ask", item:i, q:++q });
+    else if (item.kind === "ask") out.push({ kind:"ask", item:i, q:++q });
   });
   return out;
 }
@@ -144,7 +144,7 @@ const SESSION_KEY = "discovery-session-v1";
 function loadSession() {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "{}") || {}; } catch { return {}; }
 }
-const EMPTY_BRIEF = { prospect:"", company:"", signals:"", role:"", systemSize:"", roles:"", turnover:"", signOns:"", contract:"", benefits:"", schools:"", decision:"", pain:"" };
+const EMPTY_BRIEF = { prospect:"", company:"", colleague:"", source:"", signals:"", role:"", systemSize:"", roles:"", turnover:"", signOns:"", contract:"", benefits:"", schools:"", decision:"", pain:"" };
 
 export default function App() {
   const saved = useRef(loadSession()).current;
@@ -232,12 +232,13 @@ export default function App() {
     const c = captures, b = briefFields;
     const v = x => (x || "").trim();
     const join = parts => parts.map(v).filter(Boolean).join("; ");
-    const current = v(c.metric) && (v(c.current) || v(c.target))
-      ? `${v(c.metric)} is at ${v(c.current) || "?"}${v(c.target) ? `, and you want it at ${v(c.target)}` : ""}` : "";
+    const today = [v(c.turnover) && `first-year turnover is ${v(c.turnover)}`, v(c.signOns) && `you're offering ${v(c.signOns)} in sign-ons`, v(c.contract) && `you're using ${v(c.contract)} in contract labor`].filter(Boolean).join(", ");
+    const current = today && `${today}${v(c.target) ? `, and you want to get to ${v(c.target)}` : ""}`;
     const cause = v(c.rootCause) && `and it sounds like the root cause is ${v(c.rootCause)}`;
     switch (name.toLowerCase()) {
       case "names": case "name": return v(b.prospect);
       case "their company": return v(b.company);
+      case "colleague name": return v(b.colleague);
       case "the area they chose": return { "Pipeline":"build a bigger pipeline of soon-to-graduate talent", "Labor cost":"spend less on sign-ons and contract labor", "Retention":"retain and grow their people", "All three":"build a bigger pipeline of soon-to-graduate talent" }[c.startArea] || "";
       case "what you spotted": return v(b.signals);
       case "recommended next step": return v(c.nextStep);
@@ -248,7 +249,6 @@ export default function App() {
       case "suspected root cause": return v(c.suspected);
       case "capability": return v(c.capability);
       case "your honest read": return v(c.read);
-      case "metric they named": return v(c.metric);
       case "business problem and current state": return join([c.businessDriver, current]);
       case "business problem + root causes": return join([c.businessDriver, cause]);
       case "brief summary": return join([c.businessDriver, current, cause, v(c.ripple) && `it's causing ${v(c.ripple)}`, v(c.cost) && `and it's costing about ${v(c.cost)} a month`]);
@@ -258,10 +258,33 @@ export default function App() {
 
   // Teleprompter cursor: one highlighted line per stage. Index == length means the stage is done.
   const [showAllAreas, setShowAllAreas] = useState(false);
-  const script = visibleScript(activeStage, captures.startArea, showAllAreas);
+  const beatConditions = { hasColleague: !!(briefFields.colleague || "").trim(), noColleague: !(briefFields.colleague || "").trim(),
+    inbound: briefFields.source !== "Outbound", outbound: briefFields.source !== "Inbound" };
+  // Sub-tracks (e.g. sign-ons vs contract labor) show only what was picked; nothing picked shows all.
+  const subVisible = (it, picks = captures) => {
+    if (it.when && !beatConditions[it.when]) return false;
+    if (!it.sub) return true;
+    const v = picks[it.subKey];
+    return !v || v === "Both" || v === it.sub;
+  };
+  const script = visibleScript(activeStage, captures.startArea, showAllAreas)
+    .filter(it => subVisible(it))
+    .map(it => it.kind === "say" ? { ...it, beats: it.beats.filter(bt => !bt.when || beatConditions[bt.when]) } : it);
   const flat = flattenScript(script);
   const focusIdx = Math.min(focus[activeStage] ?? 0, flat.length);
   const setFocusIdx = i => setFocus(f => ({ ...f, [activeStage]: Math.max(0, Math.min(i, flat.length)) }));
+  function pickSub(key, value) {
+    setCapture(key, value);
+    const picks = { ...captures, [key]: value };
+    const visible = visibleScript(activeStage, captures.startArea, showAllAreas).filter(it => subVisible(it, picks));
+    let line = 0, jump = -1;
+    visible.forEach(it => {
+      if (jump < 0 && it.subKey === key && it.sub) jump = line;
+      if (it.kind === "say") line += it.beats.length; else if (it.kind === "ask") line += 1;
+    });
+    if (jump >= 0) setFocus(f => ({ ...f, [activeStage]: jump }));
+  }
+
   useEffect(() => {
     if (!flat.length) return;
     const el = document.querySelector(`[data-line="${activeStage}-${focusIdx}"]`);
@@ -787,6 +810,23 @@ ${combinedText}` }]
     return (
       <div>
         {script.map((item, i) => {
+          if (item.kind === "picker") return (
+            <div key={i} style={{ margin:"-4px 0 14px", padding:"14px 16px", borderRadius:14, background:C.white, border:`1px solid ${C.border}` }}>
+              <div style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginBottom:10 }}>{item.label}</div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))", gap:10 }}>
+                {item.options.map(o => {
+                  const on = captures[item.key] === o.value;
+                  return (
+                    <button key={o.value} onClick={e => { e.stopPropagation(); pickSub(item.key, o.value); }}
+                      style={{ ...B, textAlign:"left", padding:"12px 14px", borderRadius:12, border:`1.5px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textPrimary, boxShadow:on ? "0 4px 14px rgba(37,99,235,0.25)" : "none" }}>
+                      <div style={{ fontSize:16, fontWeight:700, marginBottom:2 }}>{on ? "✓ " : ""}{o.value}</div>
+                      <div style={{ fontSize:13, color:on ? "rgba(255,255,255,0.85)" : C.textMuted }}>{o.sub}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
           if (item.kind === "say") return (
             <div key={i}>
             {groupHeader(item)}
@@ -1198,13 +1238,26 @@ const sd = STAGE_DATA[activeStage];
                 <div style={{ marginBottom:28 }}>
                   <div style={{ ...card, padding:"18px 20px 20px" }}>
                     <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Who's on the call</div>
-                    <div style={{ fontSize:13, color:C.textMuted, marginBottom:16 }}>These three fill the script.</div>
+                    <div style={{ fontSize:13, color:C.textMuted, marginBottom:16 }}>These fill the script.</div>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
                       {[
                         { key:"prospect", label:"Prospect name(s)", placeholder:"e.g. Jane, Sam" },
                         { key:"company",  label:"Their organization", placeholder:"e.g. Acme Health" },
-                        { key:"signals",  label:"What you spotted", placeholder:"e.g. a new rehab site opening and sign-ons on their careers page", wide:true },
+                        { key:"colleague", label:"Your colleague on the call", placeholder:"Leave blank if it's just you" },
+                        { key:"signals",  label:"What you spotted", placeholder:"e.g. new rehab site, sign-ons on careers page" },
                       ].map(field)}
+                    </div>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:14 }}>
+                      <span style={{ fontSize:11, color:C.textMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginRight:4 }}>How they came in</span>
+                      {["Inbound","Outbound"].map(o => {
+                        const on = briefFields.source === o;
+                        return (
+                          <button key={o} onClick={() => setBriefFields(f => ({ ...f, source: on ? "" : o }))}
+                            style={{ ...B, fontSize:13, fontWeight:700, padding:"7px 16px", borderRadius:8, border:`1px solid ${on ? C.emerald : C.border}`, background: on ? C.emerald : C.white, color: on ? C.white : C.textPrimary }}>
+                            {on ? "✓ " : ""}{o}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
