@@ -141,6 +141,62 @@ Be specific, brief, direct. Word-for-word scripts. Personalize using prep brief 
 
 
 const SESSION_KEY = "discovery-session-v1";
+
+// Inline edits: every spoken line, question and quick answer gets a stable id.
+// Edits live in this browser and are applied over the scripts in callTrack.js.
+const EDITS_KEY = "discovery-edits-v1";
+const EDITABLE = {};
+function registerEditable(id, obj, field = "text") {
+  obj._eid = { ...(obj._eid || {}), [field]: id };
+  EDITABLE[id] = { obj, field, orig: obj[field] };
+}
+Object.entries(STAGE_DATA).forEach(([sid, sd]) => (sd.script || []).forEach((it, i) => {
+  if (it.kind === "ask") registerEditable(`${sid}:${i}`, it);
+  if (it.kind === "say") it.beats.forEach((bt, b) => {
+    if (bt.text != null) registerEditable(`${sid}:${i}:${b}`, bt);
+    if (bt.then) registerEditable(`${sid}:${i}:${b}:then`, bt, "then");
+    (bt.list || []).forEach((pt, k) => {
+      if (typeof pt === "string") bt.list[k] = pt = { text: pt };
+      registerEditable(`${sid}:${i}:${b}:${k}`, pt);
+    });
+  });
+}));
+QUICK_ANSWERS.forEach((qa, i) => registerEditable(`qa:${i}`, qa, "a"));
+function applyEdits(edits) {
+  Object.entries(EDITABLE).forEach(([id, e]) => { e.obj[e.field] = edits[id] ?? e.orig; });
+}
+function loadEdits() {
+  try { const e = JSON.parse(localStorage.getItem(EDITS_KEY) || "{}"); applyEdits(e); return e; } catch { return {}; }
+}
+
+// In edit mode, wraps a line so a click opens it for editing.
+function Editable({ id, editing, onSave, edited, children }) {
+  const B = { fontFamily:"'Inter', system-ui, sans-serif", cursor:"pointer" };
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState("");
+  const e = id && EDITABLE[id];
+  if (!editing || !e) return children;
+  if (!open) return (
+    <div title="Click to edit" onClick={ev => { ev.stopPropagation(); setDraft(e.obj[e.field] || ""); setOpen(true); }}
+      style={{ cursor:"text", borderRadius:6, outline:`1.5px dashed ${edited ? C.emerald : C.border}`, outlineOffset:4 }}>
+      {children}
+    </div>
+  );
+  const save = v => { onSave(id, v); setOpen(false); };
+  return (
+    <div onClick={ev => ev.stopPropagation()}>
+      <textarea autoFocus value={draft} onChange={ev => setDraft(ev.target.value)} rows={Math.max(3, Math.ceil(draft.length / 70))}
+        onKeyDown={ev => { if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) save(draft); if (ev.key === "Escape") setOpen(false); }}
+        style={{ width:"100%", fontSize:16, lineHeight:1.55, padding:"10px 12px", borderRadius:8, border:`1.5px solid ${C.emerald}`, fontFamily:"inherit", resize:"vertical", outline:"none", background:C.white, color:C.textPrimary }} />
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:8, flexWrap:"wrap" }}>
+        <button onClick={() => save(draft)} style={{ ...B, fontSize:13, fontWeight:700, padding:"6px 14px", borderRadius:8, border:"none", background:C.emerald, color:C.white }}>Save</button>
+        <button onClick={() => setOpen(false)} style={{ ...B, fontSize:13, fontWeight:600, padding:"6px 12px", borderRadius:8, border:`1px solid ${C.border}`, background:C.white, color:C.textPrimary }}>Cancel</button>
+        {edited && <button onClick={() => save(null)} style={{ ...B, fontSize:13, fontWeight:600, padding:"6px 12px", borderRadius:8, border:`1px solid ${C.border}`, background:C.white, color:C.textMuted }}>Undo my edit</button>}
+        <span style={{ fontSize:12, color:C.textMuted }}>**bold** · [placeholder] · blank line = new paragraph · ⌘↵ saves</span>
+      </div>
+    </div>
+  );
+}
 function loadSession() {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "{}") || {}; } catch { return {}; }
 }
@@ -180,6 +236,23 @@ export default function App() {
   const [briefParseStatus, setBriefParseStatus] = useState("");
   const [roi, setRoi] = useState({ unitsPerMonth:"", minsPerUnit:"", teamSize:"", hourlyRate:"75", targetTimeMins:"15" });
   const [rightTab, setRightTab] = useState("capture"); // "capture" | "spiced" | "enterprise" | "roi"
+  const [edits, setEdits] = useState(loadEdits);
+  const [editMode, setEditMode] = useState(false);
+  function saveEdit(id, value) {
+    setEdits(prev => {
+      const next = { ...prev };
+      if (value == null || value === EDITABLE[id].orig) delete next[id]; else next[id] = value;
+      applyEdits(next);
+      try { localStorage.setItem(EDITS_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+  function resetEdits() {
+    if (!window.confirm("Undo all your edits and go back to the original script?")) return;
+    applyEdits({}); setEdits({});
+    try { localStorage.removeItem(EDITS_KEY); } catch {}
+  }
+  const ed = (id, node) => <Editable id={id} editing={editMode} onSave={saveEdit} edited={!!(id && edits[id] != null)}>{node}</Editable>;
   const [rightPanelOpen, setRightPanelOpen] = useState(() => typeof window === "undefined" || window.innerWidth >= 1200);
   const [confirmReset, setConfirmReset] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -862,7 +935,7 @@ ${combinedText}` }]
                       
                     </div>
                     <div style={{ minWidth:0 }}>
-                      {beat.text && <Script text={beat.text} size={20} resolve={resolveToken} />}
+                      {beat.text && ed(beat._eid?.text, <Script text={beat.text} size={20} resolve={resolveToken} />)}
                       {beat.list && (
                         <div style={{ marginTop:beat.text ? 12 : 2, display:"flex", flexDirection:"column", gap:12 }}>
                           {beat.list.map((pt, k) => (
@@ -870,13 +943,13 @@ ${combinedText}` }]
                               <span style={{ flexShrink:0, width:22, height:22, marginTop:3, borderRadius:"50%", background:C.yellowRule, color:C.yellowText, fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>{k + 1}</span>
                               <div style={{ minWidth:0 }}>
                                 {pt.tag && <div style={{ fontSize:11, fontWeight:800, letterSpacing:"0.08em", textTransform:"uppercase", color:C.yellowText, marginBottom:2 }}>{pt.tag}</div>}
-                                <Script text={pt.text ?? pt} size={18} resolve={resolveToken} />
+                                {ed(pt._eid?.text, <Script text={pt.text ?? pt} size={18} resolve={resolveToken} />)}
                               </div>
                             </div>
                           ))}
                         </div>
                       )}
-                      {beat.then && <div style={{ marginTop:"0.6em" }}><Script text={beat.then} size={20} resolve={resolveToken} /></div>}
+                      {beat.then && <div style={{ marginTop:"0.6em" }}>{ed(beat._eid?.then, <Script text={beat.then} size={20} resolve={resolveToken} />)}</div>}
                     </div>
                   </div>
                 );
@@ -912,7 +985,7 @@ ${combinedText}` }]
                   <div style={{ flex:1 }} />
                   {nc.button}
                 </div>
-                <Script text={item.text} size={20} resolve={resolveToken} followups />
+                {ed(item._eid?.text, <Script text={item.text} size={20} resolve={resolveToken} followups />)}
                 {nc.body}
               </div>
             </div>
@@ -1187,6 +1260,10 @@ const sd = STAGE_DATA[activeStage];
             {stageSub && <div style={{ fontSize:13, color:C.textMuted, marginTop:2 }}>{stageSub}</div>}
           </div>
 
+          <button onClick={() => setEditMode(m => !m)} title="Edit the script" style={{ ...B, height:38, padding:"0 14px", borderRadius:8, border:`1px solid ${editMode ? C.emerald : C.border}`, background: editMode ? C.emerald : C.white, color: editMode ? C.white : C.textPrimary, fontSize:13, fontWeight:700 }}>
+            {editMode ? "✓ Done editing" : "✎ Edit"}
+          </button>
+
           {/* CLOCKS */}
           {timeboxMs > 0 && (
             <div title="Time on this stage vs. timebox" style={{ textAlign:"right", padding:"4px 12px", borderRadius:8, background:overTime ? "#fff7ed" : C.sand, border:`1px solid ${overTime ? "#fed7aa" : C.border}` }}>
@@ -1208,6 +1285,15 @@ const sd = STAGE_DATA[activeStage];
             </button>}
           </div>
         </div>
+
+        {/* EDIT MODE BAR */}
+        {editMode && (
+          <div style={{ padding:"8px 32px", background:C.emeraldLight, borderBottom:`1px solid ${C.border}`, display:"flex", alignItems:"center", gap:12, flexShrink:0 }}>
+            <span style={{ fontSize:14, fontWeight:700, color:C.emerald }}>Edit mode.</span>
+            <span style={{ fontSize:14, color:C.textPrimary, flex:1 }}>Click any line to change it. Edits save in this browser.</span>
+            {Object.keys(edits).length > 0 && <button onClick={resetEdits} style={{ ...B, fontSize:13, fontWeight:600, padding:"6px 12px", borderRadius:8, border:`1px solid ${C.border}`, background:C.white, color:C.textMuted }}>Undo all edits ({Object.keys(edits).length})</button>}
+          </div>
+        )}
 
         {/* OVER TIME NUDGE */}
         {overTime && nextStage && (
@@ -1518,7 +1604,7 @@ const sd = STAGE_DATA[activeStage];
                       </button>
                       {isOpen && (
                         <div style={{ padding:"4px 20px 16px", background:C.sand, borderTop:`1px solid ${C.border}`, fontSize:14, color:C.textPrimary, lineHeight:1.6 }}>
-                          {renderInline(qa.a, resolveToken)}
+                          {ed(qa._eid?.a, <div>{renderInline(qa.a, resolveToken)}</div>)}
                         </div>
                       )}
                     </div>
