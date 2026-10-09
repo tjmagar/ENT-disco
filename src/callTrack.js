@@ -126,9 +126,8 @@ export const STAGE_DATA = {
     rule:"Brief context on who we are and what we do. Earn the right to ask questions, don't pitch.",
     script:[
       { kind:"say", title:"Who we are", beats:[
-        { cue:"Set up the slides", text:"So like I said, to share a bit of context for the rest of today, I've prepared **a few short slides**. Please feel free to **interrupt me** as I share a bit about us." },
-        { cue:"Who we are", text:"So at Clasp, we work **exclusively in healthcare** (full stop)… and within that, we exist to support HR and talent acquisition teams **attract and retain hard-to-fill clinical talent**." },
-        { cue:"Proof", text:"Our partners include major systems such as **Novant Health, Northwestern Medicine and Boston Children's**, as well as smaller systems like **Saint Alphonsus**. And even outpatient clinics like **Confluent Health**, specialty clinics, the whole gamut." },
+        { cue:"Set up the slides", text:"So like I said, to give you some context, I've prepared **a few short slides**. Feel free to **interrupt me** anytime." },
+        { cue:"Who we are", text:"At Clasp, we work **exclusively in healthcare** — full stop. And within that, we help HR and TA teams achieve **three distinct outcomes**." },
       ]},
     ],
     tips:["Keep it short. The point is to earn the right to ask questions, not to pitch."],
@@ -138,16 +137,16 @@ export const STAGE_DATA = {
     rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
     script:[
       { kind:"say", title:"Three outcomes", beats:[
-        { cue:"Who we talk to", text:"So we talk to a lot of HR leaders across the country — talent acquisition, L&D, workforce development, ops and business leaders — **a lot of smart folks**. And we talk to them about a lot of things, but **the three areas where we're able to drive the most value**, and where it often makes sense to work together, are here on your screen." },
-        { cue:"Three areas", text:"", list:[
-          { tag:"Pipeline", text:"Our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
-          { tag:"Labor cost", text:"Others are **bleeding money** on sign-on bonuses and contract labor, and recruitment costs just to fill and keep roles filled." },
-          { tag:"Retention", text:"And some are **losing good people** they already have to a competitor for more money — so they're motivating them to stay by offering **career pathways** and internal development opportunities — MAs into RNs, PTAs into PTs — instead of watching them walk out the door." },
+        { cue:"Walk through them", text:"I'll walk you through those briefly. It's all through an **innovative student loan repayment and recruitment program**." },
+        { cue:"Three outcomes", text:"", list:[
+          { tag:"Pipeline", text:"Some partners tell us they need a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
+          { tag:"Labor cost", text:"Others tell us they're **spending too much** — on sign-on bonuses that aren't showing ROI, on contract labor that's eating their budget, and on recruiting just to keep roles filled." },
+          { tag:"Retention", text:"And some tell us they're **losing good people** to competitors for more money — so they use the program to offer **career pathways** and internal development, like MAs into RNs and PTAs into PTs, instead of watching them walk out the door." },
         ]},
         { cue:"Hand it to them", check:"answer", text:"I have a hunch where you might fit, given [what you spotted] and the industry norm on **first-year nurse retention**. But given your situation, **where would be the most relevant place for us to start?**" },
       ]},
     ],
-    tips:["Click the area they pick. The Value Drop and discovery follow it."],
+    tips:["Mark the area they pick in the capture pane. Discovery and the Value Drop follow it."],
     watch:["Picking the area for them — let them choose"],
   },
   "value-drop": {
