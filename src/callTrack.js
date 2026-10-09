@@ -242,10 +242,10 @@ export const STAGE_DATA = {
     script:[
       { kind:"say", beats:[
         { cue:"Thank them", text:"I really appreciate you letting me share a bit about how we work with healthcare systems on an **innovative Student Loan Repayment and recruitment program**." },
-        { cue:"Recap the value", text:"Just to bring it back together — here's how our partners **tend to use** the program:", list:[
-          { tag:"Pipeline", text:"Building a **bigger, stronger pipeline** of soon-to-graduate clinical talent." },
-          { tag:"Labor cost", text:"**Spending less** on sign-ons and contract labor." },
-          { tag:"Retention", text:"And **keeping their people** longer, with real career pathways." },
+        { cue:"Recap the value", text:"", list:[
+          { tag:"Pipeline", text:"How our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs, Rehabilitation Therapists using our **recruitment marketing and campus recruitment machine**." },
+          { tag:"Labor cost", text:"How they're **saving money** not having to pay out sign-ons again and again, and filling roles with **full-time employees** that would have been worked by contract labor." },
+          { tag:"Retention", text:"And how they're **retaining their employees** and motivating them down career pathways, creating a **stronger, more stable workforce**. All through the power of their Student Loan Repayment program." },
         ]},
         { cue:"Step back", text:"At this point, I'd love to take a step back and **understand where your head is at**. The reason I ask is I'd rather not keep going if this isn't a fit for you — so I want your **honest read, not the polite one**." },
         { cue:"Buy-in check", check:"answer", text:"How is this all feeling? On a **scale of 1 to 10**, with 10 being a heck yes — **where would you say you're at?** No wrong answer." },
