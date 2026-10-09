@@ -276,7 +276,8 @@ export const STAGE_DATA = {
       ]},
       { kind:"ask", label:"Roles", text:"What **clinical and allied health roles** do you hire new grads in the most?" },
       { kind:"ask", label:"Department heads", text:"Which **department heads** do you work with the most to fill their new grad needs?" },
-      { kind:"ask", label:"Origin", text:"What was going on in your business that made you **start exploring solutions** like ours in the first place?\n\nCan you walk me back to **the moment this became a priority**?" },
+      { kind:"ask", when:"inbound", label:"Origin (inbound)", text:"What was going on in your business that made you **start exploring solutions** like ours in the first place?\n\nCan you walk me back to **the moment this became a priority**?" },
+      { kind:"ask", when:"outbound", label:"Origin (outbound)", text:"I'm sure you get **a lot of outreach** — what made this one **worth your time**?\n\nWhat's going on in your business that made it **feel relevant right now**?" },
       { kind:"say", beats:[
         { cue:"Acknowledge", text:"I understand why you would want [surface need]." },
         { cue:"Dig", text:"**But what's actually going on?**" },

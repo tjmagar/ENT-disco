@@ -144,7 +144,7 @@ const SESSION_KEY = "discovery-session-v1";
 function loadSession() {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "{}") || {}; } catch { return {}; }
 }
-const EMPTY_BRIEF = { prospect:"", company:"", colleague:"", signals:"", role:"", systemSize:"", roles:"", turnover:"", signOns:"", contract:"", benefits:"", schools:"", decision:"", pain:"" };
+const EMPTY_BRIEF = { prospect:"", company:"", colleague:"", source:"", signals:"", role:"", systemSize:"", roles:"", turnover:"", signOns:"", contract:"", benefits:"", schools:"", decision:"", pain:"" };
 
 export default function App() {
   const saved = useRef(loadSession()).current;
@@ -258,9 +258,11 @@ export default function App() {
 
   // Teleprompter cursor: one highlighted line per stage. Index == length means the stage is done.
   const [showAllAreas, setShowAllAreas] = useState(false);
-  const beatConditions = { hasColleague: !!(briefFields.colleague || "").trim(), noColleague: !(briefFields.colleague || "").trim() };
+  const beatConditions = { hasColleague: !!(briefFields.colleague || "").trim(), noColleague: !(briefFields.colleague || "").trim(),
+    inbound: briefFields.source !== "Outbound", outbound: briefFields.source !== "Inbound" };
   // Sub-tracks (e.g. sign-ons vs contract labor) show only what was picked; nothing picked shows all.
   const subVisible = (it, picks = captures) => {
+    if (it.when && !beatConditions[it.when]) return false;
     if (!it.sub) return true;
     const v = picks[it.subKey];
     return !v || v === "Both" || v === it.sub;
@@ -1244,6 +1246,18 @@ const sd = STAGE_DATA[activeStage];
                         { key:"colleague", label:"Your colleague on the call", placeholder:"Leave blank if it's just you" },
                         { key:"signals",  label:"What you spotted", placeholder:"e.g. new rehab site, sign-ons on careers page" },
                       ].map(field)}
+                    </div>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:14 }}>
+                      <span style={{ fontSize:11, color:C.textMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginRight:4 }}>How they came in</span>
+                      {["Inbound","Outbound"].map(o => {
+                        const on = briefFields.source === o;
+                        return (
+                          <button key={o} onClick={() => setBriefFields(f => ({ ...f, source: on ? "" : o }))}
+                            style={{ ...B, fontSize:13, fontWeight:700, padding:"7px 16px", borderRadius:8, border:`1px solid ${on ? C.emerald : C.border}`, background: on ? C.emerald : C.white, color: on ? C.white : C.textPrimary }}>
+                            {on ? "✓ " : ""}{o}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
