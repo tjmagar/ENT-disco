@@ -54,7 +54,6 @@ export const CAPTURE = {
   "business-problem": [{ key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
                        { key:"businessDriver", label:"Need behind the need", hint:"The business problem. Would a CFO fund it?" },
                        { key:"trigger", label:"Trigger event", hint:"What set this in motion, in their words" },
-                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" },
                        { key:"validated", label:"Confirmed as the anchor?", type:"choice", options:["Yes","Partly","No"] },
                        { key:"competing", label:"Competing priorities" }],
   "baseline-current": [{ key:"metric", label:"Metric", hint:"e.g. first-year turnover" },
@@ -71,6 +70,7 @@ export const CAPTURE = {
                        { key:"blocker", label:"What's blocking them" }],
   "negative-impact":  [{ key:"ripple", label:"Ripple effects" },
                        { key:"whoElse", label:"Who else is affected" },
+                       { key:"whoCares", label:"Who cares most", hint:"Names and titles" },
                        { key:"cost", label:"Cost per month" }],
   "future-state":     [{ key:"theirSolution", label:"What they think they need" },
                        { key:"capability", label:"Capability to test", hint:"Fills Q3" },
@@ -242,7 +242,7 @@ export const STAGE_DATA = {
     script:[
       { kind:"say", beats:[
         { cue:"Thank them", text:"I really appreciate you letting me share a bit about how we work with healthcare systems on an **innovative Student Loan Repayment and recruitment program**." },
-        { cue:"Recap the value", text:"", list:[
+        { cue:"Recap the value", text:"So just to **recap what we covered** — we talked about:", list:[
           { tag:"Pipeline", text:"How our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs, Rehabilitation Therapists using our **recruitment marketing and campus recruitment machine**." },
           { tag:"Labor cost", text:"How they're **saving money** not having to pay out sign-ons again and again, and filling roles with **full-time employees** that would have been worked by contract labor." },
           { tag:"Retention", text:"And how they're **retaining their employees** and motivating them down career pathways, creating a **stronger, more stable workforce**." },
@@ -269,14 +269,14 @@ export const STAGE_DATA = {
     watch:["Skipping the 1–10 — it's your read on whether to keep going","Answering an objection before you understand it","Recapping all three areas at the same weight when they only care about one"],
   },
   "business-problem": {
-    rule:"Identify the business problem behind what they asked for, find out who cares, then validate it's the one to anchor on.",
+    rule:"Identify the business problem behind what they asked for, then validate it's the one to anchor on.",
     script:[
       { kind:"say", beats:[
         { cue:"Tie back", text:"You mentioned [what resonated] — I'd love to **understand that a bit better**." },
         { cue:"Earn the right", check:"answer", text:"**Mind if I ask a few questions** about what's going on at [company]? The reason I ask — I **don't want to assume** this is a fit just because it sounded good on a slide." },
       ]},
+      { kind:"ask", label:"Go back in time", text:"Let's **go back in time** for a second — can you walk me back to **the moment this became a priority**?\n\nWhat was happening?" },
       { kind:"ask", label:"Origin", text:"What was going on in your business that made you **start exploring solutions** like ours in the first place?" },
-      { kind:"ask", label:"The moment", text:"Can you walk me back to **the moment this became a priority**?\n\nWhat happened?" },
       { kind:"say", beats:[
         { cue:"Acknowledge", text:"I understand why you would want [surface need]." },
         { cue:"Dig", text:"**But what's actually going on?**" },
@@ -284,9 +284,6 @@ export const STAGE_DATA = {
       { kind:"ask", label:"Priority driver", text:"What's causing that to be **a priority**?" },
       { kind:"ask", label:"Energy", text:"What's driving you to **prioritize that**?" },
       { kind:"ask", label:"Business driver", text:"What is going on **in your business** that's driving you to put the focus and energy on that?" },
-      { kind:"ask", group:"Retention", label:"Priority", text:"How often have you **spoken internally** about reducing that turnover number?\n\nWho **cares the most** about the turnover number?" },
-      { kind:"ask", group:"Labor cost", label:"Sign-on priority", text:"How often have you **spoken internally** about reducing the amount you spend on sign-ons?\n\nWho **cares the most** about how much you spend on sign-ons?" },
-      { kind:"ask", group:"Labor cost", label:"Contract priority", text:"How often have you **spoken internally** about reducing the amount of contract labor you use in these departments?\n\nWho **cares the most** about what you spend on contract labor?" },
       { kind:"say", beats:[{ cue:"Pause the flow", text:"Before we go too much further — I want to make sure we're **anchoring this conversation to the right thing**." }] },
       { kind:"ask", label:"Anchor check", text:"Is this **the challenge we should be focused on** solving together?\n\nOr are there other things that are going to overpower this?" },
       { kind:"ask", label:"Priority test", text:"Is this going to make its way onto your **priorities slide**?\n\nOr is this a **shiny object**?" },
@@ -304,7 +301,6 @@ export const STAGE_DATA = {
       { kind:"ask", group:"Pipeline", label:"Roles", text:"What **clinical and allied health roles** do you hire new grads in the most?" },
       { kind:"ask", group:"Pipeline", label:"Department heads", text:"Which **department heads** do you work with the most to fill their new grad needs?" },
       { kind:"ask", group:"Pipeline", label:"School relationships", text:"What existing relationships do you have with the **local college programs** to funnel students in these fields your way?\n\nWho works on those relationships?" },
-      { kind:"ask", group:"Pipeline", label:"Loan debt", text:"How often have you had these students **ask about help with their student loan debt**?" },
       { kind:"ask", group:"Retention", label:"Replacement hires", text:"How many **replacement hires** do you make in these departments?" },
       { kind:"ask", group:"Retention", label:"First-year turnover", text:"What is the **first-year turnover** there?" },
       { kind:"ask", group:"Labor cost", label:"Sign-ons", text:"What type of **sign-on bonuses** are you offering for these roles?" },
@@ -324,6 +320,7 @@ export const STAGE_DATA = {
       { kind:"ask", label:"Open diagnostic", text:"**Why** do you think this challenge is happening?" },
       { kind:"ask", label:"Blocker", text:"What's **preventing you** from improving it?" },
       { kind:"ask", group:"Pipeline", label:"School fit", text:"**How well** are those school relationships meeting your needs?" },
+      { kind:"ask", group:"Pipeline", label:"Loan debt", text:"How often have you had these students **ask about help with their student loan debt**?" },
       { kind:"ask", group:"Labor cost", label:"Sign-on reliance", text:"How important do you find sign-ons to be in **getting a commitment**?" },
       { kind:"ask", label:"Suspected cause", text:"To what extent do you think [suspected root cause] is **contributing to the challenge**?" },
     ],
@@ -341,6 +338,9 @@ export const STAGE_DATA = {
       { kind:"ask", label:"Ripple effects", text:"What **ripple effects** are you seeing this challenge have on the rest of the business?" },
       { kind:"ask", label:"Derailed", text:"What would **get derailed** if you didn't make progress in solving these challenges?" },
       { kind:"ask", label:"Who else", text:"**Who else** does this challenge impact within the business?\n\nAnd how?" },
+      { kind:"ask", group:"Retention", label:"Priority", text:"How often have you **spoken internally** about reducing that turnover number?\n\nWho **cares the most** about the turnover number?" },
+      { kind:"ask", group:"Labor cost", label:"Sign-on priority", text:"How often have you **spoken internally** about reducing the amount you spend on sign-ons?\n\nWho **cares the most** about how much you spend on sign-ons?" },
+      { kind:"ask", group:"Labor cost", label:"Contract priority", text:"How often have you **spoken internally** about reducing the amount of contract labor you use in these departments?\n\nWho **cares the most** about what you spend on contract labor?" },
       { kind:"ask", label:"Cost", text:"What's the **financial cost** of not closing that gap **per month**?" },
     ],
     tips:["After they confirm the summary, explore cost, consequences, and ripple effects.","One or two negative ramifications is enough on a first call."],
