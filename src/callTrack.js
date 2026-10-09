@@ -142,7 +142,7 @@ export const STAGE_DATA = {
         { cue:"Three outcomes", text:"", list:[
           { tag:"Pipeline", text:"Some partners tell us they need a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
           { tag:"Labor cost", text:"Others tell us they're **spending too much** — on sign-on bonuses that aren't showing ROI, on contract labor that's eating their budget, and on recruiting just to keep roles filled." },
-          { tag:"Retention", text:"And some tell us they're **losing good people** to competitors for more money — so they use the program to offer **career pathways** and internal development, like MAs into RNs and PTAs into PTs, instead of watching them walk out the door." },
+          { tag:"Retention", text:"And some tell us they're **losing good people** to competitors for more money — so they use the program to reward not only **joining, but staying**. And they build out **career pathways**, like MAs into RNs and PTAs into PTs, instead of watching them walk out the door." },
         ]},
         { cue:"Hand it to them", check:"answer", text:"I have a hunch where you might fit, given [what you spotted] and the industry norm on **first-year nurse retention**. But given your situation, **where would be the most relevant place for us to start?**" },
       ]},
