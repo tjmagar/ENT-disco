@@ -25,16 +25,16 @@ export const STAGES = [
 // Timeboxes add up to a 30-minute call.
 export const STAGE_META = {
   "rapport-opener":   { phase:"OPEN",             timebox:"2 min" },
-  "rules-engagement": { phase:"ALIGN",            timebox:"2 min" },
+  "rules-engagement": { phase:"ALIGN",            timebox:"1 min" },
   "context":          { phase:"CONTEXT",          timebox:"1 min" },
   "orient":           { phase:"ORIENT",           timebox:"2 min" },
-  "value-drop":       { phase:"VALUE",            timebox:"7 min" },
+  "value-drop":       { phase:"VALUE",            timebox:"12 min" },
   "summary-buyin":    { phase:"BUY-IN",           timebox:"1 min" },
-  "business-problem": { phase:"BUSINESS PROBLEM", timebox:"3 min" },
-  "baseline-current": { phase:"CURRENT STATE",    timebox:"3 min" },
+  "business-problem": { phase:"BUSINESS PROBLEM", timebox:"2 min" },
+  "baseline-current": { phase:"CURRENT STATE",    timebox:"2 min" },
   "cause-analysis":   { phase:"CAUSE ANALYSIS",   timebox:"2 min" },
-  "negative-impact":  { phase:"NEGATIVE IMPACT",  timebox:"2 min" },
-  "future-state":     { phase:"FUTURE STATE",     timebox:"2 min" },
+  "negative-impact":  { phase:"NEGATIVE IMPACT",  timebox:"1 min" },
+  "future-state":     { phase:"FUTURE STATE",     timebox:"1 min" },
   "close-next-steps": { phase:"CLOSE",            timebox:"3 min" },
 };
 
@@ -74,10 +74,12 @@ export const CAPTURE = {
   "future-state":     [{ key:"theirSolution", label:"What they think they need" },
                        { key:"capability", label:"Capability to test", hint:"Fills Q3" },
                        { key:"needle", label:"How much it moves the needle" }],
-  "close-next-steps": [{ key:"read", label:"Your honest read", hint:"Fills the close script" },
+  "close-next-steps": [{ key:"icp", label:"ICP — 3+ of: 2K–50K employees · open clinical roles · hiring consistently · sign-ons · contract labor · double-digit turnover", type:"choice", options:["Yes","No"] },
+                       { key:"persona", label:"Persona: TA/HR, Director+, said they're interested?", type:"choice", options:["Yes","No"] },
+                       { key:"read", label:"Your honest read", hint:"Fills the close script" },
                        { key:"nextStep", label:"Next step" },
                        { key:"who", label:"Who attends" },
-                       { key:"date", label:"Date" }],
+                       { key:"date", label:"Date", hint:"Within 6 weeks. Send the invite + log in HubSpot" }],
 };
 
 // Script items per stage.
@@ -362,7 +364,7 @@ export const STAGE_DATA = {
       { kind:"ask", label:"Next step", text:"What should the **next logical step** look like?\n\nAnd **who needs to be there**?" },
       { kind:"ask", label:"Date", text:"Can we put **a specific date** on the calendar now?" },
       { kind:"say", title:"If they ask what the next meeting looks like", beats:[
-        { cue:"The agenda", text:"Great question. Next time, we'd walk through a **program design built for you** — what we can realistically drive for [roles they named], **what it would cost**, and how it fits alongside your current package." },
+        { cue:"The agenda", text:"Great question. I find it helpful to see that **the all-in cost wouldn't break the bank**. So next time, we'd put your numbers next to what you're spending on **sign-ons and turnover** today — and see if this makes **directional sense** to pursue." },
         { cue:"What you need", check:"answer", text:"To make that real, I'd need a few inputs: **how many you're looking to hire** this year, **what you're offering today**, and **where the biggest gaps are**. Is that something you could pull together?" },
       ]},
       { kind:"say", title:"If they say \"just email me\"", beats:[
@@ -377,7 +379,7 @@ export const STAGE_DATA = {
 // Backup questions for the Bank tab — Orlob-style, adapted for Clasp.
 // Straight answers to what prospects ask mid-call. Short enough to read live.
 export const QUICK_ANSWERS = [
-  { q:"What does it cost? (asked early)", a:"Great question — and I'll absolutely get you numbers. Pricing is built around **how many hires we drive** for you, so it depends on a few things I don't know yet. Mind if I ask a couple of questions first so what I give you is **actually grounded**?" },
+  { q:"What does it cost? (asked early)", a:"Great question. Pricing is built around **how many hires we drive** for you. I find it helpful to see that **the all-in cost wouldn't break the bank** — so let's put it next to what you spend on **sign-ons and turnover** today. Mind if I ask a couple of questions so the numbers are **actually yours**?" },
   { q:"Are those hires or just leads?", a:"**Hires.** Students sign an agreement in their final stretch of school committing to join you when they graduate — and **about 95%** of them follow through." },
   { q:"We're a state / federal institution. Is that a problem?", a:"**Not a barrier.** We work with state- and federally-affiliated systems. Contracting can take a few extra steps, and we'll walk through them with you." },
   { q:"Any conflict with PSLF?", a:"**No conflict with PSLF.**" },
