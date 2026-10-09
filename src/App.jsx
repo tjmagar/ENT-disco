@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { STAGES, STAGE_META, CAPTURE, STAGE_DATA, QUESTION_BANK } from "./callTrack.js";
+import { STAGES, STAGE_META, CAPTURE, STAGE_DATA, QUESTION_BANK, QUICK_ANSWERS } from "./callTrack.js";
 
 const C = {
   pageBg: "#f4f5f7",
@@ -165,6 +165,7 @@ export default function App() {
   const cardRegistry = useRef({});
   const [prepBrief, setPrepBrief] = useState(saved.prepBrief || "");
   const [openSpiced, setOpenSpiced] = useState(null);
+  const [openAnswer, setOpenAnswer] = useState(null);
   const [prepOpen, setPrepOpen] = useState(false);
   const [outputs, setOutputs] = useState({ spiced:"", email:"", score:"", whatweheard:"", debrief:"", fixplan:"" });
   const [outputLoading, setOutputLoading] = useState("");
@@ -243,6 +244,8 @@ export default function App() {
       case "what you spotted": return v(b.signals);
       case "recommended next step": return v(c.nextStep);
       case "who should join": return v(c.who);
+      case "roles they named": return v(c.roles) || v(b.roles);
+      case "date": return v(c.date);
 
       case "surface need": return v(c.surfaceNeed);
       case "what they said": return v(c.startWhy) || v(c.surfaceNeed);
@@ -1206,6 +1209,17 @@ const sd = STAGE_DATA[activeStage];
           </div>
         </div>
 
+        {/* OVER TIME NUDGE */}
+        {overTime && nextStage && (
+          <div style={{ padding:"8px 32px", background:"#fff7ed", borderBottom:"1px solid #fed7aa", display:"flex", alignItems:"center", gap:12, flexShrink:0 }}>
+            <span style={{ fontSize:14, fontWeight:700, color:C.amber }}>Over time.</span>
+            <span style={{ fontSize:14, color:C.textPrimary, flex:1 }}>Land the next check-in and move on.</span>
+            <button onClick={()=>setActiveStage(nextStage.id)} style={{ ...B, fontSize:13, fontWeight:700, padding:"6px 14px", borderRadius:8, border:"none", background:C.amber, color:C.white, whiteSpace:"nowrap" }}>
+              Go to {nextStage.short} →
+            </button>
+          </div>
+        )}
+
         {/* LIVE STATUS BAR */}
         {liveMode && (
           <div style={{ padding:"6px 32px", background: liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#fdf2f2" : "#f0f5ff", borderBottom:`1px solid ${liveStatus.startsWith("Can't") || liveStatus.startsWith("Bridge error") ? "#f3c9c9" : "#bccdf5"}`, display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
@@ -1420,6 +1434,7 @@ const sd = STAGE_DATA[activeStage];
               {[
                 { id:"capture",    label:"Capture" },
                 { id:"spiced",     label:"Backup questions" },
+                { id:"answers",    label:"Quick answers" },
               ].map(t => (
                 <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"13px 4px 11px", fontSize:12, fontWeight:700, letterSpacing:"0.04em", border:"none", borderBottom: rightTab===t.id ? `2px solid ${C.emerald}` : "2px solid transparent", background:"transparent", color: rightTab===t.id ? C.emerald : C.textMuted, marginBottom:-1 }}>
                   {t.label}
@@ -1488,6 +1503,29 @@ const sd = STAGE_DATA[activeStage];
                 </div>
               );
             })()}
+
+            {/* QUICK ANSWERS TAB */}
+            {rightTab === "answers" && (
+              <div style={{ overflowY:"auto", flex:1 }}>
+                <div style={{ padding:"16px 20px 10px", fontSize:13, color:C.textMuted, lineHeight:1.5 }}>When they ask, open the question for a short answer.</div>
+                {QUICK_ANSWERS.map((qa, i) => {
+                  const isOpen = openAnswer === i;
+                  return (
+                    <div key={i} style={{ borderTop:`1px solid ${C.border}` }}>
+                      <button onClick={()=>setOpenAnswer(isOpen ? null : i)} style={{ ...B, width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, padding:"14px 20px", background:isOpen?C.sand:"transparent", border:"none", textAlign:"left" }}>
+                        <span style={{ fontSize:13, fontWeight:700, color:isOpen?C.emerald:C.textPrimary }}>{qa.q}</span>
+                        <span style={{ fontSize:14, color:isOpen?C.emerald:C.textMuted, fontWeight:700 }}>{isOpen?"▲":"▼"}</span>
+                      </button>
+                      {isOpen && (
+                        <div style={{ padding:"4px 20px 16px", background:C.sand, borderTop:`1px solid ${C.border}`, fontSize:14, color:C.textPrimary, lineHeight:1.6 }}>
+                          {renderInline(qa.a, resolveToken)}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* QUESTION BANK TAB */}
             {rightTab === "spiced" && (
