@@ -259,7 +259,10 @@ export default function App() {
   // Teleprompter cursor: one highlighted line per stage. Index == length means the stage is done.
   const [showAllAreas, setShowAllAreas] = useState(false);
   const beatConditions = { hasColleague: !!(briefFields.colleague || "").trim(), noColleague: !(briefFields.colleague || "").trim(),
-    inbound: briefFields.source !== "Outbound", outbound: briefFields.source !== "Inbound" };
+    inbound: briefFields.source !== "Outbound", outbound: briefFields.source !== "Inbound",
+    hesitant: captures.reaction === "Hesitant", notHesitant: captures.reaction !== "Hesitant",
+    funnel: !captures.startArea || captures.startArea === "Pipeline" || captures.startArea === "All three",
+    notFunnel: !!captures.startArea && captures.startArea !== "Pipeline" && captures.startArea !== "All three" };
   // Sub-tracks (e.g. sign-ons vs contract labor) show only what was picked; nothing picked shows all.
   const subVisible = (it, picks = captures) => {
     if (it.when && !beatConditions[it.when]) return false;
