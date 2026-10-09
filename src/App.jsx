@@ -144,7 +144,7 @@ const SESSION_KEY = "discovery-session-v1";
 function loadSession() {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "{}") || {}; } catch { return {}; }
 }
-const EMPTY_BRIEF = { prospect:"", company:"", signals:"", role:"", systemSize:"", roles:"", turnover:"", signOns:"", contract:"", benefits:"", schools:"", decision:"", pain:"" };
+const EMPTY_BRIEF = { prospect:"", company:"", colleague:"", signals:"", role:"", systemSize:"", roles:"", turnover:"", signOns:"", contract:"", benefits:"", schools:"", decision:"", pain:"" };
 
 export default function App() {
   const saved = useRef(loadSession()).current;
@@ -238,6 +238,7 @@ export default function App() {
     switch (name.toLowerCase()) {
       case "names": case "name": return v(b.prospect);
       case "their company": return v(b.company);
+      case "colleague name": return v(b.colleague);
       case "the area they chose": return { "Pipeline":"build a bigger pipeline of soon-to-graduate talent", "Labor cost":"spend less on sign-ons and contract labor", "Retention":"retain and grow their people", "All three":"build a bigger pipeline of soon-to-graduate talent" }[c.startArea] || "";
       case "what you spotted": return v(b.signals);
       case "recommended next step": return v(c.nextStep);
@@ -258,7 +259,9 @@ export default function App() {
 
   // Teleprompter cursor: one highlighted line per stage. Index == length means the stage is done.
   const [showAllAreas, setShowAllAreas] = useState(false);
-  const script = visibleScript(activeStage, captures.startArea, showAllAreas);
+  const beatConditions = { hasColleague: !!(briefFields.colleague || "").trim(), noColleague: !(briefFields.colleague || "").trim() };
+  const script = visibleScript(activeStage, captures.startArea, showAllAreas)
+    .map(it => it.kind === "say" ? { ...it, beats: it.beats.filter(bt => !bt.when || beatConditions[bt.when]) } : it);
   const flat = flattenScript(script);
   const focusIdx = Math.min(focus[activeStage] ?? 0, flat.length);
   const setFocusIdx = i => setFocus(f => ({ ...f, [activeStage]: Math.max(0, Math.min(i, flat.length)) }));
@@ -1198,12 +1201,13 @@ const sd = STAGE_DATA[activeStage];
                 <div style={{ marginBottom:28 }}>
                   <div style={{ ...card, padding:"18px 20px 20px" }}>
                     <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Who's on the call</div>
-                    <div style={{ fontSize:13, color:C.textMuted, marginBottom:16 }}>These three fill the script.</div>
+                    <div style={{ fontSize:13, color:C.textMuted, marginBottom:16 }}>These fill the script.</div>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
                       {[
                         { key:"prospect", label:"Prospect name(s)", placeholder:"e.g. Jane, Sam" },
                         { key:"company",  label:"Their organization", placeholder:"e.g. Acme Health" },
-                        { key:"signals",  label:"What you spotted", placeholder:"e.g. a new rehab site opening and sign-ons on their careers page", wide:true },
+                        { key:"colleague", label:"Your colleague on the call", placeholder:"Leave blank if it's just you" },
+                        { key:"signals",  label:"What you spotted", placeholder:"e.g. new rehab site, sign-ons on careers page" },
                       ].map(field)}
                     </div>
                   </div>
