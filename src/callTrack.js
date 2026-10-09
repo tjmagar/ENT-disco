@@ -189,10 +189,15 @@ export const STAGE_DATA = {
         { cue:"Check in", check:"answer", text:"**How do you think something like that would land with your recruiters?**" },
       ]},
       { kind:"say", group:"Labor cost", title:"Open", beats:[
-        { cue:"Bridge", text:"And this may or may not be relevant to you — but offering a Student Loan Repayment program can do more than build pipeline. It can also help you **spend less on sign-on bonuses and contract labor**." },
-        { cue:"Ask", check:"answer", text:"Do you currently spend money on either of these for **Nursing, Imaging Techs, or Rehab Therapists**? No wrong answer — some systems lean on them a lot, some hardly at all." },
+        { cue:"Bridge", text:"So this is a great way we help our partners **avoid cost** and get more of their **budget back** to take on other projects." },
+        { cue:"Ask", check:"answer", text:"By offering a Student Loan Repayment program, it does more than just build pipeline. It can help you **spend less on sign-on bonuses and contract labor**. Do you currently spend money on either of these for **Nursing, Imaging Techs, or Rehab Therapists**?" },
       ]},
-      { kind:"say", group:"Labor cost", title:"If they spend on sign-ons", proof:["Every $10k in sign-ons creates about $2,800 of value: −72% ROI (Laudio)","Upfront cash hit, nearly impossible to claw back, re-paid with every backfill"], beats:[
+      { kind:"picker", group:"Labor cost", key:"spendType", label:"What do they spend on?", options:[
+        { value:"Sign-ons", sub:"Sign-on bonuses" },
+        { value:"Contract labor", sub:"Travelers + agency" },
+        { value:"Both", sub:"Sign-ons, then contract labor" },
+      ]},
+      { kind:"say", group:"Labor cost", sub:"Sign-ons", title:"If they spend on sign-ons", proof:["Every $10k in sign-ons creates about $2,800 of value: −72% ROI (Laudio)","Upfront cash hit, nearly impossible to claw back, re-paid with every backfill"], beats:[
         { cue:"The arms race", check:"answer", text:"Let me ask you a question — and feel free to push back if this doesn't match what you're seeing. What our partners tell us is that sign-on bonuses feel a bit like **an arms race**. You have to offer one because everyone else is, and they keep escalating every year. **What have you seen in that regard?**" },
         { cue:"Acknowledge, then the story", text:"It's funny, I was talking to a TA leader at a hospital and she said that healthcare is **the only place where you can get a job with a sign-on**, work there 6 months, quit, walk across the street, and **get another sign-on bonus the next day**." },
         { cue:"Why sign-ons fail", text:"In our experience, the sign-on tends to appeal to a **'right now' mentality**. Very often it goes towards other expenses, and the loans just accumulate interest. It's a big part of why they're often **not that effective at keeping people around**." },
@@ -201,7 +206,7 @@ export const STAGE_DATA = {
         { cue:"Paid over time", text:"The payment is also made **over time, monthly**, while they're employed with you. So **no costly clawbacks**, and no paying in advance for someone who leaves after year 1. Spreading the payments out — sometimes with a **ladder payment** approach — means **you're only spending to get and keep them**." },
         { cue:"Check in", check:"answer", text:"**How does that compare to how you're thinking about sign-ons today?**" },
       ]},
-      { kind:"say", group:"Labor cost", title:"If they spend on contract labor", proof:["Travelers cost ~2.2x","Weekly averages: RN $2,190 · Rad Tech $2,291 · PT $2,231 · RT $2,015 (about $8–9k a month each)"], beats:[
+      { kind:"say", group:"Labor cost", sub:"Contract labor", title:"If they spend on contract labor", proof:["Travelers cost ~2.2x","Weekly averages: RN $2,190 · Rad Tech $2,291 · PT $2,231 · RT $2,015 (about $8–9k a month each)"], beats:[
         { cue:"Ask", check:"answer", text:"We can also help **reduce spend on contract labor**, especially in the locations, specialties, and shifts that are hard to fill with a full-time employee. I'm curious — **where do you find you're using contract labor the most?**" },
         { cue:"Acknowledge + reframe", text:"That makes sense — areas like that are often tough to fill. Many of our partners use travelers to fill the gaps too. What they're finding is that this type of program gets the attention of candidates who want help with their student loans, and who are **willing to work at the location, in the specialty, or on the shift where you need it most**." },
         { cue:"The payoff", text:"They're motivated by the Student Loan Repayment to come work for you, and you can **need fewer travelers**. Depending on your mix, that can mean **thousands of dollars a week** recouped." },

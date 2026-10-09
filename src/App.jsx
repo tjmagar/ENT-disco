@@ -88,7 +88,7 @@ function flattenScript(script) {
   let q = 0;
   script.forEach((item, i) => {
     if (item.kind === "say") item.beats.forEach((_, b) => out.push({ kind:"beat", item:i, beat:b }));
-    else out.push({ kind:"ask", item:i, q:++q });
+    else if (item.kind === "ask") out.push({ kind:"ask", item:i, q:++q });
   });
   return out;
 }
@@ -260,11 +260,25 @@ export default function App() {
   // Teleprompter cursor: one highlighted line per stage. Index == length means the stage is done.
   const [showAllAreas, setShowAllAreas] = useState(false);
   const beatConditions = { hasColleague: !!(briefFields.colleague || "").trim(), noColleague: !(briefFields.colleague || "").trim() };
+  // Sub-tracks (e.g. sign-ons vs contract labor) show only what was picked; nothing picked shows all.
+  const pickedSub = captures.spendType && captures.spendType !== "Both" ? captures.spendType : "";
   const script = visibleScript(activeStage, captures.startArea, showAllAreas)
+    .filter(it => !it.sub || !pickedSub || it.sub === pickedSub)
     .map(it => it.kind === "say" ? { ...it, beats: it.beats.filter(bt => !bt.when || beatConditions[bt.when]) } : it);
   const flat = flattenScript(script);
   const focusIdx = Math.min(focus[activeStage] ?? 0, flat.length);
   const setFocusIdx = i => setFocus(f => ({ ...f, [activeStage]: Math.max(0, Math.min(i, flat.length)) }));
+  function pickSub(key, value) {
+    setCapture(key, value);
+    const target = value === "Both" ? "Sign-ons" : value;
+    const visible = visibleScript(activeStage, captures.startArea, showAllAreas).filter(it => !it.sub || value === "Both" || it.sub === value);
+    let line = 0, jump = -1;
+    visible.forEach(it => {
+      if (jump < 0 && it.sub === target) jump = line;
+      if (it.kind === "say") line += it.beats.length; else if (it.kind === "ask") line += 1;
+    });
+    if (jump >= 0) setFocus(f => ({ ...f, [activeStage]: jump }));
+  }
   useEffect(() => {
     if (!flat.length) return;
     const el = document.querySelector(`[data-line="${activeStage}-${focusIdx}"]`);
@@ -790,6 +804,23 @@ ${combinedText}` }]
     return (
       <div>
         {script.map((item, i) => {
+          if (item.kind === "picker") return (
+            <div key={i} style={{ margin:"-4px 0 14px", padding:"14px 16px", borderRadius:14, background:C.white, border:`1px solid ${C.border}` }}>
+              <div style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginBottom:10 }}>{item.label}</div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))", gap:10 }}>
+                {item.options.map(o => {
+                  const on = captures[item.key] === o.value;
+                  return (
+                    <button key={o.value} onClick={e => { e.stopPropagation(); pickSub(item.key, o.value); }}
+                      style={{ ...B, textAlign:"left", padding:"12px 14px", borderRadius:12, border:`1.5px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textPrimary, boxShadow:on ? "0 4px 14px rgba(37,99,235,0.25)" : "none" }}>
+                      <div style={{ fontSize:16, fontWeight:700, marginBottom:2 }}>{on ? "✓ " : ""}{o.value}</div>
+                      <div style={{ fontSize:13, color:on ? "rgba(255,255,255,0.85)" : C.textMuted }}>{o.sub}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
           if (item.kind === "say") return (
             <div key={i}>
             {groupHeader(item)}
