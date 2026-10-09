@@ -232,8 +232,8 @@ export default function App() {
     const c = captures, b = briefFields;
     const v = x => (x || "").trim();
     const join = parts => parts.map(v).filter(Boolean).join("; ");
-    const current = v(c.metric) && (v(c.current) || v(c.target))
-      ? `${v(c.metric)} is at ${v(c.current) || "?"}${v(c.target) ? `, and you want it at ${v(c.target)}` : ""}` : "";
+    const today = [v(c.turnover) && `first-year turnover is ${v(c.turnover)}`, v(c.signOns) && `you're offering ${v(c.signOns)} in sign-ons`, v(c.contract) && `you're using ${v(c.contract)} in contract labor`].filter(Boolean).join(", ");
+    const current = today && `${today}${v(c.target) ? `, and you want to get to ${v(c.target)}` : ""}`;
     const cause = v(c.rootCause) && `and it sounds like the root cause is ${v(c.rootCause)}`;
     switch (name.toLowerCase()) {
       case "names": case "name": return v(b.prospect);
@@ -249,7 +249,6 @@ export default function App() {
       case "suspected root cause": return v(c.suspected);
       case "capability": return v(c.capability);
       case "your honest read": return v(c.read);
-      case "metric they named": return v(c.metric);
       case "business problem and current state": return join([c.businessDriver, current]);
       case "business problem + root causes": return join([c.businessDriver, cause]);
       case "brief summary": return join([c.businessDriver, current, cause, v(c.ripple) && `it's causing ${v(c.ripple)}`, v(c.cost) && `and it's costing about ${v(c.cost)} a month`]);
