@@ -261,24 +261,29 @@ export default function App() {
   const [showAllAreas, setShowAllAreas] = useState(false);
   const beatConditions = { hasColleague: !!(briefFields.colleague || "").trim(), noColleague: !(briefFields.colleague || "").trim() };
   // Sub-tracks (e.g. sign-ons vs contract labor) show only what was picked; nothing picked shows all.
-  const pickedSub = captures.spendType && captures.spendType !== "Both" ? captures.spendType : "";
+  const subVisible = (it, picks = captures) => {
+    if (!it.sub) return true;
+    const v = picks[it.subKey];
+    return !v || v === "Both" || v === it.sub;
+  };
   const script = visibleScript(activeStage, captures.startArea, showAllAreas)
-    .filter(it => !it.sub || !pickedSub || it.sub === pickedSub)
+    .filter(it => subVisible(it))
     .map(it => it.kind === "say" ? { ...it, beats: it.beats.filter(bt => !bt.when || beatConditions[bt.when]) } : it);
   const flat = flattenScript(script);
   const focusIdx = Math.min(focus[activeStage] ?? 0, flat.length);
   const setFocusIdx = i => setFocus(f => ({ ...f, [activeStage]: Math.max(0, Math.min(i, flat.length)) }));
   function pickSub(key, value) {
     setCapture(key, value);
-    const target = value === "Both" ? "Sign-ons" : value;
-    const visible = visibleScript(activeStage, captures.startArea, showAllAreas).filter(it => !it.sub || value === "Both" || it.sub === value);
+    const picks = { ...captures, [key]: value };
+    const visible = visibleScript(activeStage, captures.startArea, showAllAreas).filter(it => subVisible(it, picks));
     let line = 0, jump = -1;
     visible.forEach(it => {
-      if (jump < 0 && it.sub === target) jump = line;
+      if (jump < 0 && it.subKey === key && it.sub) jump = line;
       if (it.kind === "say") line += it.beats.length; else if (it.kind === "ask") line += 1;
     });
     if (jump >= 0) setFocus(f => ({ ...f, [activeStage]: jump }));
   }
+
   useEffect(() => {
     if (!flat.length) return;
     const el = document.querySelector(`[data-line="${activeStage}-${focusIdx}"]`);

@@ -197,7 +197,7 @@ export const STAGE_DATA = {
         { value:"Contract labor", sub:"Travelers + agency" },
         { value:"Both", sub:"Sign-ons, then contract labor" },
       ]},
-      { kind:"say", group:"Labor cost", sub:"Sign-ons", title:"If they spend on sign-ons", proof:["Every $10k in sign-ons creates about $2,800 of value: −72% ROI (Laudio)","Upfront cash hit, nearly impossible to claw back, re-paid with every backfill"], beats:[
+      { kind:"say", group:"Labor cost", subKey:"spendType", sub:"Sign-ons", title:"If they spend on sign-ons", proof:["Every $10k in sign-ons creates about $2,800 of value: −72% ROI (Laudio)","Upfront cash hit, nearly impossible to claw back, re-paid with every backfill"], beats:[
         { cue:"The arms race", check:"answer", text:"Let me ask you a question — and feel free to push back if this doesn't match what you're seeing. What our partners tell us is that sign-on bonuses feel a bit like **an arms race**. You have to offer one because everyone else is, and they keep escalating every year. **What have you seen in that regard?**" },
         { cue:"Acknowledge, then the story", text:"It's funny, I was talking to a TA leader at a hospital and she said that healthcare is **the only place where you can get a job with a sign-on**, work there 6 months, quit, walk across the street, and **get another sign-on bonus the next day**." },
         { cue:"Why sign-ons fail", text:"In our experience, the sign-on tends to appeal to a **'right now' mentality**. Very often it goes towards other expenses, and the loans just accumulate interest. It's a big part of why they're often **not that effective at keeping people around**." },
@@ -206,7 +206,7 @@ export const STAGE_DATA = {
         { cue:"Paid over time", text:"The payment is also made **over time, monthly**, while they're employed with you. So **no costly clawbacks**, and no paying in advance for someone who leaves after year 1. Spreading the payments out — sometimes with a **ladder payment** approach — means **you're only spending to get and keep them**." },
         { cue:"Check in", check:"answer", text:"**How does that compare to how you're thinking about sign-ons today?**" },
       ]},
-      { kind:"say", group:"Labor cost", sub:"Contract labor", title:"If they spend on contract labor", proof:["Travelers cost ~2.2x","Weekly averages: RN $2,190 · Rad Tech $2,291 · PT $2,231 · RT $2,015 (about $8–9k a month each)"], beats:[
+      { kind:"say", group:"Labor cost", subKey:"spendType", sub:"Contract labor", title:"If they spend on contract labor", proof:["Travelers cost ~2.2x","Weekly averages: RN $2,190 · Rad Tech $2,291 · PT $2,231 · RT $2,015 (about $8–9k a month each)"], beats:[
         { cue:"Ask", check:"answer", text:"We can also help **reduce spend on contract labor**, especially in the locations, specialties, and shifts that are hard to fill with a full-time employee. I'm curious — **where do you find you're using contract labor the most?**" },
         { cue:"Acknowledge + reframe", text:"That makes sense — areas like that are often tough to fill. Many of our partners use travelers to fill the gaps too. What they're finding is that this type of program gets the attention of candidates who want help with their student loans, and who are **willing to work at the location, in the specialty, or on the shift where you need it most**." },
         { cue:"The payoff", text:"They're motivated by the Student Loan Repayment to come work for you, and you can **need fewer travelers**. Depending on your mix, that can mean **thousands of dollars a week** recouped." },
@@ -245,18 +245,28 @@ export const STAGE_DATA = {
         { cue:"Recap the value", text:"", list:[
           { tag:"Pipeline", text:"How our partners use this program to build a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs, Rehabilitation Therapists using our **recruitment marketing and campus recruitment machine**." },
           { tag:"Labor cost", text:"How they're **saving money** not having to pay out sign-ons again and again, and filling roles with **full-time employees** that would have been worked by contract labor." },
-          { tag:"Retention", text:"And how they're **retaining their employees** and motivating them down career pathways, creating a **stronger, more stable workforce**. All through the power of their Student Loan Repayment program." },
+          { tag:"Retention", text:"And how they're **retaining their employees** and motivating them down career pathways, creating a **stronger, more stable workforce**." },
         ]},
+        { cue:"Land it", text:"**All through the power of their Student Loan Repayment program.**" },
         { cue:"Step back", text:"At this point, I'd love to take a step back and **understand where your head is at**. The reason I ask is I'd rather not keep going if this isn't a fit for you — so I want your **honest read, not the polite one**." },
-        { cue:"Buy-in check", check:"answer", text:"How is this all feeling? On a **scale of 1 to 10**, with 10 being a heck yes — **where would you say you're at?** No wrong answer." },
-        { cue:"Read the reaction", text:"", list:[
-          { tag:"Hesitant or negative", text:"\"That's totally fair — and I appreciate the honesty. **What's giving you pause?**\" Then do discovery on why they feel that way." },
-          { tag:"Positive, with questions", text:"**Answer their questions.** Then: \"I'm curious — **what would need to be true for that to be a 10?**\"" },
-          { tag:"Positive, no questions", text:"\"I'm glad it's resonating. **Mind if I ask a few questions about how things work today?** The reason I ask is I don't want to assume anything.\" Then move into Business Problem." },
-        ]},
+        { cue:"Buy-in check", check:"answer", text:"So — quick gut check. On a **scale of 1 to 10**, with 10 being '**this is exactly what we need**' — **where would you put this right now?**" },
+      ]},
+      { kind:"picker", key:"reaction", label:"How did they react?", options:[
+        { value:"Hesitant", sub:"Low number, or pushback" },
+        { value:"Positive", sub:"High number, or leaning in" },
+      ]},
+      { kind:"say", subKey:"reaction", sub:"Hesitant", title:"If they're hesitant", beats:[
+        { cue:"Acknowledge", text:"That's totally fair — and I **appreciate the honesty**." },
+        { cue:"Get curious", check:"answer", text:"I'm curious — **what's keeping it from being higher?**" },
+        { cue:"Dig in", check:"answer", text:"Tell me more about that. **What would need to be true** for this to be worth a closer look?" },
+      ]},
+      { kind:"say", subKey:"reaction", sub:"Positive", title:"If they're positive", beats:[
+        { cue:"If they have questions", text:"**Answer their questions first.** Keep it short." },
+        { cue:"Close the gap", check:"answer", text:"Glad it's resonating. I'm curious — **what would it take to make that a 10?**" },
+        { cue:"Earn the next questions", check:"answer", text:"**Mind if I ask a few questions about how things work today?** The reason I ask is I don't want to assume anything." },
       ]},
     ],
-    tips:["Their words first, not yours. Parrot their exact language back before you recap.","Give a reason before the hard question ('The reason I ask is…').","Hedge the tie-back ('I may be off here') so they correct you rather than nod along.","Below a 10, get curious about the gap. Don't defend.","Save 'fair' for the agenda and the close."],
+    tips:["Give a reason before the hard question ('The reason I ask is…').","Below a 10, get curious about the gap. Don't defend.","Save 'fair' for the agenda and the close."],
     watch:["Skipping the 1–10 — it's your read on whether to keep going","Answering an objection before you understand it","Recapping all three areas at the same weight when they only care about one"],
   },
   "business-problem": {
