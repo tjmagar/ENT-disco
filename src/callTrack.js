@@ -144,7 +144,7 @@ export const STAGE_DATA = {
           { tag:"Labor cost", text:"Others tell us they're **spending too much** — on sign-on bonuses that aren't showing ROI, on contract labor that's eating their budget, and on recruiting just to keep roles filled." },
           { tag:"Retention", text:"And some tell us they're **losing good people** to competitors for more money — so they use the program to reward not only **joining, but staying**. And they build out **career pathways**, like MAs into RNs and PTAs into PTs, instead of watching them walk out the door." },
         ]},
-        { cue:"Hand it to them", check:"answer", text:"I have a hunch where you might fit, given [what you spotted] and the industry norm on **first-year nurse retention**. But given your situation, **where would be the most relevant place for us to start?**" },
+        { cue:"Hand it to them", check:"answer", text:"I have a hunch where you might fit, considering [what you spotted]. But given your situation, **where would be the most relevant place for us to start?**" },
       ]},
     ],
     tips:["Mark the area they pick in the capture pane. Discovery and the Value Drop follow it."],
