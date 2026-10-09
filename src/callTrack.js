@@ -127,7 +127,8 @@ export const STAGE_DATA = {
     script:[
       { kind:"say", title:"Who we are", beats:[
         { cue:"Set up the slides", text:"So like I said, to give you some context, I've prepared **a few short slides**. Feel free to **interrupt me** anytime." },
-        { cue:"Who we are", text:"At Clasp, we work **exclusively in healthcare** — full stop. And within that, we help HR and TA teams achieve **three distinct outcomes**." },
+        { cue:"Who we are", text:"At Clasp, we work **exclusively in healthcare**. Within that, we help HR and talent acquisition teams achieve **three distinct outcomes** through an **innovative student loan repayment and recruitment program**, which I'll share briefly." },
+        { cue:"Who we work with", text:"Our partners range from major systems like **Novant Health, Northwestern Medicine and Boston Children's**, to smaller systems like **Saint Alphonsus**, to outpatient groups like **Confluent Health**." },
       ]},
     ],
     tips:["Keep it short. The point is to earn the right to ask questions, not to pitch."],
@@ -137,7 +138,7 @@ export const STAGE_DATA = {
     rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
     script:[
       { kind:"say", title:"Three outcomes", beats:[
-        { cue:"Walk through them", text:"I'll walk you through those briefly. It's all through an **innovative student loan repayment and recruitment program**." },
+        { cue:"Next slide", text:"And the three distinct outcomes…" },
         { cue:"Three outcomes", text:"", list:[
           { tag:"Pipeline", text:"Some partners tell us they need a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
           { tag:"Labor cost", text:"Others tell us they're **spending too much** — on sign-on bonuses that aren't showing ROI, on contract labor that's eating their budget, and on recruiting just to keep roles filled." },
