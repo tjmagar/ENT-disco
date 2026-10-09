@@ -242,8 +242,7 @@ export const STAGE_DATA = {
     script:[
       { kind:"say", beats:[
         { cue:"Thank them", text:"I really appreciate you letting me share a bit about how we work with healthcare systems on an **innovative Student Loan Repayment and recruitment program**." },
-        { cue:"Their words first", check:"answer", text:"Before I recap — let me make sure I've got this right. You mentioned [what they said]. **Did I get that right?**" },
-        { cue:"Recap the value", text:"Great. Just to bring it back together — here's how our partners **tend to use** the program:", list:[
+        { cue:"Recap the value", text:"Just to bring it back together — here's how our partners **tend to use** the program:", list:[
           { tag:"Pipeline", text:"Building a **bigger, stronger pipeline** of soon-to-graduate Nurses, Imaging Techs and Rehabilitation Therapists, through our **recruitment marketing and campus recruitment** machine." },
           { tag:"Labor cost", text:"**Saving money** by not paying out sign-ons again and again, and filling roles with **full-time employees** that would otherwise be worked by contract labor." },
           { tag:"Retention", text:"And **retaining their people** and motivating them down career pathways — a **stronger, more stable workforce**. All through the power of their Student Loan Repayment program." },
