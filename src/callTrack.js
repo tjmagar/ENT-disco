@@ -155,13 +155,14 @@ export const STAGE_DATA = {
     screen:"Sharing the slides and examples for each talk track",
     script:[
       { kind:"say", beats:[
-        { cue:"Acknowledge + start", text:"Okay — if it's alright with you, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't apply** to you." },
+        { cue:"Acknowledge + start", text:"Okay, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't feel relevant**." },
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
-        { cue:"The outcome", text:"The biggest outcome we tend to drive for our partners is building them a **bigger pipeline of soon-to-graduate talent**. I'm not sure yet how much of this applies to you, so I'll keep it high level. We do this through a number of channels.", list:[
-          { tag:"Educate", text:"Channels that **educate the students** on the possibilities and benefits of this type of program." },
-          { tag:"Awareness", text:"Channels that **generate awareness** of this type of program as a reason to join your system after graduation." },
-          { tag:"Convert", text:"And channels to **convert them into applicants** — to get them to raise their hand and say, \"When I graduate, I want to come work for you!\"" },
+        { cue:"The outcome", text:"So this is an area where we **really excel** and produce great outcomes for our partners. For example, [pipeline customer story]." },
+        { cue:"Three ways", text:"And the way we build a **bigger, more sustainable pipeline** of talent is really three main ways:", list:[
+          { tag:"Educate", text:"We tap into channels in unique and innovative ways to actually **educate the students** on the possibilities and benefits of this type of program." },
+          { tag:"Awareness", text:"By having built out programs, partnerships and relationships within these **four channels**, we're able to **generate awareness** of this type of program as a reason to join your system instead of another once they graduate." },
+          { tag:"Convert", text:"And third — this presence helps us **convert them into applicants**, getting them to raise their hand and say, \"When I graduate, I want to come work for you!\"" },
         ]},
         { cue:"Check in", check:"answer", text:"Before I go further — I'm curious, **how are you building that early pipeline today?**" },
       ]},
