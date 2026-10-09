@@ -263,7 +263,6 @@ export const STAGE_DATA = {
       { kind:"say", subKey:"reaction", sub:"Positive", title:"If they're positive", beats:[
         { cue:"If they have questions", text:"**Answer their questions first.** Keep it short." },
         { cue:"Close the gap", check:"answer", text:"Glad it's resonating. I'm curious — **what would it take to make that a 10?**" },
-        { cue:"Earn the next questions", check:"answer", text:"**Mind if I ask a few questions about how things work today?** The reason I ask is I don't want to assume anything." },
       ]},
     ],
     tips:["Give a reason before the hard question ('The reason I ask is…').","Below a 10, get curious about the gap. Don't defend.","Save 'fair' for the agenda and the close."],
@@ -273,7 +272,8 @@ export const STAGE_DATA = {
     rule:"Identify the business problem behind what they asked for, find out who cares, then validate it's the one to anchor on.",
     script:[
       { kind:"say", beats:[
-        { cue:"Reflect + permission", check:"answer", text:"It sounds like [what they said]. **Can we dig into that some more?**" },
+        { cue:"Tie back", text:"You mentioned [what resonated] — I'd love to **understand that a bit better**." },
+        { cue:"Earn the right", check:"answer", text:"**Mind if I ask a few questions** about what's going on at [company]? The reason I ask — I **don't want to assume** this is a fit just because it sounded good on a slide." },
       ]},
       { kind:"ask", label:"Origin", text:"What was going on in your business that made you **start exploring solutions** like ours in the first place?" },
       { kind:"ask", label:"The moment", text:"Can you walk me back to **the moment this became a priority**?\n\nWhat happened?" },
