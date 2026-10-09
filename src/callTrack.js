@@ -175,7 +175,7 @@ export const STAGE_DATA = {
         { cue:"Show a video", text:"Videos like this one. You can see the **level of engagement** — the views, the comments, the reshares. It tends to get these students **thinking about what's possible**." },
         { cue:"Check in", check:"answer", text:"I'm curious — **is that the kind of reach you're getting with students today, or is that pretty different?**" },
       ]},
-      { kind:"say", group:"Pipeline", title:"Schools + campus", proof:["Active school partnerships: 70+ nursing, 90+ imaging, 70+ rehab therapy, 110+ RT","Ambassadors: we recruit, onboard, track referrals and pay out. Low lift for your team","Virtual career fair: 187 PT, OT and SLP students from 88 schools"], beats:[
+      { kind:"say", group:"Pipeline", title:"Schools + campus", proof:["Active school partnerships: 70+ nursing, 90+ imaging, 70+ rehab therapy, 110+ RT","CRNA + CAA: relationships with 60–70 programs","Ambassadors: we recruit, onboard, track referrals and pay out. Low lift for your team","Virtual career fair: 187 PT, OT and SLP students from 88 schools"], beats:[
         { cue:"School network", text:"Social only gets you so far, though. To really engage with the students, we've built out a **nationwide network of school relationships** that drive applicants into the top of your funnel. We talk with **Program Directors and Career Services** to spread the word that there are healthcare systems, like yourself, that will help their students pay part of their loans when they come to work for you." },
         { cue:"Why schools care", text:"From what program directors tell us, this message resonates with them in a way **a sign-on bonus usually doesn't**. It motivates them to share it with their students, and gets us **access to their students** in a way that many employers don't have." },
         { cue:"Campus ambassadors", text:"We also have a network of **campus ambassadors**, boots on the ground, to engage the students on campus. They're talking to soon-to-graduate nurses, imaging techs, and rehab therapists about our partners who are offering these programs." },
@@ -361,6 +361,13 @@ export const STAGE_DATA = {
       { kind:"ask", label:"Fairness check", text:"Does that **feel fair** to you?" },
       { kind:"ask", label:"Next step", text:"What should the **next logical step** look like?\n\nAnd **who needs to be there**?" },
       { kind:"ask", label:"Date", text:"Can we put **a specific date** on the calendar now?" },
+      { kind:"say", title:"If they ask what the next meeting looks like", beats:[
+        { cue:"The agenda", text:"Great question. Next time, we'd walk through a **program design built for you** — what we can realistically drive for [roles they named], **what it would cost**, and how it fits alongside your current package." },
+        { cue:"What you need", check:"answer", text:"To make that real, I'd need a few inputs: **how many you're looking to hire** this year, **what you're offering today**, and **where the biggest gaps are**. Is that something you could pull together?" },
+      ]},
+      { kind:"say", title:"If they say \"just email me\"", beats:[
+        { cue:"Hold the date", check:"answer", text:"Absolutely — I'll send a recap. Mind if I **drop a hold on the calendar** for [date] so it doesn't slip? **Easy to move** if it doesn't work." },
+      ]},
     ],
     tips:["Leave with a concrete decision.","A next step is not real until it has an owner and a date."],
     watch:["Leaving without a booked meeting — 'I'll send some times' is not a next step","Skipping the ROE callback — the ask lands cold without it"],
@@ -368,6 +375,18 @@ export const STAGE_DATA = {
 };
 
 // Backup questions for the Bank tab — Orlob-style, adapted for Clasp.
+// Straight answers to what prospects ask mid-call. Short enough to read live.
+export const QUICK_ANSWERS = [
+  { q:"What does it cost? (asked early)", a:"Great question — and I'll absolutely get you numbers. Pricing is built around **how many hires we drive** for you, so it depends on a few things I don't know yet. Mind if I ask a couple of questions first so what I give you is **actually grounded**?" },
+  { q:"Are those hires or just leads?", a:"**Hires.** Students sign an agreement in their final stretch of school committing to join you when they graduate — and **about 95%** of them follow through." },
+  { q:"We're a state / federal institution. Is that a problem?", a:"**Not a barrier.** We work with state- and federally-affiliated systems. Contracting can take a few extra steps, and we'll walk through them with you." },
+  { q:"Any conflict with PSLF?", a:"**No conflict with PSLF.**" },
+  { q:"What's the admin lift on our side?", a:"**None.** Our platform syncs with about **97% of federal and private loan servicers**, and we administer the monthly payments. It takes about 30 seconds for them to connect." },
+  { q:"How does it work for the clinician?", a:"A **monthly payment toward their loans** while they're employed with you, typically structured over **3–5 years**. The first **$5,250 a year** is tax-advantaged — it doesn't count toward payroll tax." },
+  { q:"What if they leave?", a:"**Payments stop.** No clawbacks, nothing to chase, no upfront money walking out the door." },
+  { q:"Can you benchmark what other systems offer?", a:"**Yes** — I'll bring benchmarks for [roles they named] at similar systems to our next conversation. Use it as the reason to **book the date now**." },
+];
+
 export const QUESTION_BANK = [
   { key:"pain", label:"Business pain", questions:[
     "What challenges would sting the most if they're still unsolved six months from now?",
