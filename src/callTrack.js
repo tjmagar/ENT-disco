@@ -272,10 +272,10 @@ export const STAGE_DATA = {
     rule:"Identify the business problem behind what they asked for, then validate it's the one to anchor on.",
     script:[
       { kind:"say", beats:[
-        { cue:"Tie back", text:"You mentioned [what resonated] — I'd love to **understand that a bit better**." },
-        { cue:"Earn the right", check:"answer", text:"**Mind if I ask a few questions** about what's going on at [company]? The reason I ask — I **don't want to assume** this is a fit just because it sounded good on a slide." },
+        { cue:"Bridge", text:"So hopefully you have a good idea, and it seems there's **still alignment so far**. But to understand **where we need to get to**, I'd love to understand more about **where you are**." },
+        { cue:"Go back in time", check:"answer", text:"**Mind if we go back in time for a moment?**" },
       ]},
-      { kind:"ask", label:"Go back in time", text:"Let's **go back in time** for a second — can you walk me back to **the moment this became a priority**?\n\nWhat was happening?" },
+      { kind:"ask", label:"The moment", text:"Can you walk me back to **the moment this became a priority**?\n\nWhat was happening?" },
       { kind:"ask", label:"Origin", text:"What was going on in your business that made you **start exploring solutions** like ours in the first place?" },
       { kind:"say", beats:[
         { cue:"Acknowledge", text:"I understand why you would want [surface need]." },
