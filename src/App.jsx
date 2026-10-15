@@ -920,6 +920,35 @@ ${combinedText}` }]
                   ))}
                 </div>
               )}
+              {item.show && (() => {
+                const role = captures.role;
+                const roles = [...new Set(item.show.map(l => l.role).filter(Boolean))];
+                const shown = item.show.filter(l => !l.role || !role || l.role === role);
+                return (
+                  <div onClick={e => e.stopPropagation()} style={{ margin:"0 18px 12px", padding:"10px 14px", borderRadius:10, background:C.white, border:`1px solid ${C.yellowRule}` }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", marginBottom:8 }}>
+                      <span style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginRight:4 }}>Show this</span>
+                      {roles.map(r => {
+                        const on = role === r;
+                        return (
+                          <button key={r} onClick={() => setCapture("role", on ? "" : r)}
+                            style={{ ...B, fontSize:12, fontWeight:700, padding:"3px 10px", borderRadius:99, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? C.white : C.textSecondary }}>
+                            {on ? "✓ " : ""}{r}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                      {shown.map(l => (
+                        <a key={l.url} href={l.url} target="_blank" rel="noreferrer"
+                          style={{ fontSize:15, fontWeight:600, color:C.emerald, textDecoration:"none", display:"flex", gap:8, alignItems:"baseline" }}>
+                          <span style={{ fontSize:12 }}>↗</span><span>{l.label}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
               {item.beats.map((beat, b) => {
                 line++;
                 const idx = line, st = lineState(idx);

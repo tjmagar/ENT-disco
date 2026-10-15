@@ -165,7 +165,16 @@ export const STAGE_DATA = {
         ]},
         { cue:"Check in", check:"answer", text:"Before I go further — I'm curious, **how are you building that early pipeline today?**" },
       ]},
-      { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", proof:["Curated influencer network reaches 4.6M+ engaged followers"], beats:[
+      { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", proof:["Curated influencer network reaches 4.6M+ engaged followers"], show:[
+        { role:"Nursing", label:"TikTok search: nursing student loan debt", url:"https://www.tiktok.com/discover/nursing-student-loan-debt" },
+        { role:"Nursing", label:"Video: \"$95,487.73 in debt at 26 to be a nurse\"", url:"https://www.tiktok.com/@amaiyacamillo/video/7468387036647410974" },
+        { role:"Rehab", label:"TikTok search: physical therapy student debt", url:"https://www.tiktok.com/discover/student-debt-physical-therapy" },
+        { role:"Rehab", label:"Video: \"My school debt journey as a physical therapist\"", url:"https://www.tiktok.com/@dpt.biggie/video/7436586501326032171" },
+        { role:"Imaging", label:"TikTok search: rad tech student loan debt", url:"https://www.tiktok.com/search?q=rad%20tech%20student%20loan%20debt" },
+        { role:"Respiratory", label:"TikTok search: respiratory therapist student loan debt", url:"https://www.tiktok.com/search?q=respiratory%20therapist%20student%20loan%20debt" },
+        { role:"CRNA / CAA", label:"TikTok search: CRNA student loan debt", url:"https://www.tiktok.com/search?q=CRNA%20student%20loan%20debt" },
+        { label:"Our high-performing Clasp TikTok (x-ray tech creator, covers all roles)", url:"https://www.tiktok.com/@jroddynotricch/video/7517416929674398989" },
+      ], beats:[
         { cue:"Get the word out", text:"First we have to get the word out — if you're becoming a Nurse, an Imaging Tech, a Rehab Therapist, there are healthcare systems that will **help repay part of your student loans** so that you'll want to work with them." },
         { cue:"Influencers", text:"One of the most effective ways we've found to do this is through **social media influencers**. We have a whole curated network of **TikTok influencers who are clinicians and techs**. We've **really cracked the code** on this. I know it may sound funny, but it really works — and it's **so important for this generation**." },
         { cue:"Where they talk", text:"From what we're seeing, this is where they go to talk to each other — and **their student loan debt is a lot of what they're talking about**." },
@@ -186,7 +195,13 @@ export const STAGE_DATA = {
       { kind:"ask", group:"Pipeline", label:"School relationships", text:"What existing relationships do you have with the **local college programs** to funnel students in these fields your way?\n\nWho works on those relationships?" },
       { kind:"ask", group:"Pipeline", label:"School fit", text:"**How well** are those school relationships meeting your needs?" },
       { kind:"ask", group:"Pipeline", label:"Loan debt", text:"When you're recruiting those students, how often do they **ask about help with their loan debt**?" },
-      { kind:"say", group:"Pipeline", title:"Convert: your recruiters", proof:["One system hit >200% of its rad tech applicant goal, with applicants from 6 states","Northwestern Medicine: \"we did not ever have 32 RT applicants at a time prior to Clasp\"","Partners see applicants from 10+ states on average"], beats:[
+      { kind:"say", group:"Pipeline", title:"Convert: your recruiters", proof:["One system hit >200% of its rad tech applicant goal, with applicants from 6 states","Northwestern Medicine: \"we did not ever have 32 RT applicants at a time prior to Clasp\"","Partners see applicants from 10+ states on average"], show:[
+        { label:"Partner landing pages", url:"https://www.clasp.com/students#programs" },
+        { label:"Partner one-pagers and flyers (Canva)", url:"https://www.canva.com/folder/FAFxRyvQNKw" },
+        { label:"List of influencer videos (Slack)", url:"https://app.slack.com/client/TJYFBHNEL/unified-files/doc/F0BGME1JGDN" },
+        { label:"Staged applicant platform", url:"https://staging.portal.clasp.com/welcome" },
+        { label:"Staged employer platform", url:"https://staging.portal.clasp.com/account/login" },
+      ], beats:[
         { cue:"Set the table", text:"Last piece — let me show you how we **equip your recruiters**." },
         { cue:"Support your TA", text:"And this isn't meant to replace what your TA team is already doing — **it's meant to support it**, with the local programs and residency programs. We have a team dedicated to **enabling your recruiters**. The landing pages and other materials we create help them **convert candidates they're already talking to** before the competition does." },
         { cue:"Show landing pages", text:"Landing pages like these. We tailor it to **your message, your employer brand and value prop**. The goal is to send the message to students: 'We understand what you're looking for, and **we're the right fit for you**.'" },
