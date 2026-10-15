@@ -284,8 +284,6 @@ export const STAGE_DATA = {
         { cue:"Start with hiring", when:"notFunnel", text:"Let's start with **who you're hiring**." },
       ]},
       { kind:"ask", label:"Roles + leaders", text:"What **roles** do you hire new grads into the most — and **who are the leaders** you're working with to fill those?" },
-      { kind:"say", beats:[{ cue:"Pause the flow", text:"Before we go too much further — I want to make sure we're **anchoring this conversation to the right thing**." }] },
-      { kind:"ask", label:"Anchor check", text:"Is this **the challenge we should be focused on** solving together?\n\nOr are there other things that are going to overpower this?" },
     ],
     tips:["Keep peeling only while the answer is still a symptom. Stop when a CFO would fund it.","\"Who cares the most\" is your multithreading list.","Get explicit agreement that this is the problem worth solving now."],
     watch:["Stopping at the symptom and moving on","Happy ears — getting excited before validating it is a raging fire","Skipping the anchor check because it feels confrontational"],
