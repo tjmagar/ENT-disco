@@ -270,7 +270,7 @@ export const STAGE_DATA = {
     script:[
       { kind:"say", beats:[
         { cue:"Thank them", text:"Okay, that was a lot there. **Thank you for letting me share** a bit about how we [what they picked] through our **innovative program**." },
-        { cue:"Pivot check", check:"answer", text:"At the beginning of the call, we agreed that once I set some context, we'd pivot into **exploring more about what your current state looks like** around these areas. **Does that still feel like the right move here?**" },
+        { cue:"Pivot check", check:"answer", text:"At the beginning of the call, we agreed that once I set some context, we'd pivot into **exploring more about what your current state looks like** around these areas, which would help us understand if there's a **mutual fit**. **Does that still feel like the right move here?**" },
       ]},
       { kind:"picker", key:"reaction", label:"How did they react?", options:[
         { value:"Hesitant", sub:"Unsure, or pushback" },
