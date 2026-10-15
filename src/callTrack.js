@@ -113,9 +113,9 @@ export const STAGE_DATA = {
     rule:"Brief context on who we are and what we do. Earn the right to ask questions, don't pitch.",
     script:[
       { kind:"say", title:"Who we are", beats:[
-        { cue:"Set up the slides", text:"So like I said, to give you some context, I've prepared **a few short slides**. Feel free to **interrupt me** anytime." },
-        { cue:"Who we are", text:"At Clasp, we work **exclusively in healthcare**. Within that, we help HR and talent acquisition teams achieve **three distinct outcomes** through an **innovative student loan repayment and recruitment program**, which I'll share briefly." },
-        { cue:"Who we work with", text:"Our partners range from major systems like **Novant Health, Northwestern Medicine and Boston Children's**, to smaller systems like **Saint Alphonsus**, to outpatient groups like **Confluent Health**." },
+        { cue:"Set up the slides", text:"To give you some context, I've got **a few short slides** — feel free to **interrupt me**." },
+        { cue:"Who we are", text:"Clasp works **only in healthcare**. We help HR and TA teams hit **three outcomes** through a **student loan repayment and recruitment program**." },
+        { cue:"Who we work with", text:"Partners range from **Novant Health and Northwestern Medicine** to **Saint Alphonsus** and **Confluent Health**." },
       ]},
     ],
     tips:["Keep it short. The point is to earn the right to ask questions, not to pitch."],
