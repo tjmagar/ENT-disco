@@ -1217,9 +1217,9 @@ const sd = STAGE_DATA[activeStage];
   const meta = STAGE_META[activeStage] || {};
   const timeboxMs = (parseInt(meta.timebox) || 0) * 60000;
   const stageElapsed = now - stageStart;
-  const overTime = timeboxMs && stageElapsed > timeboxMs;
+  const overTime = timeboxMs > 0 && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Clasp Context","orient":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Hiring Needs Analysis","relationship-check":"School Partnerships","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Clasp Context","orient":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Hiring Needs Analysis","relationship-check":"School Partnerships","turnover":"Retention + Turnover","signon-spend":"Sign-on Spend","contract-labor":"Contract Labor","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Who's on the call, and anything you spotted.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
@@ -1237,9 +1237,9 @@ const sd = STAGE_DATA[activeStage];
         </div>
 
         <div style={{ flex:1, padding:"6px 10px" }}>
-          {["setup","orient","value","discovery","close"].map(group => {
+          {["setup","orient","value","discovery","deeper","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
-            const groupLabel = { setup:"Setup", orient:"Orient", value:"Value", discovery:"Discovery", close:"Close" }[group];
+            const groupLabel = { setup:"Setup", orient:"Orient", value:"Value", discovery:"Discovery", deeper:"Go deeper · if time", close:"Close" }[group];
             return (
               <div key={group} style={{ marginBottom:14 }}>
                 <div style={{ fontSize:10, fontWeight:700, color:C.textMuted, letterSpacing:"0.12em", textTransform:"uppercase", padding:"0 10px", marginBottom:4 }}>{groupLabel}</div>
@@ -1255,6 +1255,7 @@ const sd = STAGE_DATA[activeStage];
                         border: isActive || isPast ? "none" : `1.5px solid ${C.border}`,
                         color: isActive ? "#fff" : isPast ? C.textSecondary : C.textMuted }}>{s.icon}</span>
                       <span style={{ flex:1, fontSize:13, color:isActive ? "#1d4ed8" : isPast ? C.textSecondary : C.textPrimary, fontWeight:isActive ? 700 : 500, lineHeight:1.3 }}>{s.short}</span>
+                      {s.area && (captures.startArea === s.area || captures.startArea === "All three") && <span title="Their pick" style={{ fontSize:9, fontWeight:700, color:C.filledText, background:C.filledBg, borderRadius:99, padding:"1px 6px", flexShrink:0 }}>pick</span>}
                       {tb && <span style={{ fontSize:10, color:isActive ? "#1d4ed8" : C.textMuted, fontWeight:600, flexShrink:0 }}>{tb.replace(" min","m")}</span>}
                     </button>
                   );

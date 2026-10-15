@@ -16,7 +16,10 @@ export const STAGES = [
   { id:"summary-buyin",      icon:"6",  short:"Summary + Buy-in",         group:"value" },
   { id:"business-problem",   icon:"7",  short:"Hiring Needs Analysis",         group:"discovery" },
   { id:"relationship-check", icon:"8",  short:"School Partnerships",      group:"discovery" },
-  { id:"close-next-steps",   icon:"9", short:"Close + Next Steps",       group:"close" },
+  { id:"turnover",           icon:"9",  short:"Retention + Turnover",     group:"deeper", area:"Retention" },
+  { id:"signon-spend",       icon:"10", short:"Sign-on Spend",            group:"deeper", area:"Labor cost" },
+  { id:"contract-labor",     icon:"11", short:"Contract Labor",           group:"deeper", area:"Labor cost" },
+  { id:"close-next-steps",   icon:"12", short:"Close + Next Steps",       group:"close" },
 ];
 
 // Timeboxes add up to a 30-minute call.
@@ -29,6 +32,9 @@ export const STAGE_META = {
   "summary-buyin":    { phase:"BUY-IN",           timebox:"1 min" },
   "business-problem": { phase:"HIRING NEEDS", timebox:"4 min" },
   "relationship-check": { phase:"SCHOOL PARTNERSHIPS", timebox:"2 min" },
+  "turnover":         { phase:"GO DEEPER",        timebox:"" },
+  "signon-spend":     { phase:"GO DEEPER",        timebox:"" },
+  "contract-labor":   { phase:"GO DEEPER",        timebox:"" },
   "close-next-steps": { phase:"CLOSE",            timebox:"4 min" },
 };
 
@@ -40,10 +46,7 @@ export const CAPTURE = {
   "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
   "orient":           [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
                        { key:"startWhy", label:"What they said", hint:"Their words" }],
-  "value-drop":       [{ key:"turnover", label:"First-year turnover", hint:"Number + department" },
-                       { key:"signOns", label:"Sign-on bonuses", hint:"Type and amount" },
-                       { key:"contract", label:"Contract labor", hint:"How much, where" },
-                       { key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
+  "value-drop":       [{ key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
   "summary-buyin":    [{ key:"buyIn", label:"Their reaction", hint:"In their words" }],
   "business-problem": [{ key:"roles", label:"Hardest role to recruit new grads for" },
                        { key:"hiresPerYear", label:"Hires per year for that role" },
@@ -51,6 +54,13 @@ export const CAPTURE = {
   "relationship-check": [{ key:"schools", label:"School relationships", hint:"Which programs, who owns them" },
                        { key:"schoolsWorking", label:"How they're working" },
                        { key:"debtComesUp", label:"Does loan debt come up?" }],
+  "turnover":         [{ key:"replacementHires", label:"Replacement hires per year" },
+                       { key:"turnover", label:"First-year turnover", hint:"Number + department" },
+                       { key:"turnoverOwner", label:"Who feels it most", hint:"Names + titles" }],
+  "signon-spend":     [{ key:"signOns", label:"Sign-on bonuses", hint:"Type and amount, per role" },
+                       { key:"signOnOwner", label:"Who watches that spend", hint:"Names + titles" }],
+  "contract-labor":   [{ key:"contract", label:"Contract labor", hint:"How much, where" },
+                       { key:"contractOwner", label:"Who cares most about that spend", hint:"Names + titles" }],
   "close-next-steps": [{ key:"icp", label:"ICP — 3+ of: 2K–50K employees · open clinical roles · hiring consistently · sign-ons · contract labor · double-digit turnover", type:"choice", options:["Yes","No"] },
                        { key:"persona", label:"Persona: TA/HR, Director+, said they're interested?", type:"choice", options:["Yes","No"] },
                        { key:"read", label:"Your honest read", hint:"Fills the close script" },
@@ -204,8 +214,6 @@ export const STAGE_DATA = {
         { cue:"Paid over time", text:"The payment is also made **over time, monthly**, while they're employed with you. So **no costly clawbacks**, and no paying in advance for someone who leaves after year 1. Spreading the payments out — sometimes with a **ladder payment** approach — means **you're only spending to get and keep them**." },
         { cue:"Summarize", text:"So the sign-on wins **today's yes** — the loan repayment wins **the next three to five years**." },
       ]},
-      { kind:"ask", group:"Labor cost", subKey:"spendType", sub:"Sign-ons", label:"Sign-ons", text:"What type of **sign-on bonuses** are you offering for these roles?" },
-      { kind:"ask", group:"Labor cost", subKey:"spendType", sub:"Sign-ons", label:"Sign-on reliance", text:"How important do you find sign-ons to be in **getting a commitment**?" },
       { kind:"say", group:"Labor cost", subKey:"spendType", sub:"Contract labor", title:"If they spend on contract labor", proof:["Travelers cost ~2.2x","Weekly averages: RN $2,190 · Rad Tech $2,291 · PT $2,231 · RT $2,015 (about $8–9k a month each)"], beats:[
         { cue:"Ask", check:"answer", text:"We can also help **reduce spend on contract labor**, especially in the locations, specialties, and shifts that are hard to fill with a full-time employee. I'm curious — **where do you find you're using contract labor the most?**" },
         { cue:"Acknowledge + reframe", text:"That makes sense — areas like that are often tough to fill. Many of our partners use travelers to fill the gaps too. What they're finding is that this type of program gets the attention of candidates who want help with their student loans, and who are **willing to work at the location, in the specialty, or on the shift where you need it most**." },
@@ -213,15 +221,12 @@ export const STAGE_DATA = {
         { cue:"Summarize", text:"So fewer gaps to fill means **fewer travelers** — and more of that budget back." },
         { cue:"Check in", check:"answer", text:"**Is that a gap you're feeling right now, or is contract labor pretty well under control?**" },
       ]},
-      { kind:"ask", group:"Labor cost", subKey:"spendType", sub:"Contract labor", label:"Contract labor", text:"How much **contract labor** do you use to fill the gaps for these roles?" },
       { kind:"say", group:"Retention", title:"Built to keep them", proof:["Partners' year-1 turnover is ~5% vs an industry average above 20%","Paid monthly once they're an employee; payments can step up in year 2"], beats:[
         { cue:"Bridge", text:"Building pipeline and saving on spend are important — but there's another area where we tend to have an impact, and for a lot of partners it ends up mattering most. We're also helping them **retain and grow their employees**." },
         { cue:"Built to stay", text:"The way your Student Loan Repayment program is structured **encourages people to stay 3, 4, or 5 years**. The amount is spread out monthly over that period and paid while they're employed. **It works a lot like a 401K match** — an incentive to stay to get the full amount." },
         { cue:"Proof", text:"It's a big part of why our partners tend to see **single-digit turnover, sometimes as low as 5%**, with the clinicians and techs in the program." },
         { cue:"Summarize", text:"So it's built to reward **staying**, not just **joining**." },
       ]},
-      { kind:"ask", group:"Retention", label:"Replacement hires", text:"How many **replacement hires** do you make for these roles?" },
-      { kind:"ask", group:"Retention", label:"First-year turnover", text:"What is the **first-year turnover** there?" },
       { kind:"say", group:"Retention", title:"Nudges", proof:["Early affinity, testimonials, psychological nudges: \"Your employer had your back this month\""], beats:[
         { cue:"Set the table", text:"Here's how we **keep it top of mind** once they're hired." },
         { cue:"Gamification", text:"We've also built in some **gamification, some psychological nudges**." },
@@ -289,6 +294,35 @@ export const STAGE_DATA = {
     ],
     tips:[],
     watch:[],
+  },
+  "turnover": {
+    rule:"Optional. Go here if retention came up. Ask with curiosity, not to prove a point.",
+    script:[
+      { kind:"ask", label:"Replacement hires", text:"Shifting gears for a second — I'm curious, roughly **how many replacement hires** are you making in these departments in a given year?" },
+      { kind:"ask", label:"First-year turnover", text:"And do you have a sense of what **first-year turnover** looks like there? Even a ballpark is helpful." },
+      { kind:"ask", label:"Internal conversations", text:"It sounds like that might already be on the radar. How much has **bringing that number down** come up in conversations internally?" },
+      { kind:"ask", label:"Who feels it", text:"And who would you say **feels that number the most**?" },
+    ],
+    tips:[], watch:[],
+  },
+  "signon-spend": {
+    rule:"Optional. Go here if sign-ons came up. Let them tell you how they feel about them.",
+    script:[
+      { kind:"ask", label:"Sign-ons today", text:"Tell me a little about the **sign-on bonuses** you're offering for these roles today." },
+      { kind:"ask", label:"Do they work", text:"How much of a role would you say they play in actually **getting someone to commit**?" },
+      { kind:"ask", label:"Internal conversations", text:"Has the **amount you're spending on sign-ons** come up internally at all?" },
+      { kind:"ask", label:"Who watches it", text:"And who tends to **keep the closest eye** on that spend?" },
+    ],
+    tips:[], watch:[],
+  },
+  "contract-labor": {
+    rule:"Optional. Go here if contract labor came up. Stay curious about the gaps, not the cost.",
+    script:[
+      { kind:"ask", label:"Contract labor today", text:"Where does **contract labor** fit in today for these roles? Roughly how much are you **leaning on it** to fill the gaps?" },
+      { kind:"ask", label:"Internal conversations", text:"Is **reducing that reliance** something that's come up internally?" },
+      { kind:"ask", label:"Who cares most", text:"And who would you say **cares the most** about what's being spent there?" },
+    ],
+    tips:[], watch:[],
   },
   "close-next-steps": {
     rule:"Call back the ROE. Leave with a concrete decision — a next step is not real until it has an owner and a date.",
