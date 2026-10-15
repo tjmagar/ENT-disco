@@ -159,11 +159,12 @@ export const STAGE_DATA = {
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
         { cue:"The outcome", text:"So this is an area where we **really excel** and produce great outcomes for our partners." },
-        { cue:"Three ways", text:"And the way we build a **bigger, more sustainable pipeline** of talent is really three main ways:", list:[
-          { tag:"Educate", text:"We tap into channels in unique and innovative ways to actually **educate the students** on the possibilities and benefits of this type of program." },
-          { tag:"Awareness", text:"By having built out programs, partnerships and relationships within these **four channels**, we're able to **generate awareness** of this type of program as a reason to join your system instead of another once they graduate." },
-          { tag:"Convert", text:"And third — this presence helps us **convert them into applicants**, getting them to raise their hand and say, \"When I graduate, I want to come work for you!\"" },
+        { cue:"Three ways", text:"And there's really **three ways** we produce great outcomes here:", list:[
+          { tag:"Educate", text:"First, we **educate the students** that a program like this even exists. We want them to know that you're an **innovative org** offering this great benefit." },
+          { tag:"Awareness", text:"Then we **generate awareness**. This is going to actually **produce the applicants**." },
+          { tag:"Convert", text:"And lastly, we help you **convert those applicants** — getting them to raise their hand and say, \"When I graduate, **I want to come work for you!**\"" },
         ]},
+        { cue:"The channels", text:"And the way we do it is through these **4 main channels**." },
         { cue:"Check in", check:"answer", text:"Before I go further — I'm curious, **how are you building that early pipeline today?**" },
       ]},
       { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", proof:["Curated influencer network reaches 4.6M+ engaged followers"], show:[
