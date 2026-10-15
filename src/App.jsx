@@ -1463,21 +1463,24 @@ const sd = STAGE_DATA[activeStage];
               <div>
                 {activeStage === "value-drop" && (
                   <div style={{ marginBottom:16, padding:"12px 16px", borderRadius:14, background:C.white, border:`1px solid ${C.border}` }}>
-                    <div style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginBottom:8 }}>
-                      Heard a different pain? Say it, then tap · <span style={{ color:C.emerald }}>now on {captures.startArea || "all three"}</span>
+                    <div style={{ fontSize:14, color:C.textSecondary, marginBottom:10 }}>
+                      Different pain? Say <strong style={{ color:C.textPrimary }}>"Sounds like that's the bigger issue — want to focus there?"</strong> then tap.
                     </div>
-                    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:10 }}>
                       {[
-                        { a:"Pipeline",   pain:"finding enough of the right people" },
-                        { a:"Labor cost", pain:"what you're spending to keep these roles filled" },
-                        { a:"Retention",  pain:"keeping people once you've invested in them" },
-                      ].filter(o => o.a !== captures.startArea).map(o => (
-                        <button key={o.a} onClick={() => { setCapture("startArea", o.a); setFocus(f => ({ ...f, "value-drop": 0 })); }}
-                          style={{ ...B, display:"flex", alignItems:"baseline", gap:12, textAlign:"left", padding:"8px 12px", borderRadius:10, border:`1px solid ${C.border}`, background:C.white }}>
-                          <span style={{ flexShrink:0, minWidth:84, fontSize:12, fontWeight:800, color:C.emerald }}>→ {o.a}</span>
-                          <span style={{ fontSize:15, lineHeight:1.5, color:C.textPrimary }}>"It sounds like <strong>{o.pain}</strong> might be the bigger issue. Would it be more useful to spend our time there instead?"</span>
-                        </button>
-                      ))}
+                        { a:"Pipeline",   pain:"Finding people" },
+                        { a:"Labor cost", pain:"Spending too much" },
+                        { a:"Retention",  pain:"Keeping people" },
+                      ].map(o => {
+                        const on = captures.startArea === o.a;
+                        return (
+                          <button key={o.a} onClick={() => { setCapture("startArea", o.a); setFocus(f => ({ ...f, "value-drop": 0 })); }}
+                            style={{ ...B, textAlign:"left", padding:"12px 14px", borderRadius:12, border:`1.5px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? C.white : C.textPrimary, boxShadow:on ? "0 4px 14px rgba(37,99,235,0.25)" : "none" }}>
+                            <div style={{ fontSize:17, fontWeight:700 }}>{on ? "✓ " : ""}{o.a}</div>
+                            <div style={{ fontSize:13, color:on ? "rgba(255,255,255,0.85)" : C.textMuted }}>{o.pain}</div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
