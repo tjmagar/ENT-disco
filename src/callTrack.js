@@ -112,7 +112,7 @@ export const STAGE_DATA = {
   "context": {
     rule:"Brief context on who we are and what we do. Earn the right to ask questions, don't pitch.",
     script:[
-      { kind:"say", title:"Who we are", slide:"Clasp Today: results + logos", beats:[
+      { kind:"say", title:"Who we are", slide:"Slide 1 · Title", beats:[
         { cue:"Set up the slides", text:"To give you some context, I've got **a few short slides** — feel free to **interrupt me**." },
         { cue:"Who we are", text:"Clasp works **only in healthcare**. We help HR and TA teams hit **three outcomes** through a **student loan repayment and recruitment program**." },
         { cue:"Who we work with", text:"Partners range from **Novant Health and Northwestern Medicine** to **Saint Alphonsus** and **Confluent Health**." },
@@ -124,7 +124,7 @@ export const STAGE_DATA = {
   "orient": {
     rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
     script:[
-      { kind:"say", title:"Three outcomes", slide:"Three outcomes", beats:[
+      { kind:"say", title:"Three outcomes", slide:"Slide 2 · Three outcomes", beats:[
         { cue:"Next slide", text:"And through speaking with HR and TA leaders, **the three areas where we tend to drive the most value**, and where a partnership often makes sense, are here on your screen:" },
         { cue:"Three outcomes", text:"", list:[
           { tag:"Pipeline", text:"So first, **pipeline**. Some partners tell us they **aren't able to build a bigger, more sustainable pipeline** of soon-to-graduate talent for critical clinical and allied health roles — and by the time those grads **hit the open market**, they're **competing with every system in town** for the same small pool." },
@@ -145,7 +145,7 @@ export const STAGE_DATA = {
         { cue:"Acknowledge + start", when:"funnel", text:"Okay, let's talk about what we do to help you **build that pipeline**. And I'd love to understand **what you're currently doing**, so we can explore any opportunities to **amplify that** and be **additive to your team**." },
         { cue:"Acknowledge + start", when:"notFunnel", text:"Okay, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't feel relevant**." },
       ]},
-      { kind:"say", group:"Pipeline", title:"The outcome", slide:"4 channels", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
+      { kind:"say", group:"Pipeline", title:"The outcome", slide:"Slide 3 · 4 channels", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
         { cue:"The outcome", text:"So building pipeline is honestly where we **really excel** for our partners." },
         { cue:"Three ways", text:"And there's really **3 steps** to producing great outcomes here:", list:[
           { tag:"Educate", text:"First, we **educate the students** that a program like this even exists. We want them to know that you're an **innovative org** offering this great benefit." },
@@ -154,7 +154,7 @@ export const STAGE_DATA = {
         ]},
         { cue:"The channels", text:"And the way we do it is through these **4 main channels**." },
       ]},
-      { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", slide:"Influencer network (4.6M+)", proof:["Curated influencer network reaches 4.6M+ engaged followers"], show:[
+      { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", slide:"Slide 4 · Influencers (4.6M+)", proof:["Curated influencer network reaches 4.6M+ engaged followers"], show:[
         { role:"RN", label:"TikTok search: nursing student loan debt", url:"https://www.tiktok.com/discover/nursing-student-loan-debt" },
         { role:"RN", label:"Video: \"$95,487.73 in debt at 26 to be a nurse\"", url:"https://www.tiktok.com/@amaiyacamillo/video/7468387036647410974" },
         { role:"PT", label:"TikTok search: physical therapy student debt", url:"https://www.tiktok.com/discover/student-debt-physical-therapy" },
@@ -177,14 +177,14 @@ export const STAGE_DATA = {
         { cue:"Creative + compliance", text:"So we tap into this channel, utilizing our **creative team**, who partners with these influencers to make content that **resonates with students** and educates them on these types of programs. And since this is healthcare, you're probably wondering about compliance. We have a **full compliance team** that greenlights everything, ensuring that it's **buttoned up**, but maintaining the style that **Gen Z engages with**." },
         { cue:"Summarize", text:"So that's how we **get their attention**." },
       ]},
-      { kind:"say", group:"Pipeline", title:"Schools + campus", slide:"School partnerships · Student Ambassadors", proof:["Active school partnerships: 70+ nursing, 90+ imaging, 70+ rehab therapy, 110+ RT","CRNA + CAA: relationships with 60–70 programs","Ambassadors: we recruit, onboard, track referrals and pay out. Low lift for your team","Virtual career fair: 187 PT, OT and SLP students from 88 schools"], beats:[
+      { kind:"say", group:"Pipeline", title:"Schools + campus", slide:"Slides 5–6 · Schools + Ambassadors", proof:["Active school partnerships: 70+ nursing, 90+ imaging, 70+ rehab therapy, 110+ RT","CRNA + CAA: relationships with 60–70 programs","Ambassadors: we recruit, onboard, track referrals and pay out. Low lift for your team","Virtual career fair: 187 PT, OT and SLP students from 88 schools"], beats:[
         { cue:"School network", text:"Beyond social, we've found **nothing beats being on campus**. So to really engage with the students, we've built out a **nationwide network of school relationships** that drive applicants into the top of your funnel. We talk with **Program Directors and Career Services** to spread the word that there are healthcare systems, like yourself, that will help their students pay part of their loans when they come to work for you." },
         { cue:"Why schools care", text:"From what program directors tell us, this message **resonates with them** in a way offering **a sign-on bonus doesn't**. It motivates them to share this information with their students, and gets us **access to their students** in a way that many employers don't have." },
         { cue:"Campus ambassadors", text:"We also have a network of **campus ambassadors**, boots on the ground, to engage the students on campus. They're talking to soon-to-graduate nurses, imaging techs, and rehab therapists about our partners who are offering these programs." },
         { cue:"Wider reach", text:"These channels are what we use to **fill the top of your funnel** with applicants. And since we have relationships with schools across the country, this **widens your talent pool**. It allows you to pull in students from **beyond your immediate area**. Gives you reach into campuses that you **might not have a relationship with** right now." },
         { cue:"Summarize", text:"So social gets their attention, and the **schools and ambassadors** get you in the room." },
       ]},
-      { kind:"say", group:"Pipeline", title:"Convert: your recruiters", slide:"Results: >200%, 275%, Northwestern", proof:["One system hit >200% of its rad tech applicant goal, with applicants from 6 states","Northwestern Medicine: \"we did not ever have 32 RT applicants at a time prior to Clasp\"","Partners see applicants from 10+ states on average"], show:[
+      { kind:"say", group:"Pipeline", title:"Convert: your recruiters", slide:"Slide 7 · Results are strong", proof:["One system hit >200% of its rad tech applicant goal, with applicants from 6 states","Northwestern Medicine: \"we did not ever have 32 RT applicants at a time prior to Clasp\"","Partners see applicants from 10+ states on average"], show:[
         { label:"Partner landing pages", url:"https://www.clasp.com/students#programs" },
         { label:"Partner one-pagers and flyers (Canva)", url:"https://www.canva.com/folder/FAFxRyvQNKw" },
         { label:"List of influencer videos (Slack)", url:"https://app.slack.com/client/TJYFBHNEL/unified-files/doc/F0BGME1JGDN" },
@@ -197,7 +197,7 @@ export const STAGE_DATA = {
         { cue:"Show landing pages", text:"Landing pages [like these ↗](https://www.clasp.com/students#programs). We tailor it to **your message, your employer brand and value prop**. The goal is to send the message to students: 'We understand what you're looking for, and **we're the right fit for you**.'" },
         { cue:"Summarize", text:"So it's not just more people in the funnel — your recruiters have what they need to **get them to yes**." },
       ]},
-      { kind:"say", group:"Labor cost", title:"Open", slide:"Duct tape: sign-ons −72% ROI · contract ~2.2x", beats:[
+      { kind:"say", group:"Labor cost", title:"Open", slide:"Slide 9 · Duct tape on a leaky bucket", beats:[
         { cue:"Bridge", text:"So this is a great way we help our partners **avoid cost** and get more of their **budget back** to take on other projects." },
         { cue:"Ask", check:"answer", text:"By offering a Student Loan Repayment program, it does more than just build pipeline. It can help you **spend less on sign-on bonuses and contract labor**. Do you currently spend money on either of these for **Nursing, Imaging Techs, or Rehab Therapists**?" },
       ]},
@@ -223,13 +223,13 @@ export const STAGE_DATA = {
         { cue:"Summarize", text:"So fewer gaps to fill means **fewer travelers** — and more of that budget back." },
         { cue:"Check in", check:"answer", text:"**Is that a gap you're feeling right now, or is contract labor pretty well under control?**" },
       ]},
-      { kind:"say", group:"Retention", title:"Built to keep them", slide:"Structured to keep them past year 3", proof:["Partners' year-1 turnover is ~5% vs an industry average above 20%","Paid monthly once they're an employee; payments can step up in year 2"], beats:[
+      { kind:"say", group:"Retention", title:"Built to keep them", slide:"Slide 8 · Structured to keep them", proof:["Partners' year-1 turnover is ~5% vs an industry average above 20%","Paid monthly once they're an employee; payments can step up in year 2"], beats:[
         { cue:"Bridge", text:"Building pipeline and saving on spend are important — but there's another area where we tend to have an impact, and for a lot of partners it ends up mattering most. We're also helping them **retain and grow their employees**." },
         { cue:"Built to stay", text:"The way your Student Loan Repayment program is structured **encourages people to stay 3, 4, or 5 years**. The amount is spread out monthly over that period and paid while they're employed. **It works a lot like a 401K match** — an incentive to stay to get the full amount." },
         { cue:"Proof", text:"It's a big part of why our partners tend to see **single-digit turnover, sometimes as low as 5%**, with the clinicians and techs in the program." },
         { cue:"Summarize", text:"So it's built to reward **staying**, not just **joining**." },
       ]},
-      { kind:"say", group:"Retention", title:"Nudges", slide:"Reinforce your value", proof:["Early affinity, testimonials, psychological nudges: \"Your employer had your back this month\""], beats:[
+      { kind:"say", group:"Retention", title:"Nudges", slide:"Slide 10 · Reinforce your value", proof:["Early affinity, testimonials, psychological nudges: \"Your employer had your back this month\""], beats:[
         { cue:"Set the table", text:"Here's how we **keep it top of mind** once they're hired." },
         { cue:"Gamification", text:"We've also built in some **gamification, some psychological nudges**." },
         { cue:"Sign-ons fade", text:"When someone gets a sign-on, they usually spend it faster than they planned — and then **it's gone from their mind**. Now they're looking for the next thing. So **we remind them** of the help you're giving them with their student loan debt." },
@@ -239,7 +239,7 @@ export const STAGE_DATA = {
         { cue:"Summarize", text:"So every month, they're reminded **who has their back**." },
         { cue:"Check in", check:"answer", text:"**What are you doing today to keep that value top of mind once someone's hired — or is that tough to do?**" },
       ]},
-      { kind:"say", group:"Retention", title:"Beyond new hires", slide:"Career pathways", proof:["Pathways: MAs and LPNs → RNs · PTAs → PTs · ICU nurses → CRNAs"], beats:[
+      { kind:"say", group:"Retention", title:"Beyond new hires", slide:"Slide 11 · Career pathways", proof:["Pathways: MAs and LPNs → RNs · PTAs → PTs · ICU nurses → CRNAs"], beats:[
         { cue:"Existing staff", text:"And this doesn't have to be just for new hires — it can be part of your **retention strategy**. So many clinicians and techs carry student loan debt for years. When they see you extend this to them, it tends to deepen the relationship and reassure them they've found **their long-term home**." },
         { cue:"Career pathing", text:"Some partners also use it for **career pathing** — motivating **Medical Assistants and LPNs into RNs, PTAs into PTs, ICU nurses into CRNAs** while they work for you." },
         { cue:"The message", text:"You're telling them, 'Go get the next-level degree and come back here. We have a place for you, and **we'll help you pay** for the loans you take out to upskill.' Now you're filling these roles with people who already **fit your culture and your mission**. It builds a **stronger, more stable workforce**." },
@@ -336,7 +336,7 @@ export const STAGE_DATA = {
         { cue:"Recommend", text:"Given that, I'd recommend we **regroup on [a date within 2 weeks]** to dig deeper." },
         { cue:"Check", check:"answer", text:"**Does that feel like a reasonable next step** to take?" },
       ]},
-      { kind:"say", title:"If they ask what the next meeting looks like", beats:[
+      { kind:"say", title:"If they ask what the next meeting looks like", slide:"Slide 12 · Break-even by role", beats:[
         { cue:"The agenda", text:"Great question. I find it helpful to see that **the all-in cost wouldn't break the bank**. So next time, we'd put your numbers next to what you're spending on **sign-ons and turnover** today — and see if this makes **directional sense** to pursue." },
         { cue:"What you need", check:"answer", text:"To make that real, I'd need a few inputs: **how many you're looking to hire** this year, **what you're offering today**, and **where the biggest gaps are**. Is that something you could pull together?" },
       ]},
