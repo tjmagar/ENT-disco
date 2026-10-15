@@ -339,6 +339,9 @@ export const STAGE_DATA = {
       { kind:"say", title:"If they say \"just email me\"", beats:[
         { cue:"Hold the date", check:"answer", text:"Absolutely — I'll send a recap. Mind if I **drop a hold on the calendar** for [date] so it doesn't slip? **Easy to move** if it doesn't work." },
       ]},
+      { kind:"say", title:"If someone key wasn't on the call", beats:[
+        { cue:"Bring them in", text:"Okay, so we have our **next conversation set up**. We'll **invite [who should join]** to that. If they can make it, great. If not, we'll set up **another meeting with them** to bring them up to speed and **get their perspective**." },
+      ]},
       { kind:"say", title:"Wrap up", beats:[
         { cue:"Thank them", text:"Great, **thanks again** for the conversation today. I'm very excited about **the potential you see here** and about the **positive outcomes** we can work on together. We'll talk again soon — enjoy the rest of the day." },
       ]},
