@@ -202,7 +202,7 @@ export const STAGE_DATA = {
         { label:"Staged applicant platform", url:"https://staging.portal.clasp.com/welcome" },
         { label:"Staged employer platform", url:"https://staging.portal.clasp.com/account/login" },
       ], beats:[
-        { cue:"Set the table", text:"Last piece — let me show you how we **equip your recruiters**." },
+        { cue:"Set the table", text:"Last piece — let me show you how we **equip your recruiters** to **convert all the new candidates** who are applying." },
         { cue:"Support your TA", text:"And this isn't meant to replace what your TA team is already doing — **it's meant to support it**, with the local programs and residency programs. We have a team dedicated to **enabling your recruiters**. The landing pages and other materials we create help them **convert candidates they're already talking to** before the competition does." },
         { cue:"Show landing pages", text:"Landing pages like these. We tailor it to **your message, your employer brand and value prop**. The goal is to send the message to students: 'We understand what you're looking for, and **we're the right fit for you**.'" },
         { cue:"Summarize", text:"So it's not just more people in the funnel — your recruiters have what they need to **get them to yes**." },
