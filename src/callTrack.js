@@ -139,9 +139,9 @@ export const STAGE_DATA = {
       { kind:"say", title:"Three outcomes", beats:[
         { cue:"Next slide", text:"And through speaking with HR and TA leaders, **the three areas where we tend to drive the most value**, and where a partnership often makes sense, are here on your screen:" },
         { cue:"Three outcomes", text:"", list:[
-          { tag:"Pipeline", text:"Some partners tell us they need a **bigger, stronger pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — **before they ever hit the open market**." },
-          { tag:"Labor cost", text:"Others tell us they're **spending too much** — on sign-on bonuses that aren't showing ROI, on contract labor that's eating their budget, and on recruiting just to keep roles filled." },
-          { tag:"Retention", text:"And some tell us they're **losing good people** to competitors for more money — so they use the program to reward not only **joining, but staying**. And they build out **career pathways**, like MAs into RNs and PTAs into PTs, instead of watching them walk out the door." },
+          { tag:"Pipeline", text:"So first, **pipeline**. Some partners tell us they **can't build a big enough pipeline** of soon-to-graduate RNs, Imaging Techs, Rehabilitation Therapists, and other clinical and allied health roles — and by the time those grads **hit the open market**, they're **competing with every system in town** for the same small pool." },
+          { tag:"Labor cost", text:"Second, **the spend**. Others tell us they're **spending too much**, whether it be on sign-on bonuses that **aren't showing ROI**, on contract labor that's **eating into their operating margin**, or on recruiting just to keep roles filled." },
+          { tag:"Retention", text:"And last but not least, **retention**. Some partners tell us they do great at building pipeline, but **still struggle to keep people**. Often their benefits and programs **reward joining, not staying** — so they're **losing good people** to the system across the street." },
         ]},
         { cue:"Hand it to them", check:"answer", text:"I have a hunch where you might fit, considering [what you spotted]. But given your situation, **where would be the most relevant place for us to start?**" },
       ]},
