@@ -51,8 +51,8 @@ export const CAPTURE = {
                        { key:"signOns", label:"Sign-on bonuses", hint:"Type and amount" },
                        { key:"contract", label:"Contract labor", hint:"How much, where" },
                        { key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
-  "summary-buyin":    [{ key:"buyIn", label:"Buy-in score (1–10)" },
-                       { key:"toTen", label:"What would make it a 10" }],
+  "summary-buyin":    [{ key:"buyIn", label:"Their reaction", hint:"In their words" },
+                       { key:"toTen", label:"What's giving them pause" }],
   "business-problem": [{ key:"roles", label:"Roles they hire new grads in" },
                        { key:"deptHeads", label:"Department heads they work with" },
                        { key:"surfaceNeed", label:"Surface need", hint:"What they say they want" },
@@ -270,21 +270,20 @@ export const STAGE_DATA = {
     script:[
       { kind:"say", beats:[
         { cue:"Thank them", text:"Okay, that was a lot there. **Thank you for letting me share** a bit about how we [what they picked] through our **innovative program**." },
-        { cue:"Step back", text:"At this point, I'd love to take a step back and **understand where your head is at**. The reason I ask is I'd rather not keep going if this isn't a fit for you — so I want your **honest read, not the polite one**." },
-        { cue:"Buy-in check", check:"answer", text:"So — quick gut check. On a **scale of 1 to 10**, with 10 being '**this is exactly what we need**' — **where would you put this right now?**" },
+        { cue:"Pivot check", check:"answer", text:"At the beginning of the call, we agreed that once I set some context, we'd pivot into **exploring more about what your current state looks like** around these areas. **Does that still feel like the right move here?**" },
       ]},
       { kind:"picker", key:"reaction", label:"How did they react?", options:[
-        { value:"Hesitant", sub:"Low number, or pushback" },
-        { value:"Positive", sub:"High number, or leaning in" },
+        { value:"Hesitant", sub:"Unsure, or pushback" },
+        { value:"Positive", sub:"Yes, or leaning in" },
       ]},
       { kind:"say", subKey:"reaction", sub:"Hesitant", title:"If they're hesitant", beats:[
         { cue:"Acknowledge", text:"That's totally fair — and I **appreciate the honesty**." },
-        { cue:"Get curious", check:"answer", text:"I'm curious — **what's keeping it from being higher?**" },
+        { cue:"Get curious", check:"answer", text:"I'm curious — **what's giving you pause?**" },
         { cue:"Dig in", check:"answer", text:"Tell me more about that. **What would need to be true** for this to be worth a closer look?" },
       ]},
       { kind:"say", subKey:"reaction", sub:"Positive", title:"If they're positive", beats:[
         { cue:"If they have questions", text:"**Answer their questions first.** Keep it short." },
-        { cue:"Close the gap", check:"answer", text:"Glad it's resonating. I'm curious — **what would it take to make that a 10?**" },
+        { cue:"Let's dig in", text:"Great — **let's dig in**." },
       ]},
     ],
     tips:["Give a reason before the hard question ('The reason I ask is…').","Below a 10, get curious about the gap. Don't defend.","Save 'fair' for the agenda and the close."],
