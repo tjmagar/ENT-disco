@@ -948,8 +948,8 @@ ${combinedText}` }]
                       </div>
                     )}
                     {shown.length > 0 && (
-                      <div style={{ display:"flex", flexWrap:"wrap", gap:"6px 16px", marginTop:roles.length ? 10 : 0 }}>
-                        {!roles.length && <span style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, alignSelf:"center" }}>Show this</span>}
+                      <div style={{ display:"flex", flexDirection:"column", gap:6, marginTop:roles.length ? 10 : 0 }}>
+                        {!roles.length && <span style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted }}>Show this</span>}
                         {shown.map(l => (
                           <a key={l.url} href={l.url} target="_blank" rel="noreferrer"
                             style={{ fontSize:15, fontWeight:600, color:C.emerald, textDecoration:"underline", textUnderlineOffset:3 }}>
