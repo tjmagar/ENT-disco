@@ -15,7 +15,7 @@ export const STAGES = [
   { id:"value-drop",         icon:"5",  short:"Value Drop",               group:"value" },
   { id:"summary-buyin",      icon:"6",  short:"Summary + Buy-in",         group:"value" },
   { id:"business-problem",   icon:"7",  short:"Hiring Needs Analysis",         group:"discovery" },
-  { id:"relationship-check", icon:"8",  short:"Relationship Check",       group:"discovery" },
+  { id:"relationship-check", icon:"8",  short:"School Partnerships",      group:"discovery" },
   { id:"close-next-steps",   icon:"9", short:"Close + Next Steps",       group:"close" },
 ];
 
@@ -28,7 +28,7 @@ export const STAGE_META = {
   "value-drop":       { phase:"VALUE",            timebox:"13 min" },
   "summary-buyin":    { phase:"BUY-IN",           timebox:"1 min" },
   "business-problem": { phase:"HIRING NEEDS", timebox:"4 min" },
-  "relationship-check": { phase:"RELATIONSHIPS", timebox:"2 min" },
+  "relationship-check": { phase:"SCHOOL PARTNERSHIPS", timebox:"2 min" },
   "close-next-steps": { phase:"CLOSE",            timebox:"4 min" },
 };
 
@@ -48,7 +48,9 @@ export const CAPTURE = {
   "business-problem": [{ key:"roles", label:"Hardest role to recruit new grads for" },
                        { key:"hiresPerYear", label:"Hires per year for that role" },
                        { key:"incentives", label:"Incentives today", hint:"Sign-on amount per role, tuition program details…" }],
-  "relationship-check": [{ key:"schools", label:"School relationships", hint:"Which programs, who owns them" }],
+  "relationship-check": [{ key:"schools", label:"School relationships", hint:"Which programs, who owns them" },
+                       { key:"schoolsWorking", label:"How they're working" },
+                       { key:"debtComesUp", label:"Does loan debt come up?" }],
   "close-next-steps": [{ key:"icp", label:"ICP — 3+ of: 2K–50K employees · open clinical roles · hiring consistently · sign-ons · contract labor · double-digit turnover", type:"choice", options:["Yes","No"] },
                        { key:"persona", label:"Persona: TA/HR, Director+, said they're interested?", type:"choice", options:["Yes","No"] },
                        { key:"read", label:"Your honest read", hint:"Fills the close script" },
@@ -281,6 +283,9 @@ export const STAGE_DATA = {
     rule:"Find out what school relationships they already have, and how well they're working.",
     script:[
       { kind:"ask", label:"Existing relationships", text:"So earlier we talked about some of **our relationships with schools** — talk to me a little about the **existing relationships** you have with local programs and universities to **funnel students in these fields** your way." },
+      { kind:"ask", label:"Who owns them", text:"That's great. And who on your team tends to **own those relationships** day to day?" },
+      { kind:"ask", label:"How they're working", text:"I'm curious — how would you say those relationships are **working for you** so far?" },
+      { kind:"ask", label:"Loan debt", text:"And out of curiosity, when you're talking with students from those programs, does **student loan debt** ever come up?" },
     ],
     tips:[],
     watch:[],
