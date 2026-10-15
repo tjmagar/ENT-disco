@@ -902,7 +902,7 @@ ${combinedText}` }]
                     <button key={o.value} onClick={e => { e.stopPropagation(); pickSub(item.key, o.value); }}
                       style={{ ...B, textAlign:"left", padding:"12px 14px", borderRadius:12, border:`1.5px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textPrimary, boxShadow:on ? "0 4px 14px rgba(37,99,235,0.25)" : "none" }}>
                       <div style={{ fontSize:16, fontWeight:700, marginBottom:2 }}>{on ? "✓ " : ""}{o.value}</div>
-                      <div style={{ fontSize:13, color:on ? "rgba(255,255,255,0.85)" : C.textMuted }}>{o.sub}</div>
+                      {o.sub && <div style={{ fontSize:13, color:on ? "rgba(255,255,255,0.85)" : C.textMuted }}>{o.sub}</div>}
                     </button>
                   );
                 })}
