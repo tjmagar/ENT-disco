@@ -36,10 +36,12 @@ function cleanLabel(label = "") {
 // Inline markup: **bold** = words to land; [placeholder] = fill-in. If resolve() knows the
 // placeholder (from the prep brief or capture pane), their words are dropped in, marked green.
 function renderInline(str, resolve, kp = "x", sentenceStart = true) {
-  const parts = String(str).split(/(\*\*[^*]+\*\*|\[[^\]]+\])/g);
+  const parts = String(str).split(/(\[[^\]]+\]\(https?:[^)\s]+\)|\*\*[^*]+\*\*|\[[^\]]+\])/g);
   return parts.map((seg, j) => {
     const atStart = sentenceStart && j === 1 && parts[0].trim() === "";
     const key = `${kp}-${j}`;
+    const link = /^\[([^\]]+)\]\((https?:[^)\s]+)\)$/.exec(seg);
+    if (link) return <a key={key} href={link[2]} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ color:C.emerald, fontWeight:700, textDecoration:"underline", textUnderlineOffset:3 }}>{link[1]}</a>;
     if (/^\*\*[^*]+\*\*$/.test(seg)) return <strong key={key} style={{ fontWeight:700, color:C.black }}>{renderInline(seg.slice(2, -2), resolve, key, atStart)}</strong>;
     if (/^\[[^\]]+\]$/.test(seg)) {
       const name = seg.slice(1, -1);
