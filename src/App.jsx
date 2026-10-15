@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { STAGES, STAGE_META, CAPTURE, STAGE_DATA, QUESTION_BANK, QUICK_ANSWERS } from "./callTrack.js";
+import { STAGES, STAGE_META, CAPTURE, STAGE_DATA, QUESTION_BANK, QUICK_ANSWERS, ROLE_CARDS, ROLE_RESULTS_URL } from "./callTrack.js";
 
 const C = {
   pageBg: "#f4f5f7",
@@ -36,10 +36,12 @@ function cleanLabel(label = "") {
 // Inline markup: **bold** = words to land; [placeholder] = fill-in. If resolve() knows the
 // placeholder (from the prep brief or capture pane), their words are dropped in, marked green.
 function renderInline(str, resolve, kp = "x", sentenceStart = true) {
-  const parts = String(str).split(/(\*\*[^*]+\*\*|\[[^\]]+\])/g);
+  const parts = String(str).split(/(\[[^\]]+\]\(https?:[^)\s]+\)|\*\*[^*]+\*\*|\[[^\]]+\])/g);
   return parts.map((seg, j) => {
     const atStart = sentenceStart && j === 1 && parts[0].trim() === "";
     const key = `${kp}-${j}`;
+    const link = /^\[([^\]]+)\]\((https?:[^)\s]+)\)$/.exec(seg);
+    if (link) return <a key={key} href={link[2]} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ color:C.emerald, fontWeight:700, textDecoration:"underline", textUnderlineOffset:3 }}>{link[1]}</a>;
     if (/^\*\*[^*]+\*\*$/.test(seg)) return <strong key={key} style={{ fontWeight:700, color:C.black }}>{renderInline(seg.slice(2, -2), resolve, key, atStart)}</strong>;
     if (/^\[[^\]]+\]$/.test(seg)) {
       const name = seg.slice(1, -1);
@@ -315,6 +317,7 @@ export default function App() {
       case "colleague name": return v(b.colleague);
       case "the area they chose": return { "Pipeline":"build a bigger pipeline of soon-to-graduate talent", "Labor cost":"spend less on sign-ons and contract labor", "Retention":"retain and grow their people", "All three":"build a bigger pipeline of soon-to-graduate talent" }[c.startArea] || "";
       case "what you spotted": return v(b.signals);
+      case "what they picked": return { "Pipeline":"help you build a bigger pipeline of soon-to-graduate talent", "Labor cost":"help you spend less on sign-ons and contract labor", "Retention":"help you retain and grow your people", "All three":"help you build pipeline, spend less, and keep your people" }[c.startArea] || "";
       case "recommended next step": return v(c.nextStep);
       case "who should join": return v(c.who);
       case "roles they named": return v(c.roles) || v(b.roles);
@@ -344,6 +347,7 @@ export default function App() {
     if (it.when && !beatConditions[it.when]) return false;
     if (!it.sub) return true;
     const v = picks[it.subKey];
+    if (it.untilPicked && !v) return false;
     return !v || v === "Both" || v === it.sub;
   };
   const script = visibleScript(activeStage, captures.startArea, showAllAreas)
@@ -359,7 +363,7 @@ export default function App() {
     let line = 0, jump = -1;
     visible.forEach(it => {
       if (jump < 0 && it.subKey === key && it.sub) jump = line;
-      if (it.kind === "say") line += it.beats.length; else if (it.kind === "ask") line += 1;
+      if (it.kind === "say") line += it.beats.filter(bt => !bt.when || beatConditions[bt.when]).length; else if (it.kind === "ask") line += 1;
     });
     if (jump >= 0) setFocus(f => ({ ...f, [activeStage]: jump }));
   }
@@ -899,7 +903,7 @@ ${combinedText}` }]
                     <button key={o.value} onClick={e => { e.stopPropagation(); pickSub(item.key, o.value); }}
                       style={{ ...B, textAlign:"left", padding:"12px 14px", borderRadius:12, border:`1.5px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? "#fff" : C.textPrimary, boxShadow:on ? "0 4px 14px rgba(37,99,235,0.25)" : "none" }}>
                       <div style={{ fontSize:16, fontWeight:700, marginBottom:2 }}>{on ? "✓ " : ""}{o.value}</div>
-                      <div style={{ fontSize:13, color:on ? "rgba(255,255,255,0.85)" : C.textMuted }}>{o.sub}</div>
+                      {o.sub && <div style={{ fontSize:13, color:on ? "rgba(255,255,255,0.85)" : C.textMuted }}>{o.sub}</div>}
                     </button>
                   );
                 })}
@@ -920,6 +924,35 @@ ${combinedText}` }]
                   ))}
                 </div>
               )}
+              {item.show && (() => {
+                const role = captures.role;
+                const roles = [...new Set(item.show.map(l => l.role).filter(Boolean))];
+                const shown = item.show.filter(l => !l.role || !role || l.role === role);
+                return (
+                  <div onClick={e => e.stopPropagation()} style={{ margin:"0 18px 12px", padding:"10px 14px", borderRadius:10, background:C.white, border:`1px solid ${C.yellowRule}` }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", marginBottom:8 }}>
+                      <span style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginRight:4 }}>Show this</span>
+                      {roles.map(r => {
+                        const on = role === r;
+                        return (
+                          <button key={r} onClick={() => setCapture("role", on ? "" : r)}
+                            style={{ ...B, fontSize:12, fontWeight:700, padding:"3px 10px", borderRadius:99, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? C.white : C.textSecondary }}>
+                            {on ? "✓ " : ""}{r}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                      {shown.map(l => (
+                        <a key={l.url} href={l.url} target="_blank" rel="noreferrer"
+                          style={{ fontSize:15, fontWeight:600, color:C.emerald, textDecoration:"none", display:"flex", gap:8, alignItems:"baseline" }}>
+                          <span style={{ fontSize:12 }}>↗</span><span>{l.label}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
               {item.beats.map((beat, b) => {
                 line++;
                 const idx = line, st = lineState(idx);
@@ -1120,7 +1153,7 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#9b2c2c", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("baseline-current")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <button onClick={()=>setActiveStage("close-next-steps")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span>Summarize, then baseline the current state</span><span style={{ fontSize:18 }}>→</span>
           </button>
         </>}
@@ -1140,7 +1173,7 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#9b2c2c", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>}
-          <button onClick={()=>setActiveStage("baseline-current")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <button onClick={()=>setActiveStage("close-next-steps")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span>Summarize, then baseline the current state</span><span style={{ fontSize:18 }}>→</span>
           </button>
         </>}
@@ -1171,7 +1204,7 @@ ${combinedText}` }]
               <div key={i} style={{ display:"flex", gap:10, marginBottom:i<2?8:0 }}><span style={{ background:C.coral, color:C.white, fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:4, flexShrink:0, marginTop:2 }}>!</span><span style={{ fontSize:13, color:"#9b2c2c", lineHeight:1.65 }}>{w}</span></div>
             ))}
           </div>
-          <button onClick={()=>setActiveStage("baseline-current")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <button onClick={()=>setActiveStage("close-next-steps")} style={{ ...B, width:"100%", marginTop:14, padding:"14px 20px", background:C.emerald, border:"none", borderRadius:12, fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span>Summarize, then baseline the current state</span><span style={{ fontSize:18 }}>→</span>
           </button>
         </>}
@@ -1186,7 +1219,7 @@ const sd = STAGE_DATA[activeStage];
   const stageElapsed = now - stageStart;
   const overTime = timeboxMs && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Clasp Context","orient":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Identify + Validate the Business Problem","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Clasp Context","orient":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Hiring Needs Analysis","relationship-check":"Relationship Check","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Who's on the call, and anything you spotted.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
@@ -1519,8 +1552,9 @@ const sd = STAGE_DATA[activeStage];
             <div style={{ display:"flex", alignItems:"stretch", borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
               {[
                 { id:"capture",    label:"Capture" },
-                { id:"spiced",     label:"Backup questions" },
-                { id:"answers",    label:"Quick answers" },
+                { id:"roles",      label:"Roles" },
+                { id:"spiced",     label:"Backup Qs" },
+                { id:"answers",    label:"Answers" },
               ].map(t => (
                 <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"13px 4px 11px", fontSize:12, fontWeight:700, letterSpacing:"0.04em", border:"none", borderBottom: rightTab===t.id ? `2px solid ${C.emerald}` : "2px solid transparent", background:"transparent", color: rightTab===t.id ? C.emerald : C.textMuted, marginBottom:-1 }}>
                   {t.label}
@@ -1586,6 +1620,62 @@ const sd = STAGE_DATA[activeStage];
                       ))}
                     </div>
                   )}
+                </div>
+              );
+            })()}
+
+            {/* ROLE BATTLE CARDS TAB */}
+            {rightTab === "roles" && (() => {
+              const card = ROLE_CARDS.find(r => r.key === captures.role);
+              const row = (label, val) => val ? (
+                <div style={{ display:"flex", justifyContent:"space-between", gap:12, padding:"6px 0", borderTop:`1px solid ${C.border}` }}>
+                  <span style={{ fontSize:12, color:C.textMuted }}>{label}</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:C.textPrimary, textAlign:"right" }}>{val}</span>
+                </div>
+              ) : null;
+              const head = t => <div style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, margin:"16px 0 4px" }}>{t}</div>;
+              return (
+                <div style={{ overflowY:"auto", flex:1, padding:"16px 20px 24px" }}>
+                  <div style={{ fontSize:13, color:C.textMuted, lineHeight:1.5, marginBottom:10 }}>Tap the role as it comes up. <span style={{ color:C.filledText, fontWeight:700 }}>●</span> = proven role.</div>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                    {ROLE_CARDS.map(r => {
+                      const on = captures.role === r.key;
+                      return (
+                        <button key={r.key} onClick={() => setCapture("role", on ? "" : r.key)}
+                          style={{ ...B, fontSize:12, fontWeight:700, padding:"4px 10px", borderRadius:99, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? C.white : C.textSecondary }}>
+                          {r.proven && <span style={{ color:on ? C.white : C.filledText, marginRight:4 }}>●</span>}{r.key}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {card && (
+                    <div style={{ marginTop:16 }}>
+                      <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary }}>{card.name}</div>
+                      {card.proven && <div style={{ display:"inline-block", marginTop:4, fontSize:11, fontWeight:700, color:C.filledText, background:C.filledBg, borderRadius:99, padding:"2px 8px" }}>Proven role</div>}
+                      {card.note && <div style={{ marginTop:8, fontSize:13, lineHeight:1.5, color:C.amber, fontWeight:600 }}>{card.note}</div>}
+                      {head("Their debt")}
+                      {row("Have student loans", card.withLoans)}
+                      {row("Avg student debt", card.debt)}
+                      {row("Education", card.education)}
+                      {row("Program length", card.length)}
+                      {row("Accredited programs", card.programs)}
+                      {head("Pay + program design")}
+                      {row("Avg salary", card.salary)}
+                      {row("Avg sign-on", card.signOn)}
+                      {row("Peak turnover", card.turnover)}
+                      {row("Typical repayment", card.repay)}
+                      {row("Retention period", card.retention)}
+                      {head("Our results")}
+                      {row("Peak applicant-to-goal", card.goal)}
+                      {row("States yielding applicants", card.states)}
+                      {row("Schools yielding applicants", card.schools)}
+                      {card.highlight && <div style={{ marginTop:10, fontSize:14, lineHeight:1.55, color:C.textPrimary }}>{card.highlight}</div>}
+                      {card.highlightLink && <a href={card.highlightLink} target="_blank" rel="noreferrer" style={{ display:"block", marginTop:6, fontSize:13, fontWeight:600, color:C.emerald, textDecoration:"none" }}>↗ {card.highlightLabel || "See it live"}</a>}
+                      {card.associations && <>{head("Associations")}<div style={{ fontSize:13, color:C.textPrimary, lineHeight:1.5 }}>{card.associations}</div></>}
+                      {card.influencerLink && <>{head("Influencer")}<a href={card.influencerLink} target="_blank" rel="noreferrer" style={{ fontSize:14, fontWeight:600, color:C.emerald, textDecoration:"none" }}>↗ {card.influencer}</a></>}
+                    </div>
+                  )}
+                  <a href={ROLE_RESULTS_URL} target="_blank" rel="noreferrer" style={{ display:"block", marginTop:20, fontSize:13, fontWeight:600, color:C.emerald, textDecoration:"none" }}>↗ Latest results by role (dashboard)</a>
                 </div>
               );
             })()}
