@@ -159,7 +159,7 @@ export const STAGE_DATA = {
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
         { cue:"The outcome", text:"So this is an area where we **really excel** and produce great outcomes for our partners." },
-        { cue:"Three ways", text:"And there's really **three ways** we produce great outcomes here:", list:[
+        { cue:"Three ways", text:"And there's really **3 steps** to producing great outcomes here:", list:[
           { tag:"Educate", text:"First, we **educate the students** that a program like this even exists. We want them to know that you're an **innovative org** offering this great benefit." },
           { tag:"Awareness", text:"Then we **generate awareness**. This is going to actually **produce the applicants**." },
           { tag:"Convert", text:"And lastly, we help you **convert those applicants** — getting them to raise their hand and say, \"When I graduate, **I want to come work for you!**\"" },
