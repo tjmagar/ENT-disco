@@ -195,9 +195,6 @@ export const STAGE_DATA = {
         { cue:"Wider reach", text:"These channels are what we use to **fill the top of your funnel** with applicants. And since we have relationships with schools across the country, this **widens your talent pool**. It allows you to pull in students from **beyond your immediate area**. Gives you reach into campuses that you **might not have a relationship with** right now." },
         { cue:"Summarize", text:"So social gets their attention, and the **schools and ambassadors** get you in the room." },
       ]},
-      { kind:"ask", group:"Pipeline", label:"School relationships", text:"What existing relationships do you have with the **local college programs** to funnel students in these fields your way?\n\nWho works on those relationships?" },
-      { kind:"ask", group:"Pipeline", label:"School fit", text:"**How well** are those school relationships meeting your needs?" },
-      { kind:"ask", group:"Pipeline", label:"Loan debt", text:"When you're recruiting those students, how often do they **ask about help with their loan debt**?" },
       { kind:"say", group:"Pipeline", title:"Convert: your recruiters", proof:["One system hit >200% of its rad tech applicant goal, with applicants from 6 states","Northwestern Medicine: \"we did not ever have 32 RT applicants at a time prior to Clasp\"","Partners see applicants from 10+ states on average"], show:[
         { label:"Partner landing pages", url:"https://www.clasp.com/students#programs" },
         { label:"Partner one-pagers and flyers (Canva)", url:"https://www.canva.com/folder/FAFxRyvQNKw" },
