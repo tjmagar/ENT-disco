@@ -342,6 +342,10 @@ export const STAGE_DATA = {
       { kind:"say", title:"If someone key wasn't on the call", beats:[
         { cue:"Bring them in", text:"Okay, so we have our **next conversation set up**. We'll **invite [who should join]** to that. If they can make it, great. If not, we'll set up **another meeting with them** to bring them up to speed and **get their perspective**." },
       ]},
+      { kind:"say", title:"If they say \"not right now\"", beats:[
+        { cue:"Label it", text:"That makes total sense — it sounds like **[the project on their plate]** has to land first, and you don't want to add something half-baked on top of it." },
+        { cue:"Keep the thread", check:"answer", text:"So we don't lose the thread, would it be crazy to put **30 minutes on the calendar** for when that settles — say **[a date after it lands]** — and bring **[who should join]** so we're not starting over?" },
+      ]},
       { kind:"say", title:"Wrap up", beats:[
         { cue:"Thank them", text:"Great, **thanks again** for the conversation today. I'm very excited about **the potential you see here** and about the **positive outcomes** we can work on together. We'll talk again soon — enjoy the rest of the day." },
       ]},
@@ -707,6 +711,8 @@ export const QUICK_ANSWERS = [
   { q:"Why not just sign-ons and contract labor?", a:"Sign-on bonuses carry a **negative 72% ROI**, and contract labor comes at about a **2x premium**. Both just plug the gap every time someone turns over. Retention lift from sign-ons is about **5.3%**, versus about **75%** with our model." },
   { q:"What results do partners see?", a:"About **5% year-1 turnover** vs. an industry average above 20%. **4M+** potential employees reached through our TikTok network. **48+ states** driving applicants per employer. One large system hit **220% of applicant goal in under 2 months** while eliminating sign-ons and clawbacks. A rural hospital hit **245%** with applicants from **14+ states**." },
   { q:"Who else works with you?", a:"**Novant Health, Northwestern Medicine, Boston Children's, OhioHealth, Wellstar, Methodist Le Bonheur, UNC Health Appalachian** — and many more." },
+  { q:"We already have a student loan repayment program.", a:"That's great — then you've **already seen it work**. Partners in that spot usually use us to **expand it beyond the group it covers today**, **promote it nationally**, and **take the admin off your plate**. Who owns that program today — **benefits**?" },
+  { q:"Our hardest roles need experience, not new grads.", a:"Totally fair — not every role is a new-grad role. We also run student loan repayment for **experienced hires and existing staff**: a set amount per month toward their loans. It's a strong way to **convert experienced candidates** who'd otherwise just compare sign-ons." },
   { q:"What if they leave?", a:"**Payments stop.** No clawbacks, nothing to chase, no upfront money walking out the door." },
   { q:"Can you benchmark what other systems offer?", a:"**Yes** — I'll bring benchmarks for [roles they named] at similar systems to our next conversation. Use it as the reason to **book the date now**." },
 ];
