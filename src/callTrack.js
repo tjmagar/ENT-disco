@@ -343,8 +343,8 @@ export const STAGE_DATA = {
         { cue:"Bring them in", text:"Okay, so we have our **next conversation set up**. We'll **invite [who should join]** to that. If they can make it, great. If not, we'll set up **another meeting with them** to bring them up to speed and **get their perspective**." },
       ]},
       { kind:"say", title:"If they say \"not right now\"", beats:[
-        { cue:"Label it", text:"That makes total sense — it sounds like **[the project on their plate]** has to land first, and you don't want to add something half-baked on top of it." },
-        { cue:"Keep the thread", check:"answer", text:"So we don't lose the thread, would it be crazy to put **30 minutes on the calendar** for when that settles — say **[a date after it lands]** — and bring **[who should join]** so we're not starting over?" },
+        { cue:"Label it", text:"That makes total sense — it sounds like **that project has to land first**, and you don't want to add something half-baked on top of it." },
+        { cue:"Keep the thread", check:"answer", text:"So we don't lose the thread, would it be crazy to put **30 minutes on the calendar** for when that settles — and bring in **anyone else who should weigh in** — so we're not starting over?" },
       ]},
       { kind:"say", title:"Wrap up", beats:[
         { cue:"Thank them", text:"Great, **thanks again** for the conversation today. I'm very excited about **the potential you see here** and about the **positive outcomes** we can work on together. We'll talk again soon — enjoy the rest of the day." },
