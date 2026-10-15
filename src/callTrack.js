@@ -143,7 +143,7 @@ export const STAGE_DATA = {
           { tag:"Labor cost", text:"Second, **the spend**. Others tell us they're **spending too much**, whether it be on sign-on bonuses that **aren't showing ROI**, on contract labor that's **eating into their operating margin**, or on recruiting just to keep roles filled." },
           { tag:"Retention", text:"And last but not least, **retention**. Some partners tell us they do great at building pipeline, but **still struggle to keep people**. Often their benefits and programs **reward joining, not staying** — so they're **losing good people** to the system across the street." },
         ]},
-        { cue:"Hand it to them", check:"answer", text:"I have a hunch where you might fit, considering [what you spotted]. But given your situation, **where would be the most relevant place for us to start?**" },
+        { cue:"Hand it to them", check:"answer", text:"But enough about our partners and the types of problems we solve for them… **help me understand where you fit here**, and **where would be the most relevant place for us to spend our time today?**" },
       ]},
     ],
     tips:["Mark the area they pick in the capture pane. Discovery and the Value Drop follow it."],
