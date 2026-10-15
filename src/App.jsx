@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { STAGES, STAGE_META, CAPTURE, STAGE_DATA, QUESTION_BANK, QUICK_ANSWERS } from "./callTrack.js";
+import { STAGES, STAGE_META, CAPTURE, STAGE_DATA, QUESTION_BANK, QUICK_ANSWERS, ROLE_CARDS, ROLE_RESULTS_URL } from "./callTrack.js";
 
 const C = {
   pageBg: "#f4f5f7",
@@ -1548,8 +1548,9 @@ const sd = STAGE_DATA[activeStage];
             <div style={{ display:"flex", alignItems:"stretch", borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
               {[
                 { id:"capture",    label:"Capture" },
-                { id:"spiced",     label:"Backup questions" },
-                { id:"answers",    label:"Quick answers" },
+                { id:"roles",      label:"Roles" },
+                { id:"spiced",     label:"Backup Qs" },
+                { id:"answers",    label:"Answers" },
               ].map(t => (
                 <button key={t.id} onClick={()=>setRightTab(t.id)} style={{ ...B, flex:1, padding:"13px 4px 11px", fontSize:12, fontWeight:700, letterSpacing:"0.04em", border:"none", borderBottom: rightTab===t.id ? `2px solid ${C.emerald}` : "2px solid transparent", background:"transparent", color: rightTab===t.id ? C.emerald : C.textMuted, marginBottom:-1 }}>
                   {t.label}
@@ -1615,6 +1616,62 @@ const sd = STAGE_DATA[activeStage];
                       ))}
                     </div>
                   )}
+                </div>
+              );
+            })()}
+
+            {/* ROLE BATTLE CARDS TAB */}
+            {rightTab === "roles" && (() => {
+              const card = ROLE_CARDS.find(r => r.key === captures.role);
+              const row = (label, val) => val ? (
+                <div style={{ display:"flex", justifyContent:"space-between", gap:12, padding:"6px 0", borderTop:`1px solid ${C.border}` }}>
+                  <span style={{ fontSize:12, color:C.textMuted }}>{label}</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:C.textPrimary, textAlign:"right" }}>{val}</span>
+                </div>
+              ) : null;
+              const head = t => <div style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, margin:"16px 0 4px" }}>{t}</div>;
+              return (
+                <div style={{ overflowY:"auto", flex:1, padding:"16px 20px 24px" }}>
+                  <div style={{ fontSize:13, color:C.textMuted, lineHeight:1.5, marginBottom:10 }}>Tap the role as it comes up. <span style={{ color:C.filledText, fontWeight:700 }}>●</span> = proven role.</div>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                    {ROLE_CARDS.map(r => {
+                      const on = captures.role === r.key;
+                      return (
+                        <button key={r.key} onClick={() => setCapture("role", on ? "" : r.key)}
+                          style={{ ...B, fontSize:12, fontWeight:700, padding:"4px 10px", borderRadius:99, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? C.white : C.textSecondary }}>
+                          {r.proven && <span style={{ color:on ? C.white : C.filledText, marginRight:4 }}>●</span>}{r.key}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {card && (
+                    <div style={{ marginTop:16 }}>
+                      <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary }}>{card.name}</div>
+                      {card.proven && <div style={{ display:"inline-block", marginTop:4, fontSize:11, fontWeight:700, color:C.filledText, background:C.filledBg, borderRadius:99, padding:"2px 8px" }}>Proven role</div>}
+                      {card.note && <div style={{ marginTop:8, fontSize:13, lineHeight:1.5, color:C.amber, fontWeight:600 }}>{card.note}</div>}
+                      {head("Their debt")}
+                      {row("Have student loans", card.withLoans)}
+                      {row("Avg student debt", card.debt)}
+                      {row("Education", card.education)}
+                      {row("Program length", card.length)}
+                      {row("Accredited programs", card.programs)}
+                      {head("Pay + program design")}
+                      {row("Avg salary", card.salary)}
+                      {row("Avg sign-on", card.signOn)}
+                      {row("Peak turnover", card.turnover)}
+                      {row("Typical repayment", card.repay)}
+                      {row("Retention period", card.retention)}
+                      {head("Our results")}
+                      {row("Peak applicant-to-goal", card.goal)}
+                      {row("States yielding applicants", card.states)}
+                      {row("Schools yielding applicants", card.schools)}
+                      {card.highlight && <div style={{ marginTop:10, fontSize:14, lineHeight:1.55, color:C.textPrimary }}>{card.highlight}</div>}
+                      {card.highlightLink && <a href={card.highlightLink} target="_blank" rel="noreferrer" style={{ display:"block", marginTop:6, fontSize:13, fontWeight:600, color:C.emerald, textDecoration:"none" }}>↗ {card.highlightLabel || "See it live"}</a>}
+                      {card.associations && <>{head("Associations")}<div style={{ fontSize:13, color:C.textPrimary, lineHeight:1.5 }}>{card.associations}</div></>}
+                      {card.influencerLink && <>{head("Influencer")}<a href={card.influencerLink} target="_blank" rel="noreferrer" style={{ fontSize:14, fontWeight:600, color:C.emerald, textDecoration:"none" }}>↗ {card.influencer}</a></>}
+                    </div>
+                  )}
+                  <a href={ROLE_RESULTS_URL} target="_blank" rel="noreferrer" style={{ display:"block", marginTop:20, fontSize:13, fontWeight:600, color:C.emerald, textDecoration:"none" }}>↗ Latest results by role (dashboard)</a>
                 </div>
               );
             })()}
