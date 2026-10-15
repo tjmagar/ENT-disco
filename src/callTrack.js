@@ -205,7 +205,6 @@ export const STAGE_DATA = {
         { cue:"Set the table", text:"Last piece — let me show you how we **equip your recruiters** to **convert all the new candidates** who are applying." },
         { cue:"Support your TA", text:"And this isn't meant to replace what your TA team is already doing — **it's meant to support it**, with the local programs and residency programs. We have a team dedicated to **enabling your recruiters**. The landing pages and other materials we create help them **convert candidates they're already talking to** before the competition does." },
         { cue:"Show landing pages", text:"Landing pages [like these ↗](https://www.clasp.com/students#programs). We tailor it to **your message, your employer brand and value prop**. The goal is to send the message to students: 'We understand what you're looking for, and **we're the right fit for you**.'" },
-        { cue:"Summarize", text:"So it's not just more people in the funnel — your recruiters have what they need to **get them to yes**." },
       ]},
       { kind:"say", group:"Labor cost", title:"Open", beats:[
         { cue:"Bridge", text:"So this is a great way we help our partners **avoid cost** and get more of their **budget back** to take on other projects." },
