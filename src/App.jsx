@@ -917,7 +917,10 @@ ${combinedText}` }]
             {groupHeader(item)}
             <div style={{ background:C.yellow, border:`1px solid ${C.yellowBorder}`, borderRadius:14, overflow:"hidden", marginBottom:14 }}>
               {item.title && (
-                <div style={{ padding:"11px 18px 9px", fontSize:13, fontWeight:700, color:C.yellowText }}>{item.title}</div>
+                <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", padding:"11px 18px 9px" }}>
+                  <span style={{ fontSize:13, fontWeight:700, color:C.yellowText }}>{item.title}</span>
+                  {item.slide && <span style={{ marginLeft:"auto", fontSize:11, fontWeight:700, color:C.textSecondary, background:C.white, border:`1px solid ${C.yellowRule}`, borderRadius:99, padding:"2px 10px" }}>On screen: {item.slide}</span>}
+                </div>
               )}
               {item.proof && (
                 <div style={{ margin:"-2px 18px 10px", display:"flex", flexDirection:"column", gap:2 }}>
@@ -1702,6 +1705,7 @@ const sd = STAGE_DATA[activeStage];
                       {row("States yielding applicants", card.states)}
                       {row("Schools yielding applicants", card.schools)}
                       {card.highlight && <div style={{ marginTop:10, fontSize:14, lineHeight:1.55, color:C.textPrimary }}>{card.highlight}</div>}
+                      {card.caseStudy && <div style={{ marginTop:10, fontSize:14, lineHeight:1.55, color:C.textPrimary }}><strong>Case study: </strong>{card.caseStudy}</div>}
                       {card.highlightLink && <a href={card.highlightLink} target="_blank" rel="noreferrer" style={{ display:"block", marginTop:6, fontSize:13, fontWeight:600, color:C.emerald, textDecoration:"none" }}>↗ {card.highlightLabel || "See it live"}</a>}
                       {card.associations && <>{head("Associations")}<div style={{ fontSize:13, color:C.textPrimary, lineHeight:1.5 }}>{card.associations}</div></>}
                       {card.influencerLink && <>{head("Influencer")}<a href={card.influencerLink} target="_blank" rel="noreferrer" style={{ fontSize:14, fontWeight:600, color:C.emerald, textDecoration:"none" }}>↗ {card.influencer}</a></>}
