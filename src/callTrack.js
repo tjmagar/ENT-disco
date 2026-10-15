@@ -259,9 +259,7 @@ export const STAGE_DATA = {
     rule:"Identify the business problem behind what they asked for, then validate it's the one to anchor on.",
     script:[
       { kind:"say", beats:[
-        { cue:"Bridge", text:"So hopefully you have a good idea, and it seems there's **still alignment so far**. But to understand **where we need to get to**, I'd love to understand more about **where you are**." },
-        { cue:"Start top of funnel", when:"funnel", text:"Let's start with the **top of funnel** side." },
-        { cue:"Start with hiring", when:"notFunnel", text:"Let's start with **who you're hiring**." },
+        { cue:"Bridge", text:"Great, so **let's dive into your situation**, starting with the **top of funnel** side." },
       ]},
       { kind:"ask", label:"Roles + leaders", text:"What **roles** do you hire new grads into the most — and **who are the leaders** you're working with to fill those?" },
     ],
