@@ -261,7 +261,7 @@ export const STAGE_DATA = {
       { kind:"say", beats:[
         { cue:"Bridge", text:"Great, so **let's dive into your situation**, starting with the **top of funnel** side." },
       ]},
-      { kind:"ask", label:"Roles + leaders", text:"What **roles** do you hire new grads into the most — and **who are the leaders** you're working with to fill those?" },
+      { kind:"ask", label:"Roles", text:"Which **clinical and allied health roles** do you hire the **most new grads** into?" },
     ],
     tips:["Keep peeling only while the answer is still a symptom. Stop when a CFO would fund it.","\"Who cares the most\" is your multithreading list.","Get explicit agreement that this is the problem worth solving now."],
     watch:["Stopping at the symptom and moving on","Happy ears — getting excited before validating it is a raging fire","Skipping the anchor check because it feels confrontational"],
