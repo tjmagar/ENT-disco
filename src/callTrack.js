@@ -14,8 +14,9 @@ export const STAGES = [
   { id:"orient",             icon:"4",  short:"Orient to Buyer Focus",    group:"orient" },
   { id:"value-drop",         icon:"5",  short:"Value Drop",               group:"value" },
   { id:"summary-buyin",      icon:"6",  short:"Summary + Buy-in",         group:"value" },
-  { id:"business-problem",   icon:"7",  short:"Needs Analysis",           group:"discovery" },
-  { id:"close-next-steps",   icon:"8", short:"Close + Next Steps",       group:"close" },
+  { id:"business-problem",   icon:"7",  short:"Hiring Needs Analysis",         group:"discovery" },
+  { id:"relationship-check", icon:"8",  short:"Relationship Check",       group:"discovery" },
+  { id:"close-next-steps",   icon:"9", short:"Close + Next Steps",       group:"close" },
 ];
 
 // Timeboxes add up to a 30-minute call.
@@ -26,7 +27,8 @@ export const STAGE_META = {
   "orient":           { phase:"ORIENT",           timebox:"2 min" },
   "value-drop":       { phase:"VALUE",            timebox:"13 min" },
   "summary-buyin":    { phase:"BUY-IN",           timebox:"1 min" },
-  "business-problem": { phase:"NEEDS ANALYSIS", timebox:"6 min" },
+  "business-problem": { phase:"HIRING NEEDS", timebox:"4 min" },
+  "relationship-check": { phase:"RELATIONSHIPS", timebox:"2 min" },
   "close-next-steps": { phase:"CLOSE",            timebox:"4 min" },
 };
 
@@ -38,8 +40,7 @@ export const CAPTURE = {
   "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
   "orient":           [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
                        { key:"startWhy", label:"What they said", hint:"Their words" }],
-  "value-drop":       [{ key:"schools", label:"School relationships", hint:"Which programs, who owns them" },
-                       { key:"turnover", label:"First-year turnover", hint:"Number + department" },
+  "value-drop":       [{ key:"turnover", label:"First-year turnover", hint:"Number + department" },
                        { key:"signOns", label:"Sign-on bonuses", hint:"Type and amount" },
                        { key:"contract", label:"Contract labor", hint:"How much, where" },
                        { key:"reactions", label:"What landed", hint:"Reactions, questions, objections" }],
@@ -47,6 +48,7 @@ export const CAPTURE = {
   "business-problem": [{ key:"roles", label:"Hardest role to recruit new grads for" },
                        { key:"hiresPerYear", label:"Hires per year for that role" },
                        { key:"incentives", label:"Incentives today", hint:"Sign-on amount per role, tuition program details…" }],
+  "relationship-check": [{ key:"schools", label:"School relationships", hint:"Which programs, who owns them" }],
   "close-next-steps": [{ key:"icp", label:"ICP — 3+ of: 2K–50K employees · open clinical roles · hiring consistently · sign-ons · contract labor · double-digit turnover", type:"choice", options:["Yes","No"] },
                        { key:"persona", label:"Persona: TA/HR, Director+, said they're interested?", type:"choice", options:["Yes","No"] },
                        { key:"read", label:"Your honest read", hint:"Fills the close script" },
@@ -265,15 +267,23 @@ export const STAGE_DATA = {
         { value:"Sign-on bonuses", sub:"" },
         { value:"Other", sub:"" },
       ]},
-      { kind:"say", subKey:"incentive", sub:"Sign-on bonuses", title:"If sign-on bonuses", beats:[
+      { kind:"say", subKey:"incentive", sub:"Sign-on bonuses", untilPicked:true, title:"If sign-on bonuses", beats:[
         { cue:"Dig in", check:"answer", text:"Got it — **how much**, per role?" },
       ]},
-      { kind:"say", subKey:"incentive", sub:"Tuition reimbursement", title:"If tuition reimbursement", beats:[
+      { kind:"say", subKey:"incentive", sub:"Tuition reimbursement", untilPicked:true, title:"If tuition reimbursement", beats:[
         { cue:"Dig in", check:"answer", text:"Got it, that can **look different from system to system**. What does that program **look like for you**?" },
       ]},
     ],
     tips:["Keep peeling only while the answer is still a symptom. Stop when a CFO would fund it.","\"Who cares the most\" is your multithreading list.","Get explicit agreement that this is the problem worth solving now."],
     watch:["Stopping at the symptom and moving on","Happy ears — getting excited before validating it is a raging fire","Skipping the anchor check because it feels confrontational"],
+  },
+  "relationship-check": {
+    rule:"Find out what school relationships they already have, and how well they're working.",
+    script:[
+      { kind:"ask", label:"Existing relationships", text:"So earlier we talked about some of **our relationships with schools** — talk to me a little about the **existing relationships** you have with local programs and universities to **funnel students in these fields** your way." },
+    ],
+    tips:[],
+    watch:[],
   },
   "close-next-steps": {
     rule:"Call back the ROE. Leave with a concrete decision — a next step is not real until it has an owner and a date.",

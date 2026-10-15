@@ -347,6 +347,7 @@ export default function App() {
     if (it.when && !beatConditions[it.when]) return false;
     if (!it.sub) return true;
     const v = picks[it.subKey];
+    if (it.untilPicked && !v) return false;
     return !v || v === "Both" || v === it.sub;
   };
   const script = visibleScript(activeStage, captures.startArea, showAllAreas)
@@ -1218,7 +1219,7 @@ const sd = STAGE_DATA[activeStage];
   const stageElapsed = now - stageStart;
   const overTime = timeboxMs && stageElapsed > timeboxMs;
   const nextStage = STAGES[currentIdx + 1];
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Clasp Context","orient":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Needs Analysis","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Clasp Context","orient":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Hiring Needs Analysis","relationship-check":"Relationship Check","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Who's on the call, and anything you spotted.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
