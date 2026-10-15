@@ -322,6 +322,7 @@ export default function App() {
       case "who should join": return v(c.who);
       case "roles they named": return v(c.roles) || v(b.roles);
       case "date": return v(c.date);
+      case "a date within 2 weeks": return v(c.date);
 
       case "surface need": return v(c.surfaceNeed);
       case "what they said": return v(c.startWhy) || v(c.surfaceNeed);

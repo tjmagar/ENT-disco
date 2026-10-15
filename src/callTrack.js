@@ -63,10 +63,9 @@ export const CAPTURE = {
                        { key:"contractOwner", label:"Who cares most about that spend", hint:"Names + titles" }],
   "close-next-steps": [{ key:"icp", label:"ICP — 3+ of: 2K–50K employees · open clinical roles · hiring consistently · sign-ons · contract labor · double-digit turnover", type:"choice", options:["Yes","No"] },
                        { key:"persona", label:"Persona: TA/HR, Director+, said they're interested?", type:"choice", options:["Yes","No"] },
-                       { key:"read", label:"Your honest read", hint:"Fills the close script" },
                        { key:"nextStep", label:"Next step" },
                        { key:"who", label:"Who attends" },
-                       { key:"date", label:"Date", hint:"Within 6 weeks. Send the invite + log in HubSpot" }],
+                       { key:"date", label:"Date", hint:"No more than 2 weeks out. Fills the close script" }],
 };
 
 // Script items per stage.
@@ -329,17 +328,19 @@ export const STAGE_DATA = {
     script:[
       { kind:"say", beats:[
         { cue:"Call back the agenda", text:"At the beginning of this call, we agreed we'd decide whether it makes sense to schedule a **next logical step** — or go our separate ways so we don't waste each other's time." },
-        { cue:"Give your read", text:"The sense I'm getting is [your honest read]." },
+        { cue:"Give your read", text:"The sense I'm getting is we've had a **productive meeting**, and it makes sense to **set a next step**." },
+        { cue:"Recommend", text:"Given that, I'd recommend we **regroup on [a date within 2 weeks]** to dig deeper." },
+        { cue:"Check", check:"answer", text:"**Does that feel like a reasonable next step** to take?" },
       ]},
-      { kind:"ask", label:"Fairness check", text:"Does that **feel fair** to you?" },
-      { kind:"ask", label:"Next step", text:"What should the **next logical step** look like?\n\nAnd **who needs to be there**?" },
-      { kind:"ask", label:"Date", text:"Can we put **a specific date** on the calendar now?" },
       { kind:"say", title:"If they ask what the next meeting looks like", beats:[
         { cue:"The agenda", text:"Great question. I find it helpful to see that **the all-in cost wouldn't break the bank**. So next time, we'd put your numbers next to what you're spending on **sign-ons and turnover** today — and see if this makes **directional sense** to pursue." },
         { cue:"What you need", check:"answer", text:"To make that real, I'd need a few inputs: **how many you're looking to hire** this year, **what you're offering today**, and **where the biggest gaps are**. Is that something you could pull together?" },
       ]},
       { kind:"say", title:"If they say \"just email me\"", beats:[
         { cue:"Hold the date", check:"answer", text:"Absolutely — I'll send a recap. Mind if I **drop a hold on the calendar** for [date] so it doesn't slip? **Easy to move** if it doesn't work." },
+      ]},
+      { kind:"say", title:"Wrap up", beats:[
+        { cue:"Thank them", text:"Great, **thanks again** for the conversation today. I'm very excited about **the potential you see here** and about the **positive outcomes** we can work on together. We'll talk again soon — enjoy the rest of the day." },
       ]},
     ],
     tips:["Leave with a concrete decision.","A next step is not real until it has an owner and a date."],
