@@ -929,29 +929,35 @@ ${combinedText}` }]
               {item.show && (() => {
                 const role = captures.role;
                 const roles = [...new Set(item.show.map(l => l.role).filter(Boolean))];
-                const shown = item.show.filter(l => !l.role || !role || l.role === role);
+                if (!roles.length && !role) return null;
+                const shown = role ? item.show.filter(l => !l.role || l.role === role) : [];
                 return (
                   <div onClick={e => e.stopPropagation()} style={{ margin:"0 18px 12px", padding:"10px 14px", borderRadius:10, background:C.white, border:`1px solid ${C.yellowRule}` }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", marginBottom:8 }}>
-                      <span style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginRight:4 }}>Show this</span>
-                      {roles.map(r => {
-                        const on = role === r;
-                        return (
-                          <button key={r} onClick={() => setCapture("role", on ? "" : r)}
-                            style={{ ...B, fontSize:12, fontWeight:700, padding:"3px 10px", borderRadius:99, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? C.white : C.textSecondary }}>
-                            {on ? "✓ " : ""}{r}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-                      {shown.map(l => (
-                        <a key={l.url} href={l.url} target="_blank" rel="noreferrer"
-                          style={{ fontSize:15, fontWeight:600, color:C.emerald, textDecoration:"none", display:"flex", gap:8, alignItems:"baseline" }}>
-                          <span style={{ fontSize:12 }}>↗</span><span>{l.label}</span>
-                        </a>
-                      ))}
-                    </div>
+                    {roles.length > 0 && (
+                      <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
+                        <span style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, marginRight:4 }}>{role ? "Show this" : "Which role?"}</span>
+                        {roles.map(r => {
+                          const on = role === r;
+                          return (
+                            <button key={r} onClick={() => setCapture("role", on ? "" : r)}
+                              style={{ ...B, fontSize:12, fontWeight:700, padding:"3px 10px", borderRadius:99, border:`1px solid ${on ? C.emerald : C.border}`, background:on ? C.emerald : C.white, color:on ? C.white : C.textSecondary }}>
+                              {on ? "✓ " : ""}{r}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {shown.length > 0 && (
+                      <div style={{ display:"flex", flexWrap:"wrap", gap:"6px 16px", marginTop:roles.length ? 10 : 0 }}>
+                        {!roles.length && <span style={{ fontSize:11, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", color:C.textMuted, alignSelf:"center" }}>Show this</span>}
+                        {shown.map(l => (
+                          <a key={l.url} href={l.url} target="_blank" rel="noreferrer"
+                            style={{ fontSize:15, fontWeight:600, color:C.emerald, textDecoration:"underline", textUnderlineOffset:3 }}>
+                            {l.label.replace(/^(TikTok search|Video|Creator|Creators): /, "")}
+                          </a>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })()}

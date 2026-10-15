@@ -168,7 +168,7 @@ export const STAGE_DATA = {
         { role:"CRNA", label:"Creators: Confident Care Academy (Instagram)", url:"https://www.instagram.com/reel/DRVj8dWjfWa/" },
         { role:"RT", label:"Creator: Andre RT", url:"https://www.tiktok.com/@dre.rrt/video/7543426416457682189" },
         { role:"Surg Tech", label:"Creator: Seraiah Scrubs", url:"https://www.tiktok.com/@seraiahscrubs/video/7525526389198458125" },
-        { label:"Our high-performing Clasp TikTok (JRoddy, rad tech creator, covers all roles)", url:"https://www.tiktok.com/@jroddynotricch/video/7517416929674398989" },
+        { label:"Our top Clasp TikTok", url:"https://www.tiktok.com/@jroddynotricch/video/7517416929674398989" },
       ], beats:[
         { cue:"Get the word out", text:"So first, we have to **get the word out**. We need to make sure clinical students **know this option exists** — that there's healthcare systems that will **help repay a portion of your student loan debt** in exchange for working there." },
         { cue:"Influencers", text:"And one of the most effective ways we've found this works, through **8 years of building**, is through **social media, especially TikTok**. We have a whole curated network of **TikTok influencers who are clinicians and techs**… and I know it may sound crazy, but we've **really cracked the code** on this and it really works for this generation. So by **meeting them where they are** and removing the friction from learning more, **engagement skyrockets**." },
