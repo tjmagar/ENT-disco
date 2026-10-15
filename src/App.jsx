@@ -317,6 +317,7 @@ export default function App() {
       case "colleague name": return v(b.colleague);
       case "the area they chose": return { "Pipeline":"build a bigger pipeline of soon-to-graduate talent", "Labor cost":"spend less on sign-ons and contract labor", "Retention":"retain and grow their people", "All three":"build a bigger pipeline of soon-to-graduate talent" }[c.startArea] || "";
       case "what you spotted": return v(b.signals);
+      case "what they picked": return { "Pipeline":"help you build a bigger pipeline of soon-to-graduate talent", "Labor cost":"help you spend less on sign-ons and contract labor", "Retention":"help you retain and grow your people", "All three":"help you build pipeline, spend less, and keep your people" }[c.startArea] || "";
       case "recommended next step": return v(c.nextStep);
       case "who should join": return v(c.who);
       case "roles they named": return v(c.roles) || v(b.roles);

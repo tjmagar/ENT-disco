@@ -269,7 +269,7 @@ export const STAGE_DATA = {
     screen:"Video on, no content shared",
     script:[
       { kind:"say", beats:[
-        { cue:"Thank them", text:"I really appreciate you letting me share a bit about how we work with healthcare systems on an **innovative Student Loan Repayment and recruitment program**." },
+        { cue:"Thank them", text:"Okay, that was a lot there. **Thank you for letting me share** a bit about how we [what they picked] through our **innovative program**." },
         { cue:"Step back", text:"At this point, I'd love to take a step back and **understand where your head is at**. The reason I ask is I'd rather not keep going if this isn't a fit for you — so I want your **honest read, not the polite one**." },
         { cue:"Buy-in check", check:"answer", text:"So — quick gut check. On a **scale of 1 to 10**, with 10 being '**this is exactly what we need**' — **where would you put this right now?**" },
       ]},
