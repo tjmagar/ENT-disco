@@ -158,7 +158,7 @@ export const STAGE_DATA = {
         { cue:"Acknowledge + start", when:"notFunnel", text:"Okay, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't feel relevant**." },
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
-        { cue:"The outcome", text:"So this is an area where we **really excel** and produce great outcomes for our partners." },
+        { cue:"The outcome", text:"So building pipeline is honestly where we **really excel** for our partners." },
         { cue:"Three ways", text:"And there's really **3 steps** to producing great outcomes here:", list:[
           { tag:"Educate", text:"First, we **educate the students** that a program like this even exists. We want them to know that you're an **innovative org** offering this great benefit." },
           { tag:"Awareness", text:"Then we **generate awareness**. This is going to actually **produce the applicants**." },
