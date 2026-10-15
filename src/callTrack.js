@@ -165,7 +165,6 @@ export const STAGE_DATA = {
           { tag:"Convert", text:"And lastly, we help you **convert those applicants** — getting them to raise their hand and say, \"When I graduate, **I want to come work for you!**\"" },
         ]},
         { cue:"The channels", text:"And the way we do it is through these **4 main channels**." },
-        { cue:"Check in", check:"answer", text:"Before I go further — I'm curious, **how are you building that early pipeline today?**" },
       ]},
       { kind:"say", group:"Pipeline", title:"Get the word out: TikTok", proof:["Curated influencer network reaches 4.6M+ engaged followers"], show:[
         { role:"RN", label:"TikTok search: nursing student loan debt", url:"https://www.tiktok.com/discover/nursing-student-loan-debt" },
