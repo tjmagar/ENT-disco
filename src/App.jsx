@@ -359,7 +359,7 @@ export default function App() {
     let line = 0, jump = -1;
     visible.forEach(it => {
       if (jump < 0 && it.subKey === key && it.sub) jump = line;
-      if (it.kind === "say") line += it.beats.length; else if (it.kind === "ask") line += 1;
+      if (it.kind === "say") line += it.beats.filter(bt => !bt.when || beatConditions[bt.when]).length; else if (it.kind === "ask") line += 1;
     });
     if (jump >= 0) setFocus(f => ({ ...f, [activeStage]: jump }));
   }
