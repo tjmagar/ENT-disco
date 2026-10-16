@@ -347,13 +347,13 @@ export const STAGE_DATA = {
       { kind:"ask", label:"What they've tried", text:"What have you **tried so far** to keep them?" },
       { kind:"ask", label:"Internal conversations", text:"It sounds like that might already be on the radar. How much has **bringing that number down** come up in conversations internally?" },
       { kind:"ask", label:"Who feels it", text:"And who would you say **feels that number the most**?" },
-      { kind:"say", title:"If it lands: the cost of one departure", slide:"Chart · stays vs. leaves", proof:["Stays: the sign-on, and that's it","Replacement cost: nurse ~$77K · PT ~$70K · rad tech ~$75K · RT ~$80K (Clasp research) — NSI's nurse-only figure is ~$60K","Therapists + techs 60+ days to hire: Florida Hospital Association (state data)"], beats:[
+      { kind:"say", title:"If it lands: the cost of one departure", slide:"Chart · stays vs. leaves", proof:["Stays: the sign-on, and that's it","Replacement cost: nurse $60,090 (NSI 2026) · PT ~$70K · rad tech ~$75K · RT ~$80K (Clasp research)","Therapists + techs 60+ days to hire: Florida Hospital Association (state data)"], beats:[
         { cue:"Set it up", text:"Let me show you what **one departure** actually costs." },
         { cue:"One example", text:"So here's an example just to illustrate how expensive it is when **even one new grad leaves**." },
         { cue:"Walk the chart", text:"The red line is a new grad who **stays**, the teal line is one who **leaves** — and this is what you spend on each over their first two years. Both get the **same sign-on** on day one, right? For the one who stays, that's it. That's your cost." },
         { cue:"It gets worse", text:"Okay. That's only one hire. Now it actually gets worse. The one who leaves at month 12 doesn't just walk out with the sign-on. **The role sits open.** Backfilling with an experienced nurse takes about **78 days**, and therapists and techs often take **two months or more** — or you wait for **next year's graduating class**. Meanwhile you're paying for recruiting, onboarding, overtime, and **travelers** — for a nurse, that's **$91 an hour** versus $59 for staff." },
         { cue:"Backfill", text:"Then you pay **another sign-on** to backfill." },
-        { cue:"Two years", text:"So when we extend the timeline to 2 years — assuming your second hire even stays — that one departure cost you **tens of thousands** more than the hire who stayed. Replacing a nurse runs about **$77,000**. A PT, about **$70,000**. A rad tech, **$75,000**. An RT, **$80,000**." },
+        { cue:"Two years", text:"So when we extend the timeline to 2 years — assuming your second hire even stays — that one departure cost you **tens of thousands** more than the hire who stayed. Replacing a nurse runs about **$60,000**. A PT, about **$70,000**. A rad tech, **$75,000**. An RT, **$80,000**." },
         { cue:"Why I share it", text:"And the reason I share this isn't because you need to be taught that turnover is hard. It's to make clear just **how expensive even one new grad leaving is**." },
       ]},
     ],
