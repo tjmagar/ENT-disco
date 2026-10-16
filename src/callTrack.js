@@ -110,10 +110,14 @@ export const STAGE_DATA = {
     rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
     script:[
       { kind:"say", title:"Context", slide:"Slide 1 · Title", beats:[
-        { cue:"Set up the slides", text:"To give you some context on **the problems we solve**, I've prepared **a few short slides**." },
+        { cue:"Set up the slides", text:"Great, so like I mentioned, to set **a strong foundation** for the call, I've prepared **a few short slides** to give you some context on **the problems we solve**." },
+        { cue:"Check what they know", check:"answer", text:"But before I do, **how familiar are you with Clasp** — what research have you done on us?" },
+        { cue:"Set the bar", text:"Great, well that's what I'm here for — to ensure you leave the call **more educated on our impact** than when you joined. So let's jump in." },
+        { cue:"All healthcare", text:"So at Clasp — **all we do is healthcare. Full stop.** And within that, we aim to solve **really big, complex problems** for our healthcare partners." },
+        { cue:"Who we work with", text:"Those partners range from **large health systems** like **Novant Health** and **Northwestern Medicine**, **smaller** like **Saint Alphonsus**, and even **specialty clinics** like **Confluent Health**." },
+        { cue:"The common theme", text:"But no matter the size or structure, there's **a common theme** we've seen — and it's **why our founder built Clasp**." },
       ]},
       { kind:"say", title:"Three outcomes", slide:"Slide 2 · Three outcomes", beats:[
-        { cue:"Next slide", text:"And through speaking with HR and TA leaders, **the three areas where we tend to drive the most value**, and where a partnership often makes sense, are here on your screen:" },
         { cue:"Three outcomes", text:"", list:[
           { tag:"Pipeline", text:"So first, **pipeline**. Some partners tell us they **aren't able to build a bigger, more sustainable pipeline** of soon-to-graduate talent for critical clinical and allied health roles — and by the time those grads **hit the open market**, they're **competing with every system in town** for the same small pool." },
           { tag:"Labor cost", text:"Second, **the spend**. Others tell us they're **spending too much**, whether it be on sign-on bonuses that **aren't showing ROI**, on contract labor that's **eating into their operating margin**, or on recruiting just to keep roles filled." },
@@ -135,7 +139,6 @@ export const STAGE_DATA = {
       ]},
       { kind:"say", title:"You're not alone", beats:[
         { cue:"Open", text:"So you've just shared with me that **[their focus]** is your main focus… and let me just tell you, **you're not alone** — you're in the right spot." },
-        { cue:"Who we work with", text:"Partners range from **Novant Health and Northwestern Medicine** to **Saint Alphonsus** and **Confluent Health**." },
         { cue:"Set it up", text:"Here's what **we're** seeing out there." },
       ]},
       { kind:"say", title:"What we're seeing", slide:"Stat slide · their pick", proof:["Role numbers come from the battle cards","Sign-on ROI: every $10K creates about $2,800 of value (Laudio)"], beats:[

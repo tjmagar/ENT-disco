@@ -171,9 +171,9 @@ function loadEdits() {
   try {
     const e = JSON.parse(localStorage.getItem(EDITS_KEY) || "{}");
     // v2: the pain-narrative restructure shifted lines in these stages, so older edits there would land on the wrong line.
-    if (e.__v !== 2) {
-      Object.keys(e).forEach(k => { if (/^(orient|relationship-check|turnover|context|summary-buyin):/.test(k)) delete e[k]; });
-      e.__v = 2;
+    if ((e.__v || 0) < 3) {
+      Object.keys(e).forEach(k => { if (/^(orient|pain-narrative|relationship-check|turnover|context|summary-buyin):/.test(k)) delete e[k]; });
+      e.__v = 3;
       localStorage.setItem(EDITS_KEY, JSON.stringify(e));
     }
     applyEdits(e); return e;
