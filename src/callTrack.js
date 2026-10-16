@@ -142,7 +142,7 @@ export const STAGE_DATA = {
   "pain-narrative": {
     rule:"Teach the pain before you ask about it. Covers all three problems so the pick lands. Tap a role if they named one.",
     script:[
-      { kind:"picker", key:"role", label:"Which role? (fills the numbers · none = RN)", options:[
+      { kind:"picker", key:"role", label:"Which role? (fills the numbers · skip = broad healthcare version)", options:[
         { value:"RN", sub:"" }, { value:"LPN", sub:"" }, { value:"PT", sub:"" }, { value:"OT", sub:"" }, { value:"SLP", sub:"" },
         { value:"CRNA", sub:"" }, { value:"RT", sub:"" }, { value:"Rad Tech", sub:"" }, { value:"Surg Tech", sub:"" },
         { value:"NP / PA", sub:"" }, { value:"Therapist", sub:"" }, { value:"Social Worker", sub:"" }, { value:"Optometrist", sub:"" }, { value:"DVM", sub:"" },
@@ -151,9 +151,12 @@ export const STAGE_DATA = {
         { cue:"Set it up", text:"Here's what **we're** seeing out there." },
       ]},
       { kind:"say", title:"What we're seeing", slide:"Stat slide", proof:["Role numbers come from the battle cards","Sign-on ROI: every $10K creates about $2,800 of value (Laudio)"], beats:[
-        { cue:"The debt", text:"**[role loans] of [role] grads have student loans**, averaging **[role debt]** — and it's **top of mind** when they pick where to work. So every system in town is fighting over the **same small class**." },
-        { cue:"The arms race", text:"Systems answer with sign-ons — typically **[role sign-on]** for a [role]. It's become **an arms race**. And it turns out every **$10K in sign-ons creates about $2,800 of value** — a **−72% return**." },
-        { cue:"The revolving door", text:"And still, about **[role turnover] of [role] new grads leave in their first year**. They take the sign-on, work a year, and **walk across the street** for the next one." },
+        { cue:"The debt", when:"hasRole", text:"**[role loans] of [role] grads have student loans**, averaging **[role debt]** — and it's **top of mind** when they pick where to work. So every system in town is fighting over the **same small class**." },
+        { cue:"The arms race", when:"hasRole", text:"Systems answer with sign-ons — typically **[role sign-on]** for a [role]. It's become **an arms race**. And it turns out every **$10K in sign-ons creates about $2,800 of value** — a **−72% return**." },
+        { cue:"The revolving door", when:"hasRole", text:"And still, about **[role turnover] of [role] new grads leave in their first year**. They take the sign-on, work a year, and **walk across the street** for the next one." },
+        { cue:"The debt", when:"noRole", text:"Most clinical and allied health grads finish school **with student loans** — for PTs, OTs and CRNAs, it's **well into six figures**. And it's **top of mind** when they pick where to work. So every system in town is fighting over the **same small class**." },
+        { cue:"The arms race", when:"noRole", text:"Systems answer with **sign-ons**. It's become **an arms race** — everyone offers one, and they keep going up. And it turns out every **$10K in sign-ons creates about $2,800 of value** — a **−72% return**." },
+        { cue:"The revolving door", when:"noRole", text:"And still, **more than 1 in 5 new grads leave in their first year**. They take the sign-on, work a year, and **walk across the street** for the next one." },
         { cue:"We don't appreciate", text:"So everybody understands new grads are hard to hire and keep. What we don't always appreciate is **how much it's costing us**." },
       ]},
       { kind:"say", title:"One hire", slide:"Chart · stays vs. leaves", proof:["Stays: $10K sign-on = $10K","Leaves: $10K sign-on + 4 months of traveler coverage at ~$2,200/week (~$38K) + another $10K sign-on = ~$58K"], beats:[
