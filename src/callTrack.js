@@ -164,10 +164,10 @@ export const STAGE_DATA = {
         { cue:"Multiply it", text:"Now, of course, when you multiply that across your system — every role in that gap you cover with a traveler costs about **$66,000 more a year** than a staff hire." },
         { cue:"Scale it", text:"So **10 open roles** isn't a rounding error — it's **over $650,000**. **Fifty** is **more than $3 million**. And that's **every year** the gap stays open." },
       ]},
-      { kind:"say", title:"Two bad choices", slide:"Two bad choices", beats:[
+      { kind:"say", title:"Two bad choices", slide:"Two bad choices", proof:["Contract labor 2% → 11% of total labor cost, 2019–2022 (Kaufman Hall); it has cooled since — say \"in three years,\" not \"today\""], beats:[
         { cue:"It gets worse", text:"Now, the last piece of this before I show you how we help — **it gets even worse** when you're short-staffed, just like a lot of systems are right now. You've got units to staff and services to keep open." },
         { cue:"Two choices", text:"So you've got a choice, right? **Two bad choices.**", list:[
-          { tag:"Pay", text:"Do you keep paying whatever it takes to **fill the gap**? But that means **rising sign-ons**, **expensive travelers** and **overtime** — on a budget you don't have." },
+          { tag:"Pay", text:"Do you keep paying whatever it takes to **fill the gap**? Contract labor went from **2% to 11%** of hospital labor costs in three years. That means **rising sign-ons**, **expensive travelers** and **overtime** — on a budget you don't have." },
           { tag:"Hold", text:"Or do you hold the line on spend? But that means roles sit open, your current staff **burns out** — and that **drives even more turnover**." },
         ]},
         { cue:"The question", text:"So **which expensive problem do you want to pay the price on?**" },
