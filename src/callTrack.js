@@ -125,17 +125,11 @@ export const STAGE_DATA = {
     rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
     script:[
       { kind:"say", title:"The big picture", beats:[
-        { cue:"What we're seeing", text:"Here's what we're seeing out there. **More than 1 in 5 new grads leave in their first year.** Clinical hiring has become an **arms race** — everyone's offering sign-ons, they keep going up, and new grads **take the cash and walk across the street**." },
-        { cue:"The hidden cost", text:"Everybody knows clinical roles are hard to fill. What we don't always appreciate is **how much it costs when even one new hire leaves.**" },
-        { cue:"One hire", text:"Here's one example:", list:[
-          { tag:"Year 1", text:"You hire a new grad RN and pay the **sign-on up front**. They work a year, then **leave**." },
-          { tag:"The gap", text:"The role sits open while you recruit, so you fill it with a **traveler at about 2.2x the cost** — around **$2,200 a week**." },
-          { tag:"Year 2", text:"Then you pay **another sign-on** to backfill — and hope this one stays." },
-        ]},
-        { cue:"Multiply it", text:"That's **one hire**. Multiply it across **every new grad class**, and we're not talking thousands — we're talking **millions** across the system." },
-        { cue:"Two bad choices", text:"And it gets worse when you're growing. You've got **two expensive choices**: keep paying **sign-ons and travelers** to hit headcount — or hold the line on spend and **leave roles open**. **Which expensive problem do you want to pay the price on?**" },
-        { cue:"What if", text:"What I'm about to show you helps you answer that. **What if you could** fill those roles **and keep the people you hire** — while spending less? Those goals are usually **at odds**. What we do **marries them together**." },
-        { cue:"How it works", text:"You offer **student loan repayment** as a benefit, paid **monthly while they're employed**. We get the word out to students **before they graduate**, and we **run the program** end to end." },
+        { cue:"What we're seeing", text:"Here's what we're seeing across healthcare. New grads are finishing school with **more debt than ever** — and it's **top of mind** when they pick where to work." },
+        { cue:"How systems respond", text:"Most systems answer with **sign-on bonuses**. But that's become an **arms race** — everyone offers one, they keep going up, and new grads **take the cash and move on** after a year." },
+        { cue:"What it leads to", text:"So you end up **paying to hire the same role twice** — more sign-ons, more travelers, more turnover." },
+        { cue:"What if", text:"**What if** you could turn the thing new grads are most stressed about — **their student loans** — into the reason they **choose you and stay**?" },
+        { cue:"How it works", text:"That's what we do. You offer **student loan repayment** as a benefit, paid **monthly while they're employed**. We get the word out to students **before they graduate**, and we **run the program** end to end." },
       ]},
       { kind:"say", title:"Three outcomes", slide:"Slide 2 · Three outcomes", beats:[
         { cue:"Next slide", text:"And through speaking with HR and TA leaders, **the three areas where we tend to drive the most value**, and where a partnership often makes sense, are here on your screen:" },
@@ -155,11 +149,10 @@ export const STAGE_DATA = {
     screen:"Sharing the slides and examples for each talk track",
     script:[
       { kind:"say", beats:[
-        { cue:"Summarize", text:"So it sounds like **that's where it hurts most** right now." },
-        { cue:"Check the picture", check:"answer", text:"Before we move forward, **what am I missing from this picture?**" },
         { cue:"Acknowledge + start", when:"funnel", text:"Okay, let's talk about what we do to help you **build that pipeline**. And I'd love to understand **what you're currently doing**, so we can explore any opportunities to **amplify that** and be **additive to your team**." },
         { cue:"Acknowledge + start", when:"notFunnel", text:"Okay, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't feel relevant**." },
-        { cue:"Validate", text:"**Let me show you exactly how we solve that** — because based on what you just told me, **I think you're going to love this.**" },
+        { cue:"Check the picture", check:"answer", text:"Before I show you anything — **what am I missing from this picture?**" },
+        { cue:"Show it", text:"**Let me show you exactly what this looks like.**" },
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", slide:"Slide 3 · 4 channels", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
         { cue:"What if", text:"**What if you could** have more new grads **raising their hand to work for you** — before they even graduate?" },
