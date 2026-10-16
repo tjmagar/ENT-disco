@@ -112,7 +112,7 @@ export const STAGE_DATA = {
     rule:"Lay out the three problems, then let them pick the one that hurts most. Their pick steers current state and how we solve it.",
     script:[
       { kind:"say", title:"Three outcomes", slide:"Slide 2 · Three outcomes", beats:[
-        { cue:"Bridge", text:"And through speaking with HR and TA leaders, it usually shows up in **one of three places**:" },
+        { cue:"Bridge", text:"But to do that well, I need to understand **where you fit**. Through speaking with HR and TA leaders, that gap usually hits in **one of three places**:" },
         { cue:"Three outcomes", text:"", list:[
           { tag:"Pipeline", text:"So first, **pipeline**. Some partners tell us they **aren't able to build a bigger, more sustainable pipeline** of soon-to-graduate talent for critical clinical and allied health roles — and by the time those grads **hit the open market**, they're **competing with every system in town** for the same small pool." },
           { tag:"Labor cost", text:"Second, **the spend**. Others tell us they're **spending too much**, whether it be on sign-on bonuses that **aren't showing ROI**, on contract labor that's **eating into their operating margin**, or on recruiting just to keep roles filled." },
@@ -167,7 +167,8 @@ export const STAGE_DATA = {
           { tag:"Hold", text:"Or do you hold the line on spend? But that means roles sit open, your current staff **burns out** — and that **drives even more turnover**." },
         ]},
         { cue:"The question", text:"So **which expensive problem do you want to pay the price on?**" },
-        { cue:"Hold that thought", text:"Hold that thought — we'll come back to it." },
+        { cue:"Help you answer it", text:"What I want to do today is **help you answer that question**." },
+        { cue:"What if", text:"**What if you could fill your hardest roles and keep them — without spending more?** Those two goals are usually **at odds** with each other. What we do **marries them together**, so you get **the best of both worlds**." },
       ]},
     ],
     tips:["Keep it to about 3 minutes. It's a story, not a lecture."],
@@ -181,9 +182,6 @@ export const STAGE_DATA = {
         { cue:"Acknowledge + start", when:"funnel", text:"Okay, let's talk about what we do to help you **build that pipeline**. And I'd love to understand **what you're currently doing**, so we can explore any opportunities to **amplify that** and be **additive to your team**." },
         { cue:"Acknowledge + start", when:"notFunnel", text:"Okay, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't feel relevant**." },
         { cue:"Check the picture", check:"answer", text:"Before I show you anything — **what am I missing from this picture?**" },
-        { cue:"Back to the question", text:"So — remember that question: **which expensive problem do you want to pay the price on?** What I'm about to show you **helps you answer it**." },
-        { cue:"What if", text:"**What if you could fill your hardest roles and keep them — without spending more?**" },
-        { cue:"Marry them", text:"Those 2 goals are often **at odds** with each other. What I'm going to show you **marries them together**, so that you get **the best of both worlds**." },
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", slide:"Slide 3 · 4 channels", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
         { cue:"What if", text:"**What if you could** have more new grads **raising their hand to work for you** — before they even graduate?" },
