@@ -171,9 +171,9 @@ function loadEdits() {
   try {
     const e = JSON.parse(localStorage.getItem(EDITS_KEY) || "{}");
     // v2: the pain-narrative restructure shifted lines in these stages, so older edits there would land on the wrong line.
-    if ((e.__v || 0) < 5) {
+    if ((e.__v || 0) < 6) {
       Object.keys(e).forEach(k => { if (/^(orient|about-clasp|pain-narrative|relationship-check|turnover|context|summary-buyin):/.test(k)) delete e[k]; });
-      e.__v = 5;
+      e.__v = 6;
       localStorage.setItem(EDITS_KEY, JSON.stringify(e));
     }
     applyEdits(e); return e;
@@ -361,7 +361,8 @@ export default function App() {
     funnel: !captures.startArea || captures.startArea === "Pipeline" || captures.startArea === "All three",
     notFunnel: !!captures.startArea && captures.startArea !== "Pipeline" && captures.startArea !== "All three",
     spendArea: captures.startArea === "Labor cost", retentionArea: captures.startArea === "Retention",
-    hasRole: !!captures.role, noRole: !captures.role };
+    hasRole: !!captures.role, noRole: !captures.role,
+    imaging: !captures.role || captures.role === "Rad Tech", notImaging: !!captures.role && captures.role !== "Rad Tech" };
   // Sub-tracks (e.g. sign-ons vs contract labor) show only what was picked; nothing picked shows all.
   const subVisible = (it, picks = captures) => {
     if (it.when && !beatConditions[it.when]) return false;
