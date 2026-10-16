@@ -133,7 +133,7 @@ export const STAGE_DATA = {
         { cue:"Set the bar", text:"Great, well that's what I'm here for — to ensure you leave the call **more educated on our impact** than when you joined. So let's jump in." },
         { cue:"All healthcare", text:"So at Clasp — **all we do is healthcare. Full stop.** And within that, we aim to solve **really big, complex problems** for our healthcare partners." },
         { cue:"Who we work with", text:"Those partners range from **large health systems** like **Novant Health** and **Northwestern Medicine**, **smaller** like **Saint Alphonsus**, and even **specialty clinics** like **Confluent Health**." },
-        { cue:"The common theme", text:"But no matter the size or structure, there's **a common theme** we've seen — and it's **why our founder built Clasp**." },
+        { cue:"The common theme", text:"But no matter the size or structure, there's **a common theme** we've seen — and it's **why our founder built Clasp**: to solve **the student debt crisis** and **the workforce shortage** — **in tandem**." },
       ]},
     ],
     tips:["Keep it short. The point is to set up the pain narrative, not to pitch."],
