@@ -171,9 +171,9 @@ function loadEdits() {
   try {
     const e = JSON.parse(localStorage.getItem(EDITS_KEY) || "{}");
     // v2: the pain-narrative restructure shifted lines in these stages, so older edits there would land on the wrong line.
-    if ((e.__v || 0) < 6) {
+    if ((e.__v || 0) < 7) {
       Object.keys(e).forEach(k => { if (/^(orient|about-clasp|pain-narrative|relationship-check|turnover|context|summary-buyin):/.test(k)) delete e[k]; });
-      e.__v = 6;
+      e.__v = 7;
       localStorage.setItem(EDITS_KEY, JSON.stringify(e));
     }
     applyEdits(e); return e;
@@ -371,6 +371,8 @@ export default function App() {
     if (it.untilPicked && !v) return false;
     return !v || v === "Both" || v === it.sub;
   };
+  // Next skips current-state stages for areas they didn't pick.
+  const nextStage = STAGES.slice(currentIdx + 1).find(s => !s.area || !captures.startArea || captures.startArea === "All three" || captures.startArea === s.area || showAllAreas);
   const script = visibleScript(activeStage, captures.startArea, showAllAreas)
     .filter(it => subVisible(it))
     .map(it => it.kind === "say" ? { ...it, beats: it.beats.filter(bt => !bt.when || beatConditions[bt.when]) } : it);
@@ -1085,7 +1087,7 @@ ${combinedText}` }]
 
   function renderHandoff(stageId) {
     const done = focusIdx >= flat.length;
-    const next = STAGES[currentIdx + 1];
+    const next = nextStage;
     const nextData = next && STAGE_DATA[next.id];
     const nextFirst = nextData?.script[0];
     const nextPreview = nextFirst ? (nextFirst.kind === "say" ? nextFirst.beats[0].text : nextFirst.text) : "";
@@ -1248,8 +1250,6 @@ const sd = STAGE_DATA[activeStage];
   const timeboxMs = (parseInt(meta.timebox) || 0) * 60000;
   const stageElapsed = now - stageStart;
   const overTime = timeboxMs > 0 && stageElapsed > timeboxMs;
-  // Next skips current-state stages for areas they didn't pick.
-  const nextStage = STAGES.slice(currentIdx + 1).find(s => !s.area || !captures.startArea || captures.startArea === "All three" || captures.startArea === s.area || showAllAreas);
   const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","about-clasp":"About Clasp","orient":"Which Hurts Most?","pain-narrative":"Pain Narrative","value-drop":"How We Solve It","business-problem":"Hiring Needs Analysis","relationship-check":"School Partnerships","turnover":"Retention + Turnover","signon-spend":"Sign-on Spend","contract-labor":"Contract Labor","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Who's on the call, and anything you spotted.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
@@ -1750,7 +1750,7 @@ const sd = STAGE_DATA[activeStage];
                       </button>
                       {isOpen && (
                         <div style={{ padding:"4px 20px 16px", background:C.sand, borderTop:`1px solid ${C.border}`, fontSize:14, color:C.textPrimary, lineHeight:1.6 }}>
-                          {ed(qa._eid?.a, <div>{renderInline(qa.a, resolveToken)}</div>)}
+                          {ed(qa._eid?.a, <div style={{ whiteSpace:"pre-line" }}>{renderInline(qa.a, resolveToken)}</div>)}
                         </div>
                       )}
                     </div>
