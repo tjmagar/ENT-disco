@@ -164,10 +164,10 @@ export const STAGE_DATA = {
         { cue:"Scale it", text:"So **10 open roles** isn't a rounding error — it's **over $650,000**. **Fifty** is **more than $3 million**. And that's **every year** the gap stays open." },
       ]},
       { kind:"say", title:"Two bad choices", slide:"The gap gets even WORSE when you're short-staffed…", proof:["Slide: two questions, each with a \"But…\" underneath","Backup if they push on spend: contract labor went from 2% to 11% of hospital labor costs, 2019–2022 (Kaufman Hall)"], beats:[
-        { cue:"It gets worse", text:"Now, the last piece of this before we dig into your situation — **it gets even worse** when you're short-staffed." },
-        { cue:"Two choices", text:"So you've got a choice, right? **Two bad choices.**", list:[
-          { tag:"1", text:"Number one: **do you fill every seat?** But pay whatever it takes in **sign-ons, travelers and overtime**?" },
-          { tag:"2", text:"Or number two: **do you hold the line on spend?** But leave roles open and **burn out the team you have**?" },
+        { cue:"It gets worse", text:"Now, the last piece of this before we dig into your situation — **it gets even worse** when you're short-staffed, just like a lot of systems are right now. Because you've still got **units to staff** and **hiring targets to hit**." },
+        { cue:"Two choices", text:"And you've got a choice, right? You've got **two bad choices**.", list:[
+          { tag:"1", text:"Number one, **do you fill every seat?** But because the pipeline is so thin, you have to **pay whatever it takes** — sign-ons, travelers, overtime." },
+          { tag:"2", text:"Or number two, **do you hold the line on spend?** But that leaves roles open and **burns out the team you have** — and now you miss your staffing targets, and therefore **patient care and revenue** take the hit." },
         ]},
         { cue:"The question", text:"So **which expensive problem do you want to pay the price on?**" },
         { cue:"Help you answer it", text:"What I want to do today is **help you answer that question**." },
