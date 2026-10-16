@@ -154,12 +154,6 @@ export const STAGE_DATA = {
         { cue:"Grad PLUS", text:"To make matters worse, on July 1st, the government **eliminated Grad PLUS**, the loan that covered the full cost of school. Now, **78% of nursing deans** expect enrollment to drop, and the message being told to students is clear: **you're on your own**." },
         { cue:"We don't appreciate", text:"So everybody understands clinical hiring is **getting harder**. What we don't always appreciate is **how much it's costing your system**. And with **43% of hospitals operating at a loss** — **up from a third before COVID** — there's **no budget left to throw at the problem**." },
       ]},
-      { kind:"say", title:"The gap", slide:"Chart · the gap", proof:["RT ~5,500 grads/yr vs 7,000–8,800 needed (Clasp research)","Backup — grads vs. needed per year: RT ~5,500 vs 7,000–8,800 · PT ~14,000 vs 15,000–18,000 · Rad Tech ~15,000 vs 16,000–18,000 · CRNA ~2,400 vs 4,000–5,000 (Clasp research)"], beats:[
-        { cue:"Show it", text:"So here's what the problem **actually** looks like." },
-        { cue:"Walk the chart", text:"Across nursing and allied health, we're **not graduating enough people to fill the seats**. Take respiratory therapists: about **5,500** graduate each year — for up to **8,800** jobs. And that's **just one role**." },
-        { cue:"The gap", text:"That space in between? **That's the gap.** And you pay for every inch of it — **sign-ons, travelers, overtime**." },
-        { cue:"Wider", text:"And it's **only getting wider**." },
-      ]},
       { kind:"say", title:"One open seat", slide:"Chart · one vacant FTE: staff RN vs premium labor", proof:["Staff RN $59.46/hr all-in × 2,080 hrs ≈ $124K · traveler $91.23/hr ≈ $190K · ~$66K more/yr (NSI 2026) · SIA/NATHO 2025 avg travel bill rate $90.54","Burnout: each extra patient per nurse → 23% higher odds of burnout (Aiken, JAMA 2002)","78 days to hire an experienced RN (NSI 2026)","Mortality: each extra patient per nurse → ~7% higher 30-day mortality (Aiken, JAMA 2002)","Two years, two seats ≈ nearly $200K premium over staff"], beats:[
         { cue:"One example", text:"Here's an example to illustrate how costly it can be, from **a financial standpoint** and **a quality of care standpoint**, for **just one seat you can't fill**." },
         { cue:"Walk the chart", text:"Okay, we've got this red line, which is **a staff RN in that seat**, the teal line, which is **that same seat covered by premium labor**, and this is **what each one costs you** over a year, right?" },
