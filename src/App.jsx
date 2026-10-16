@@ -168,7 +168,16 @@ function applyEdits(edits) {
   Object.entries(EDITABLE).forEach(([id, e]) => { e.obj[e.field] = edits[id] ?? e.orig; });
 }
 function loadEdits() {
-  try { const e = JSON.parse(localStorage.getItem(EDITS_KEY) || "{}"); applyEdits(e); return e; } catch { return {}; }
+  try {
+    const e = JSON.parse(localStorage.getItem(EDITS_KEY) || "{}");
+    // v2: the pain-narrative restructure shifted lines in these stages, so older edits there would land on the wrong line.
+    if (e.__v !== 2) {
+      Object.keys(e).forEach(k => { if (/^(orient|relationship-check|turnover|context|summary-buyin):/.test(k)) delete e[k]; });
+      e.__v = 2;
+      localStorage.setItem(EDITS_KEY, JSON.stringify(e));
+    }
+    applyEdits(e); return e;
+  } catch { return {}; }
 }
 
 // In edit mode, wraps a line so a click opens it for editing.
@@ -307,6 +316,7 @@ export default function App() {
   function resolveToken(name) {
     const c = captures, b = briefFields;
     const v = x => (x || "").trim();
+    const roleCard = ROLE_CARDS.find(r => r.key === c.role) || ROLE_CARDS[0];
     const join = parts => parts.map(v).filter(Boolean).join("; ");
     const today = [v(c.turnover) && `first-year turnover is ${v(c.turnover)}`, v(c.signOns) && `you're offering ${v(c.signOns)} in sign-ons`, v(c.contract) && `you're using ${v(c.contract)} in contract labor`].filter(Boolean).join(", ");
     const current = today && `${today}${v(c.target) ? `, and you want to get to ${v(c.target)}` : ""}`;
@@ -317,6 +327,12 @@ export default function App() {
       case "colleague name": return v(b.colleague);
       case "the area they chose": return { "Pipeline":"build a bigger pipeline of soon-to-graduate talent", "Labor cost":"spend less on sign-ons and contract labor", "Retention":"retain and grow their people", "All three":"build a bigger pipeline of soon-to-graduate talent" }[c.startArea] || "";
       case "what you spotted": return v(b.signals);
+      case "their focus": return { "Pipeline":"building pipeline", "Labor cost":"spend", "Retention":"retention", "All three":"building pipeline" }[c.startArea] || "building pipeline";
+      case "role": return roleCard.key;
+      case "role loans": return roleCard.withLoans || "Most";
+      case "role debt": return roleCard.debt || "tens of thousands";
+      case "role sign-on": return roleCard.signOn || "$10,000+";
+      case "role turnover": return roleCard.turnover || "1 in 5";
       case "what they picked": return { "Pipeline":"help you build a bigger pipeline of soon-to-graduate talent", "Labor cost":"help you spend less on sign-ons and contract labor", "Retention":"help you retain and grow your people", "All three":"help you build pipeline, spend less, and keep your people" }[c.startArea] || "";
       case "recommended next step": return v(c.nextStep);
       case "who should join": return v(c.who);
@@ -343,7 +359,8 @@ export default function App() {
     inbound: briefFields.source !== "Outbound", outbound: briefFields.source !== "Inbound",
     hesitant: captures.reaction === "Hesitant", notHesitant: captures.reaction !== "Hesitant",
     funnel: !captures.startArea || captures.startArea === "Pipeline" || captures.startArea === "All three",
-    notFunnel: !!captures.startArea && captures.startArea !== "Pipeline" && captures.startArea !== "All three" };
+    notFunnel: !!captures.startArea && captures.startArea !== "Pipeline" && captures.startArea !== "All three",
+    spendArea: captures.startArea === "Labor cost", retentionArea: captures.startArea === "Retention" };
   // Sub-tracks (e.g. sign-ons vs contract labor) show only what was picked; nothing picked shows all.
   const subVisible = (it, picks = captures) => {
     if (it.when && !beatConditions[it.when]) return false;
@@ -1229,8 +1246,9 @@ const sd = STAGE_DATA[activeStage];
   const timeboxMs = (parseInt(meta.timebox) || 0) * 60000;
   const stageElapsed = now - stageStart;
   const overTime = timeboxMs > 0 && stageElapsed > timeboxMs;
-  const nextStage = STAGES[currentIdx + 1];
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","context":"Clasp Context","orient":"Orient to Buyer Focus","value-drop":"Value Drop: Talk Tracks","summary-buyin":"Summary + Buy-in","business-problem":"Hiring Needs Analysis","relationship-check":"School Partnerships","turnover":"Retention + Turnover","signon-spend":"Sign-on Spend","contract-labor":"Contract Labor","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  // Next skips current-state stages for areas they didn't pick.
+  const nextStage = STAGES.slice(currentIdx + 1).find(s => !s.area || !captures.startArea || captures.startArea === "All three" || captures.startArea === s.area || showAllAreas);
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","orient":"Which Hurts Most?","pain-narrative":"Pain Narrative","value-drop":"Value Drop: Talk Tracks","business-problem":"Hiring Needs Analysis","relationship-check":"School Partnerships","turnover":"Retention + Turnover","signon-spend":"Sign-on Spend","contract-labor":"Contract Labor","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Who's on the call, and anything you spotted.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
@@ -1248,9 +1266,9 @@ const sd = STAGE_DATA[activeStage];
         </div>
 
         <div style={{ flex:1, padding:"6px 10px" }}>
-          {["setup","orient","value","discovery","deeper","close"].map(group => {
+          {["setup","orient","discovery","value","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
-            const groupLabel = { setup:"Setup", orient:"Orient", value:"Value", discovery:"Discovery", deeper:"Go deeper · if time", close:"Close" }[group];
+            const groupLabel = { setup:"Setup", orient:"Orient", discovery:"Current State", value:"Value", close:"Close" }[group];
             return (
               <div key={group} style={{ marginBottom:14 }}>
                 <div style={{ fontSize:10, fontWeight:700, color:C.textMuted, letterSpacing:"0.12em", textTransform:"uppercase", padding:"0 10px", marginBottom:4 }}>{groupLabel}</div>
