@@ -152,7 +152,7 @@ export const STAGE_DATA = {
         { cue:"So", text:"So TA teams can't wait for talent to come to them anymore. They have to be **proactive, not reactive**." },
         { cue:"Now it turns out", text:"Now it turns out the students who **do** get in are **paying for it**. **Half of all RNs** borrowed for school, and PTs, OTs and CRNAs graduate with **six figures** of debt." },
         { cue:"It just got worse", text:"And on July 1st, the government **eliminated Grad PLUS** — the loan that covered the full cost of school. It even tried to say nursing **isn't a professional degree**. That's in court, but students hear the message loud and clear: **the barrier to a healthcare career is getting higher**." },
-        { cue:"We don't appreciate", text:"So everybody understands clinical hiring is **getting harder**. What we don't always appreciate is **how much it's costing us**. And with **43% of hospitals operating at a loss**, there's **no budget left to throw at the problem**." },
+        { cue:"We don't appreciate", text:"So everybody understands clinical hiring is **getting harder**. What we don't always appreciate is **how much it's costing us**. And with **43% of hospitals operating at a loss** — **up from a third before COVID** — there's **no budget left to throw at the problem**." },
       ]},
       { kind:"say", title:"One hire", slide:"Chart · stays vs. leaves", proof:["Stays: the sign-on, and that's it","Leaves: the sign-on + ~$60,090 to replace (NSI 2025: recruiting, onboarding, overtime and premium coverage)"], beats:[
         { cue:"One example", text:"So here's an example just to illustrate how expensive it is when **even one new grad leaves**." },
@@ -168,7 +168,7 @@ export const STAGE_DATA = {
       { kind:"say", title:"Two bad choices", slide:"Two bad choices", beats:[
         { cue:"It gets worse", text:"Now, the last piece of this before I show you how we help — **it gets even worse** when you're short-staffed, just like a lot of systems are right now. You've got units to staff and services to keep open." },
         { cue:"Two choices", text:"So you've got a choice, right? **Two bad choices.**", list:[
-          { tag:"Pay", text:"Do you keep paying whatever it takes to fill the roles? But that means **rising sign-ons**, **expensive travelers**, and **nearly 1 in 3 new hires walking out** in year one." },
+          { tag:"Pay", text:"Do you keep paying whatever it takes to fill the roles? But labor costs are **already up 16% in three years** — and that means **rising sign-ons**, **expensive travelers**, and **nearly 1 in 3 new hires walking out** in year one." },
           { tag:"Hold", text:"Or do you hold the line on spend? But that means roles sit open, your current staff **burns out** — and that **drives even more turnover**." },
         ]},
         { cue:"The question", text:"So **which expensive problem do you want to pay the price on?**" },
