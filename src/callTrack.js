@@ -175,8 +175,7 @@ export const STAGE_DATA = {
       { kind:"say", title:"Quality of care", slide:"Quality of care", proof:["Mortality: each extra patient per nurse → ~7% higher 30-day mortality (Aiken, JAMA 2002)","Each understaffed shift → ~2% higher mortality risk, cumulative (Needleman, NEJM 2011)","Allied health line has no stat yet"], beats:[
         { cue:"Transition", text:"But the dollars are only half of it. Nobody gets into healthcare to get rich. They get into it to **help people get better**. And this is hitting **quality of care**." },
         { cue:"Patients don't go away", text:"When a seat sits open, **the patients don't go away**. They just get **spread across fewer people**." },
-        { cue:"Mortality", text:"Research shows every extra patient per nurse is tied to about a **7% increase in mortality risk**." },
-        { cue:"Every short shift", text:"Another study found that **every shift a unit runs understaffed** raises patients' mortality risk — and it **compounds**, shift after shift." },
+        { cue:"Mortality", text:"In nursing alone, research shows every extra patient per nurse raises **mortality risk about 7%**. And every shift that runs short, it **compounds**." },
         { cue:"Not just nursing", text:"And it's **not just nursing**. When you're short in **imaging, therapy or respiratory**, patients **wait longer** — for the scan, the treatment, the discharge." },
         { cue:"Land it", text:"So this isn't just **a budget problem**. It's **a patient care problem**." },
       ]},
