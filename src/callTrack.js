@@ -147,28 +147,27 @@ export const STAGE_DATA = {
       ]},
       { kind:"say", title:"What we're seeing", slide:"Stat slide", proof:["100,000+ short by 2028 + allied vacancy 2x nursing + 30% of counties: Clasp School Deserts / Talent Outlook · CT tech vacancy 19.4%: ASRT 2025 (radiography fell to 15.6% — don't say \"tripled\") · 78 days to fill: playbook","80,000+ qualified nursing applications turned away (2024): AACN — barriers are faculty, clinical sites, preceptors, space","Half of RNs (2.2M) borrowed: HRSA 2021 survey · Six figures for PT, OT, CRNA: battle cards · Grad PLUS ended July 1, 2026; a June 25 injunction blocked the \"nursing isn't professional\" rule — don't say nursing is capped at $100K","43% of hospitals in the red (up from 33% pre-COVID): Kaufman Hall National Hospital Flash Report, Aug 2026 data, 1,300 hospitals · Labor expenses up 16% in 3 years","CNO on the call? Add: \"…and that's before we talk about what short staffing does to patient care.\"","100K by 2028 is Mercer — mostly nursing assistants; Mercer projects an RN surplus nationally"], beats:[
         { cue:"Not pretty", text:"And honestly — **it's not pretty**." },
-        { cue:"The shortage", text:"Healthcare is **short on people**, and it's getting worse. We're projected to be **more than 100,000 critical healthcare workers short by 2028**. Allied health vacancies run **more than double nursing's** — in imaging, nearly **1 in 5 CT tech jobs sits open**. Clinical hiring has gone from **a challenge to a crisis**." },
+        { cue:"The shortage", text:"Healthcare is **short on people**, and it's getting worse. We're projected to be **more than 100,000 critical healthcare workers short by 2028**. In imaging, nearly **1 in 5 CT tech jobs** sits open. Clinical hiring has gone from **a challenge to a crisis**." },
         { cue:"Not for lack of trying", text:"And it's **not for lack of trying**. You've worked every local school and every referral — and you're still fighting every other system for **the same small class**. There just **aren't enough graduates**: nursing schools turned away **80,000 qualified applications** in a single year for lack of faculty and clinical spots, and **30% of U.S. counties** don't have a single allied health program." },
-        { cue:"So", text:"So TA teams can't wait for talent to come to them anymore. They have to be **proactive, not reactive**." },
-        { cue:"Now it turns out", text:"Now it turns out the students who **do** get in are **paying for it**. **Half of all RNs** borrowed for school, and PTs, OTs and CRNAs graduate with **six figures** of debt." },
+        { cue:"Now it turns out", text:"Now it turns out the students who **do** get in are **paying for it**. PTs, OTs and CRNAs graduate with **six figures** of debt, and **half of all RNs** borrowed just to get in." },
         { cue:"It just got worse", text:"And on July 1st, the government **eliminated Grad PLUS** — the loan that covered the full cost of school. It even tried to say nursing **isn't a professional degree**. That's in court, but students hear the message loud and clear: **the barrier to a healthcare career is getting higher**." },
         { cue:"We don't appreciate", text:"So everybody understands clinical hiring is **getting harder**. What we don't always appreciate is **how much it's costing us**. And with **43% of hospitals operating at a loss** — **up from a third before COVID** — there's **no budget left to throw at the problem**." },
       ]},
       { kind:"say", title:"The gap", slide:"Chart · the gap", proof:["Concept chart — two lines, not plotted data","Labor expenses up 16% in three years: Kaufman Hall Flash Report (Aug 2026)"], beats:[
         { cue:"Show it", text:"So here's what that looks like." },
         { cue:"Walk the chart", text:"The top line is **the people you need** — and it keeps going up. The bottom line is **the grads available to hire**. It was already flat — and now the debt crisis is **pushing it down**." },
-        { cue:"The gap", text:"That shaded space in between? **That's the gap.** And you pay for every inch of it — **sign-ons, travelers, overtime**. It's a big part of why labor costs are **up 16% in three years**." },
+        { cue:"The gap", text:"That shaded space in between? **That's the gap.** And you pay for every inch of it — **sign-ons, travelers, overtime**." },
         { cue:"Wider", text:"And it's **only getting wider**." },
       ]},
       { kind:"say", title:"Multiply it", slide:"Chart · across your system", proof:["Travel RN ~$91.23/hr vs staff RN ~$59.46/hr incl. benefits (playbook) → ~$32/hr × 2,080 hrs ≈ $66K more per role per year","10 roles ≈ $660K · 50 roles ≈ $3.3M — nurse rates; say \"for a nurse\" if pressed"], beats:[
         { cue:"Multiply it", text:"Now, of course, when you multiply that across your system — every role in that gap you cover with a traveler costs about **$66,000 more a year** than a staff hire." },
         { cue:"Scale it", text:"So **10 open roles** isn't a rounding error — it's **over $650,000**. **Fifty** is **more than $3 million**. And that's **every year** the gap stays open." },
       ]},
-      { kind:"say", title:"Two bad choices", slide:"Two bad choices", proof:["Contract labor 2% → 11% of total labor cost, 2019–2022 (Kaufman Hall); it has cooled since — say \"in three years,\" not \"today\""], beats:[
-        { cue:"It gets worse", text:"Now, the last piece of this before I show you how we help — **it gets even worse** when you're short-staffed, just like a lot of systems are right now. You've got units to staff and services to keep open." },
+      { kind:"say", title:"Two bad choices", slide:"The gap gets even WORSE when you're short-staffed…", proof:["Slide: two questions, each with a \"But…\" underneath","Backup if they push on spend: contract labor went from 2% to 11% of hospital labor costs, 2019–2022 (Kaufman Hall)"], beats:[
+        { cue:"It gets worse", text:"Now, the last piece of this before we dig into your situation — **it gets even worse** when you're short-staffed." },
         { cue:"Two choices", text:"So you've got a choice, right? **Two bad choices.**", list:[
-          { tag:"Pay", text:"Do you keep paying whatever it takes to **fill the gap**? Contract labor went from **2% to 11%** of hospital labor costs in three years. That means **rising sign-ons**, **expensive travelers** and **overtime** — on a budget you don't have." },
-          { tag:"Hold", text:"Or do you hold the line on spend? But that means roles sit open, your current staff **burns out** — and that **drives even more turnover**." },
+          { tag:"1", text:"Number one: **do you fill every seat?** But pay whatever it takes in **sign-ons, travelers and overtime**?" },
+          { tag:"2", text:"Or number two: **do you hold the line on spend?** But leave roles open and **burn out the team you have**?" },
         ]},
         { cue:"The question", text:"So **which expensive problem do you want to pay the price on?**" },
         { cue:"Help you answer it", text:"What I want to do today is **help you answer that question**." },
