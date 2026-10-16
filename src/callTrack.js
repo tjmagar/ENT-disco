@@ -124,6 +124,13 @@ export const STAGE_DATA = {
   "orient": {
     rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
     script:[
+      { kind:"say", title:"The big picture", beats:[
+        { cue:"What we're seeing", text:"Here's what we're seeing across healthcare. New grads are finishing school with **more debt than ever** — and it's **top of mind** when they pick where to work." },
+        { cue:"How systems respond", text:"Most systems answer with **sign-on bonuses**. But that's become an **arms race** — everyone offers one, they keep going up, and new grads **take the cash and move on** after a year." },
+        { cue:"What it leads to", text:"So you end up **paying to hire the same role twice** — more sign-ons, more travelers, more turnover." },
+        { cue:"What if", text:"**What if** you could turn the thing new grads are most stressed about — **their student loans** — into the reason they **choose you and stay**?" },
+        { cue:"How it works", text:"That's what we do. You offer **student loan repayment** as a benefit, paid **monthly while they're employed**. We get the word out to students **before they graduate**, and we **run the program** end to end." },
+      ]},
       { kind:"say", title:"Three outcomes", slide:"Slide 2 · Three outcomes", beats:[
         { cue:"Next slide", text:"And through speaking with HR and TA leaders, **the three areas where we tend to drive the most value**, and where a partnership often makes sense, are here on your screen:" },
         { cue:"Three outcomes", text:"", list:[
@@ -145,6 +152,7 @@ export const STAGE_DATA = {
         { cue:"Acknowledge + start", when:"funnel", text:"Okay, let's talk about what we do to help you **build that pipeline**. And I'd love to understand **what you're currently doing**, so we can explore any opportunities to **amplify that** and be **additive to your team**." },
         { cue:"Acknowledge + start", when:"notFunnel", text:"Okay, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't feel relevant**." },
         { cue:"Check the picture", check:"answer", text:"Before I show you anything — **what am I missing from this picture?**" },
+        { cue:"Show it", text:"**Let me show you exactly what this looks like.**" },
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", slide:"Slide 3 · 4 channels", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
         { cue:"What if", text:"**What if you could** have more new grads **raising their hand to work for you** — before they even graduate?" },
