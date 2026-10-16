@@ -152,7 +152,7 @@ export const STAGE_DATA = {
         { cue:"So", text:"So TA teams can't wait for talent to come to them anymore. They have to be **proactive, not reactive**." },
         { cue:"Now it turns out", text:"Now it turns out the students who **do** get in are **paying for it**. **Half of all RNs** borrowed for school, and PTs, OTs and CRNAs graduate with **six figures** of debt." },
         { cue:"It just got worse", text:"And on July 1st, the government **eliminated Grad PLUS** — the loan that covered the full cost of school. It even tried to say nursing **isn't a professional degree**. That's in court, but students hear the message loud and clear: **the barrier to a healthcare career is getting higher**." },
-        { cue:"We don't appreciate", text:"So everybody understands clinical hiring is hard. What we don't always appreciate is how much **the debt crisis is shrinking the pipeline** — before those students ever reach you." },
+        { cue:"We don't appreciate", text:"So everybody understands clinical hiring is **getting harder**. What we don't always appreciate is how much this is **impacting quality of care**." },
       ]},
       { kind:"say", title:"One hire", slide:"Chart · stays vs. leaves", proof:["Stays: the sign-on, and that's it","Leaves: the sign-on + ~$60,090 to replace (NSI 2025: recruiting, onboarding, overtime and premium coverage)"], beats:[
         { cue:"One example", text:"So here's an example just to illustrate how expensive it is when **even one new grad leaves**." },
