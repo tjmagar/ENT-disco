@@ -151,12 +151,18 @@ export const STAGE_DATA = {
       { kind:"say", title:"The common theme", beats:[
         { cue:"Set it up", text:"Here's what **we're** seeing out there." },
       ]},
-      { kind:"say", title:"What we're seeing", slide:"Stat slide", proof:["Turnover + $60,090 per RN + $4.2–6.2M per hospital: NSI 2025 · Half leave within two years: Clasp Series B release · 30% of counties + 40–85% unfunded: Clasp 2026 Talent Outlook · 78 days to fill: playbook · Imaging 18.1% vacancy: ASRT","Loan caps: Grad PLUS ends July 1, 2026; nursing, PT, PA capped at $100K (check the lawsuit status) · 1 in 3 cutting back or switching: U.S. News survey","Betting: Clasp survey of 1,000 healthcare students (say \"a survey we ran\") · 89% rewards: 2026 healthcare workforce survey (Motivosity — don't name it) · −72%: Laudio"], beats:[
+      { kind:"say", title:"What we're seeing", slide:"Stat slide", proof:["Turnover + $60,090 per RN + $4.2–6.2M per hospital: NSI 2025 · Half leave within two years: Clasp Series B release · Allied vacancy 2x nursing: Clasp School Deserts · 30% of counties + 40–85% unfunded: Clasp 2026 Talent Outlook · 78 days to fill: playbook · Imaging 18.1% vacancy: ASRT","Loan caps: Grad PLUS ends July 1, 2026; nursing, PT, PA capped at $100K (check the lawsuit status) · 1 in 3 cutting back or switching: U.S. News survey","Betting: Clasp survey of 1,000 healthcare students (say \"a survey we ran\") · 89% rewards: 2026 healthcare workforce survey (Motivosity — don't name it) · −72%: Laudio"], beats:[
         { cue:"Not pretty", text:"And honestly — **it's not pretty**." },
-        { cue:"Turnover", text:"**Nearly 1 in 3 new hires** in hospitals **leave in their first year**. For new RNs, it's about **1 in 4**. And **nearly half of new clinicians leave within two years**." },
-        { cue:"The cost", text:"**Every RN who leaves costs about $60,000** to replace. For the average hospital, that's **$4 to $6 million a year**." },
-        { cue:"Harder to replace", when:"imaging", text:"And it's getting harder to replace them. An experienced RN role takes **78 days to fill**. In imaging, vacancy rates hit **18%** — **triple** what they were three years ago." },
-        { cue:"Harder to replace", when:"notImaging", text:"And it's getting harder to replace them. An experienced RN role takes **78 days to fill**." },
+        { cue:"Turnover", when:"noRole", text:"**Nearly 1 in 3 new hires** in hospitals **leave in their first year**. And **nearly half of new clinicians leave within two years**." },
+        { cue:"Turnover", when:"hasRole", text:"About **[role turnover] of new [role]s leave in their first year**. And across healthcare, **nearly half of new clinicians leave within two years**." },
+        { cue:"The cost", when:"noRole", text:"And it's expensive. Replacing **just one nurse** costs about **$60,000** — and nurse turnover **alone** runs the average hospital **$4 to $6 million a year**." },
+        { cue:"The cost", when:"isRN", text:"And it's expensive. **Every RN who leaves costs about $60,000** to replace. For the average hospital, that's **$4 to $6 million a year**." },
+        { cue:"The cost", when:"otherRole", text:"And it's expensive. Every one who leaves means **another [role sign-on] sign-on** to backfill — before you've paid to **cover the gap**." },
+        { cue:"Harder to replace", when:"noRole", text:"And it's getting harder to replace them. **Allied health vacancies often run more than double nursing's**. In imaging, vacancy hit **18%** — **triple** what it was three years ago. Even an experienced nurse takes **78 days** to fill." },
+        { cue:"Harder to replace", when:"isRN", text:"And it's getting harder to replace them. An experienced RN role takes **78 days to fill**." },
+        { cue:"Harder to replace", when:"isImaging", text:"And it's getting harder to replace them. In imaging, vacancy hit **18%** — **triple** what it was three years ago." },
+        { cue:"Harder to replace", when:"otherAllied", text:"And it's getting harder to replace them. **Allied health vacancies often run more than double nursing's**." },
+        { cue:"Harder to replace", when:"otherNursing", text:"And it's getting harder to replace them — **every system in town is fighting over the same small class**." },
         { cue:"Can't backfill", text:"And the pipeline can't backfill it — **about 30% of U.S. counties don't have a single allied health training program**." },
         { cue:"The debt", when:"noRole", text:"**Now layer on the student debt crisis.** A new grad PT walks out with **$142,000** in debt. OTs and CRNAs, **$175,000 or more**." },
         { cue:"The debt", when:"hasRole", text:"**Now layer on the student debt crisis.** **[role loans] of [role] grads** have student loans — averaging **[role debt]**." },
@@ -168,18 +174,18 @@ export const STAGE_DATA = {
       { kind:"say", title:"One hire", slide:"Chart · stays vs. leaves", proof:["Stays: the sign-on, and that's it","Leaves: the sign-on + ~$60,090 to replace (NSI 2025: recruiting, onboarding, overtime and premium coverage)"], beats:[
         { cue:"One example", text:"So here's an example just to illustrate how expensive it is when **even one new grad leaves**." },
         { cue:"Walk the chart", text:"The red line is a new grad who **stays**, the teal line is one who **leaves** — and this is what you spend on each over their first two years. Both get the **same sign-on** on day one, right? For the one who stays, that's it. That's your cost." },
-        { cue:"It gets worse", text:"Okay. That's only one hire. Now it actually gets worse. The one who leaves at month 12 doesn't just walk out with the sign-on. **The role sits open** — for about **78 days**. You're paying for recruiting, onboarding, overtime, and **travelers at $91 an hour** versus $59 for staff." },
+        { cue:"It gets worse", text:"Okay. That's only one hire. Now it actually gets worse. The one who leaves at month 12 doesn't just walk out with the sign-on. **The role sits open** — for about **78 days**. You're paying for recruiting, onboarding, overtime, and **travelers** — for a nurse, that's **$91 an hour** versus $59 for staff." },
         { cue:"Backfill", text:"Then you pay **another sign-on** to backfill." },
-        { cue:"Two years", text:"So when we extend the timeline to 2 years — assuming your second hire even stays — that one departure cost you about **$60,000** more than the hire who stayed." },
+        { cue:"Two years", text:"So when we extend the timeline to 2 years — assuming your second hire even stays — that one departure cost you **tens of thousands** more than the hire who stayed. For a nurse, it's about **$60,000**." },
         { cue:"Why I share it", text:"And the reason I share this isn't because you need to be taught that turnover is hard. It's to make clear just **how expensive even one new grad leaving is**." },
       ]},
       { kind:"say", title:"Multiply it", slide:"Chart · across the system", proof:["Every 1-point change in RN turnover costs or saves the average hospital ~$295K a year (NSI 2025)"], beats:[
-        { cue:"Scale it", text:"Now, of course, when you multiply this across the system — **every single point of RN turnover** costs the average hospital about **$295,000 a year**. We're not just talking $60,000 anymore. We're talking **millions**. And you hire a new class **every year**." },
+        { cue:"Scale it", text:"Now, of course, when you multiply this across the system — **every single point of nurse turnover alone** costs the average hospital about **$295,000 a year**. Add in therapy, imaging and every other clinical role, and we're not just talking tens of thousands anymore. We're talking **millions**. And you hire a new class **every year**." },
       ]},
       { kind:"say", title:"Two bad choices", slide:"Two bad choices", beats:[
         { cue:"It gets worse", text:"Now, the last piece of this before I show you how we help — **it gets even worse** when you're short-staffed, just like a lot of systems are right now. You've got units to staff and services to keep open." },
         { cue:"Two choices", text:"So you've got a choice, right? **Two bad choices.**", list:[
-          { tag:"Pay", text:"Do you keep paying whatever it takes to fill the roles? But that means **rising sign-ons**, **travelers at $91 an hour**, and **nearly 1 in 3 new hires walking out** in year one." },
+          { tag:"Pay", text:"Do you keep paying whatever it takes to fill the roles? But that means **rising sign-ons**, **expensive travelers**, and **nearly 1 in 3 new hires walking out** in year one." },
           { tag:"Hold", text:"Or do you hold the line on spend? But that means roles sit open, your current staff **burns out** — and that **drives even more turnover**." },
         ]},
         { cue:"The question", text:"So **which expensive problem do you want to pay the price on?**" },
@@ -187,7 +193,7 @@ export const STAGE_DATA = {
       ]},
     ],
     tips:["If they named a role in intros, tap it so the numbers are theirs.","Keep it to about 3 minutes. It's a story, not a lecture."],
-    watch:["Turning it into a lecture — if they jump in, let them","Using \"millions\" for a small system — say \"hundreds of thousands, every year\"","Using the imaging 18% as nursing proof — tap the role so it drops out"],
+    watch:["Turning it into a lecture — if they jump in, let them","Using \"millions\" for a small system — say \"hundreds of thousands, every year\"","Saying the $60K or $295K numbers are for every role — they're nurse numbers"],
   },
   "value-drop": {
     rule:"Follow their interest. Focus the conversation on the area they chose. All three: pipeline, then spend, then retention.",

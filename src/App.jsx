@@ -171,9 +171,9 @@ function loadEdits() {
   try {
     const e = JSON.parse(localStorage.getItem(EDITS_KEY) || "{}");
     // v2: the pain-narrative restructure shifted lines in these stages, so older edits there would land on the wrong line.
-    if ((e.__v || 0) < 7) {
+    if ((e.__v || 0) < 8) {
       Object.keys(e).forEach(k => { if (/^(orient|about-clasp|pain-narrative|relationship-check|turnover|context|summary-buyin):/.test(k)) delete e[k]; });
-      e.__v = 7;
+      e.__v = 8;
       localStorage.setItem(EDITS_KEY, JSON.stringify(e));
     }
     applyEdits(e); return e;
@@ -362,7 +362,10 @@ export default function App() {
     notFunnel: !!captures.startArea && captures.startArea !== "Pipeline" && captures.startArea !== "All three",
     spendArea: captures.startArea === "Labor cost", retentionArea: captures.startArea === "Retention",
     hasRole: !!captures.role, noRole: !captures.role,
-    imaging: !captures.role || captures.role === "Rad Tech", notImaging: !!captures.role && captures.role !== "Rad Tech" };
+    isRN: captures.role === "RN", isImaging: captures.role === "Rad Tech",
+    otherRole: !!captures.role && captures.role !== "RN",
+    otherAllied: !!captures.role && !["RN","Rad Tech","LPN","CRNA","NP / PA"].includes(captures.role),
+    otherNursing: ["LPN","CRNA","NP / PA"].includes(captures.role) };
   // Sub-tracks (e.g. sign-ons vs contract labor) show only what was picked; nothing picked shows all.
   const subVisible = (it, picks = captures) => {
     if (it.when && !beatConditions[it.when]) return false;
