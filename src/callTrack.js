@@ -144,8 +144,10 @@ export const STAGE_DATA = {
       { kind:"say", beats:[
         { cue:"Acknowledge + start", when:"funnel", text:"Okay, let's talk about what we do to help you **build that pipeline**. And I'd love to understand **what you're currently doing**, so we can explore any opportunities to **amplify that** and be **additive to your team**." },
         { cue:"Acknowledge + start", when:"notFunnel", text:"Okay, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't feel relevant**." },
+        { cue:"Check the picture", check:"answer", text:"Before I show you anything — **what am I missing from this picture?**" },
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", slide:"Slide 3 · 4 channels", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
+        { cue:"What if", text:"**What if you could** have more new grads **raising their hand to work for you** — before they even graduate?" },
         { cue:"The outcome", text:"So building pipeline is honestly where we **really excel** for our partners." },
         { cue:"Three ways", text:"And there's really **3 steps** to producing great outcomes here:", list:[
           { tag:"Educate", text:"First, we **educate the students** that a program like this even exists. We want them to know that you're an **innovative org** offering this great benefit." },
@@ -198,6 +200,7 @@ export const STAGE_DATA = {
         { cue:"Summarize", text:"So it's not just more people in the funnel — your recruiters have what they need to **get them to yes**." },
       ]},
       { kind:"say", group:"Labor cost", title:"Open", slide:"Slide 9 · Duct tape on a leaky bucket", beats:[
+        { cue:"What if", text:"**What if you could** spend less on **sign-ons and travelers** — and still fill the roles?" },
         { cue:"Bridge", text:"So this is a great way we help our partners **avoid cost** and get more of their **budget back** to take on other projects." },
         { cue:"Ask", check:"answer", text:"By offering a Student Loan Repayment program, it does more than just build pipeline. It can help you **spend less on sign-on bonuses and contract labor**. Do you currently spend money on either of these for **Nursing, Imaging Techs, or Rehab Therapists**?" },
       ]},
@@ -224,6 +227,7 @@ export const STAGE_DATA = {
         { cue:"Check in", check:"answer", text:"**Is that a gap you're feeling right now, or is contract labor pretty well under control?**" },
       ]},
       { kind:"say", group:"Retention", title:"Built to keep them", slide:"Slide 8 · Structured to keep them", proof:["Partners' year-1 turnover is ~5% vs an industry average above 20%","Paid monthly once they're an employee; payments can step up in year 2"], beats:[
+        { cue:"What if", text:"**What if** the people you hire **stayed 3, 4, or 5 years**?" },
         { cue:"Bridge", text:"Building pipeline and saving on spend are important — but there's another area where we tend to have an impact, and for a lot of partners it ends up mattering most. We're also helping them **retain and grow their employees**." },
         { cue:"Built to stay", text:"The way your Student Loan Repayment program is structured **encourages people to stay 3, 4, or 5 years**. The amount is spread out monthly over that period and paid while they're employed. **It works a lot like a 401K match** — an incentive to stay to get the full amount." },
         { cue:"Proof", text:"It's a big part of why our partners tend to see **single-digit turnover, sometimes as low as 5%**, with the clinicians and techs in the program." },
@@ -345,6 +349,10 @@ export const STAGE_DATA = {
       ]},
       { kind:"say", title:"If someone key wasn't on the call", beats:[
         { cue:"Bring them in", text:"Okay, so we have our **next conversation set up**. We'll **invite [who should join]** to that. If they can make it, great. If not, we'll set up **another meeting with them** to bring them up to speed and **get their perspective**." },
+      ]},
+      { kind:"say", title:"If they need more people involved", beats:[
+        { cue:"Propose the map", check:"answer", text:"In our experience, a decision like this usually touches **total rewards, workforce development, IT, legal, and finance**. **Who else would you want in the room** for the next conversation?" },
+        { cue:"Send a manager", text:"And if it's easier, you can **send a manager to vet it on your behalf** — we'll get them up to speed." },
       ]},
       { kind:"say", title:"If they say \"not right now\"", beats:[
         { cue:"Label it", text:"That makes total sense — it sounds like **that project has to land first**, and you don't want to add something half-baked on top of it." },
@@ -707,7 +715,7 @@ export const ROLE_CARDS = [
 
 // Straight answers to what prospects ask mid-call. Short enough to read live.
 export const QUICK_ANSWERS = [
-  { q:"What does it cost? (asked early)", a:"Great question. Pricing is built around **how many hires we drive** for you. I find it helpful to see that **the all-in cost wouldn't break the bank** — so let's put it next to what you spend on **sign-ons and turnover** today. Mind if I ask a couple of questions so the numbers are **actually yours**?" },
+  { q:"What does it cost? (asked early)", a:"Fair question. It's about **$45K to set up**, then roughly **$10K a month**, depending on roles. I find it helpful to see that **the all-in cost wouldn't break the bank** — so let's put it next to what you spend on **sign-ons and turnover** today. Mind if I ask a couple of questions so the numbers are **actually yours**? And the numbers I use are **conservative**." },
   { q:"Are those hires or just leads?", a:"**Hires.** Students sign an agreement in their final stretch of school committing to join you when they graduate — and **about 95%** of them follow through." },
   { q:"We're a state / federal institution. Is that a problem?", a:"**Not a barrier.** We work with state- and federally-affiliated systems. Contracting can take a few extra steps, and we'll walk through them with you." },
   { q:"Any conflict with PSLF?", a:"**No conflict with PSLF.**" },
