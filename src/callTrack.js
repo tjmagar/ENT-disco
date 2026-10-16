@@ -39,7 +39,7 @@ export const STAGE_META = {
 // What to jot down at each stage — kept to what you can type live.
 // Several of these fill [placeholders] in later scripts.
 export const CAPTURE = {
-  "rapport-opener":   [{ key:"win", label:"What would make today a win", hint:"Each person's answer" },
+  "rapport-opener":   [{ key:"win", label:"One thing they want out of today", hint:"Each person's answer" },
                        { key:"vibe", label:"Read on them", hint:"Pronouns, energy, anything they volunteered" }],
   "rules-engagement": [{ key:"agendaAdds", label:"Added to the agenda", hint:"Anything they want covered" }],
   "orient":           [{ key:"startArea", label:"Where they want to start", type:"choice", options:["Pipeline","Labor cost","Retention","All three"] },
@@ -79,11 +79,11 @@ export const STAGE_DATA = {
         { cue:"Ask permission", text:"Great, well mind if we talk about the **agenda**?\n\nPerfect. Quick intros before we dive in." },
         { cue:"Your intro", text:"My name is **TJ Magar**, I'm a Director of Healthcare Partnerships here at Clasp." },
         { cue:"Why you care", text:"I'm super passionate about this work because **I'm an agitated borrower myself** — I know how it feels to have that barrier to education. And I love that we're **breaking it down** for the most important workforce there is: **healthcare**." },
-        { cue:"Hand off", when:"hasColleague", check:"answer", text:"I've brought my colleague [colleague name] as well — and then I'd love to hear from you, maybe just **what would make today a win**. But [colleague name], want to go next?" },
-        { cue:"Hand off", when:"noColleague", check:"answer", text:"And I'd love to hear from you — maybe just **what would make today a win**?" },
+        { cue:"Hand off", when:"hasColleague", check:"answer", text:"I've brought my colleague [colleague name] as well — and then I'd love to hear from you — just **one thing you're hoping to get out of our time today**. But [colleague name], want to go next?" },
+        { cue:"Hand off", when:"noColleague", check:"answer", text:"And I'd love to hear from you — just **one thing you're hoping to get out of our time today**?" },
       ]},
     ],
-    tips:["Pronouns: I/me/my means personal stakes matter. We/us/our means team focus and consensus matter.","Energy: talkative, stay with it. Business, pivot. Don't force the wrong mode.","Write down what would make today a win for each person. It sets up the agenda."],
+    tips:["Pronouns: I/me/my means personal stakes matter. We/us/our means team focus and consensus matter.","Energy: talkative, stay with it. Business, pivot. Don't force the wrong mode.","Write down the one thing each person wants out of today. It sets up the agenda.","One thing each — if they start to ramble, thank them and move to the agenda."],
     watch:["Thanking the prospect for their time — immediately positions you lower","Letting intros run long — keep yours to two sentences"],
   },
   "rules-engagement": {
@@ -95,9 +95,9 @@ export const STAGE_DATA = {
         { cue:"Lower the stakes", text:"Obviously, I **don't expect us to do business** on this call. So let's just learn enough about each other to determine if another call makes sense." },
         { cue:"Check", check:true, text:"Is that **fair so far**?", then:"Perfect." },
         { cue:"Walk the agenda", text:"And here's the agenda I'm thinking will help us get there:", list:[
-          "First, I'll share **a little about Clasp** upfront so you have the context for the rest of the call.",
-          "But I'd love to spend **most of our time** today getting clear on **what's important to [their company]** — maybe the different challenges or goals you might have as they relate to **workforce recruitment, development, or retention**.",
-          "If it looks like we can help, I'll **explain how it works**.",
+          "First, I'll share **a few short slides** on the **problems we solve**, and you can tell me **which one is most relevant** for you.",
+          "Then I'll share **what we're seeing** out there, and ask you **a few quick questions** about where you are today.",
+          "If it looks like we can help, I'll **show you how it works**.",
           "Then we can **jointly decide** whether we set that next step. And I'll save some time at the end for that.",
         ]},
         { cue:"Check", check:true, text:"Does that agenda feel **reasonable enough**?", then:"Great — let's take a crack at it." },
