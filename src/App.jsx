@@ -171,9 +171,9 @@ function loadEdits() {
   try {
     const e = JSON.parse(localStorage.getItem(EDITS_KEY) || "{}");
     // v2: the pain-narrative restructure shifted lines in these stages, so older edits there would land on the wrong line.
-    if ((e.__v || 0) < 3) {
-      Object.keys(e).forEach(k => { if (/^(orient|pain-narrative|relationship-check|turnover|context|summary-buyin):/.test(k)) delete e[k]; });
-      e.__v = 3;
+    if ((e.__v || 0) < 4) {
+      Object.keys(e).forEach(k => { if (/^(orient|about-clasp|pain-narrative|relationship-check|turnover|context|summary-buyin):/.test(k)) delete e[k]; });
+      e.__v = 4;
       localStorage.setItem(EDITS_KEY, JSON.stringify(e));
     }
     applyEdits(e); return e;
@@ -1248,7 +1248,7 @@ const sd = STAGE_DATA[activeStage];
   const overTime = timeboxMs > 0 && stageElapsed > timeboxMs;
   // Next skips current-state stages for areas they didn't pick.
   const nextStage = STAGES.slice(currentIdx + 1).find(s => !s.area || !captures.startArea || captures.startArea === "All three" || captures.startArea === s.area || showAllAreas);
-  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","orient":"Which Hurts Most?","pain-narrative":"Pain Narrative","value-drop":"Value Drop: Talk Tracks","business-problem":"Hiring Needs Analysis","relationship-check":"School Partnerships","turnover":"Retention + Turnover","signon-spend":"Sign-on Spend","contract-labor":"Contract Labor","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
+  const stageTitle = {"prep":"Pre-Call Prep Brief","rapport-opener":"Opening + Intros","rules-engagement":"Objective → Agenda → Decision","about-clasp":"About Clasp","orient":"Which Hurts Most?","pain-narrative":"Pain Narrative","value-drop":"How We Solve It","business-problem":"Hiring Needs Analysis","relationship-check":"School Partnerships","turnover":"Retention + Turnover","signon-spend":"Sign-on Spend","contract-labor":"Contract Labor","baseline-current":"Current State","cause-analysis":"Cause Analysis","negative-impact":"Build Negative Impact","future-state":"Future State","close-next-steps":"Close + Next Steps","outputs":"Outputs"}[activeStage];
   const stageSub = {"prep":"Who's on the call, and anything you spotted.","outputs":"Generate your end-of-call outputs."}[activeStage];
   const isNumbered = /^\d+$/.test(STAGES[currentIdx]?.icon || "");
 
@@ -1268,7 +1268,7 @@ const sd = STAGE_DATA[activeStage];
         <div style={{ flex:1, padding:"6px 10px" }}>
           {["setup","orient","discovery","value","close"].map(group => {
             const groupStages = STAGES.filter(s => s.group === group);
-            const groupLabel = { setup:"Setup", orient:"Orient", discovery:"Current State", value:"Value", close:"Close" }[group];
+            const groupLabel = { setup:"Setup", orient:"Frame the Problem", discovery:"Current State", value:"How We Solve It", close:"Close" }[group];
             return (
               <div key={group} style={{ marginBottom:14 }}>
                 <div style={{ fontSize:10, fontWeight:700, color:C.textMuted, letterSpacing:"0.12em", textTransform:"uppercase", padding:"0 10px", marginBottom:4 }}>{groupLabel}</div>

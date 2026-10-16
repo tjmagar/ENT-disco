@@ -10,23 +10,25 @@ export const STAGES = [
   { id:"prep",               icon:"◎",  short:"Prep Brief",               group:"setup" },
   { id:"rapport-opener",     icon:"1",  short:"Opening + Intros",         group:"setup" },
   { id:"rules-engagement",   icon:"2",  short:"Objective + Agenda",       group:"setup" },
-  { id:"orient",             icon:"3",  short:"Which Hurts Most",         group:"orient" },
+  { id:"about-clasp",        icon:"3",  short:"About Clasp",              group:"setup" },
   { id:"pain-narrative",     icon:"4",  short:"Pain Narrative",           group:"orient" },
-  { id:"business-problem",   icon:"5",  short:"Hiring Needs Analysis",    group:"discovery" },
-  { id:"relationship-check", icon:"6",  short:"School Partnerships",      group:"discovery", area:"Pipeline" },
-  { id:"turnover",           icon:"7",  short:"Retention + Turnover",     group:"discovery", area:"Retention" },
-  { id:"signon-spend",       icon:"8",  short:"Sign-on Spend",            group:"discovery", area:"Labor cost" },
-  { id:"contract-labor",     icon:"9",  short:"Contract Labor",           group:"discovery", area:"Labor cost" },
-  { id:"value-drop",         icon:"10", short:"Value Drop",               group:"value" },
-  { id:"close-next-steps",   icon:"11", short:"Close + Next Steps",       group:"close" },
+  { id:"orient",             icon:"5",  short:"Which Hurts Most",         group:"orient" },
+  { id:"business-problem",   icon:"6",  short:"Hiring Needs Analysis",    group:"discovery" },
+  { id:"relationship-check", icon:"7",  short:"School Partnerships",      group:"discovery", area:"Pipeline" },
+  { id:"turnover",           icon:"8",  short:"Retention + Turnover",     group:"discovery", area:"Retention" },
+  { id:"signon-spend",       icon:"9",  short:"Sign-on Spend",            group:"discovery", area:"Labor cost" },
+  { id:"contract-labor",     icon:"10", short:"Contract Labor",           group:"discovery", area:"Labor cost" },
+  { id:"value-drop",         icon:"11", short:"How We Solve It",          group:"value" },
+  { id:"close-next-steps",   icon:"12", short:"Close + Next Steps",       group:"close" },
 ];
 
-// Timeboxes add up to about 27 minutes on any one path (only their pick's current-state stages), leaving a few to spare.
+// Timeboxes add up to about 29 minutes on any one path (only their pick's current-state stages), leaving a few to spare.
 export const STAGE_META = {
   "rapport-opener":   { phase:"OPEN",             timebox:"2 min" },
   "rules-engagement": { phase:"ALIGN",            timebox:"1 min" },
-  "orient":           { phase:"ORIENT",           timebox:"2 min" },
+  "about-clasp":      { phase:"ABOUT CLASP",      timebox:"2 min" },
   "pain-narrative":   { phase:"PAIN NARRATIVE",   timebox:"3 min" },
+  "orient":           { phase:"WHICH HURTS MOST", timebox:"2 min" },
   "business-problem": { phase:"CURRENT STATE",    timebox:"3 min" },
   "relationship-check": { phase:"CURRENT STATE",  timebox:"2 min" },
   "turnover":         { phase:"CURRENT STATE",    timebox:"2 min" },
@@ -95,9 +97,9 @@ export const STAGE_DATA = {
         { cue:"Lower the stakes", text:"Obviously, I **don't expect us to do business** on this call. So let's just learn enough about each other to determine if another call makes sense." },
         { cue:"Check", check:true, text:"Is that **fair so far**?", then:"Perfect." },
         { cue:"Walk the agenda", text:"And here's the agenda I'm thinking will help us get there:", list:[
-          "First, I'll share **a few short slides** on the **problems we solve**, and you can tell me **which one is most relevant** for you.",
-          "Then I'll share **what we're seeing** out there, and ask you **a few quick questions** about where you are today.",
-          "If it looks like we can help, I'll **show you how it works**.",
+          "First, I'll share **a little about Clasp** and **what we're seeing** out there.",
+          "Then you can tell me **which problem is most relevant** for you, and I'll ask **a few quick questions** about where you are today.",
+          "If it looks like we can help, I'll show you **at a high level how we solve it**.",
           "Then we can **jointly decide** whether we set that next step. And I'll save some time at the end for that.",
         ]},
         { cue:"Check", check:true, text:"Does that agenda feel **reasonable enough**?", then:"Great — let's take a crack at it." },
@@ -107,7 +109,23 @@ export const STAGE_DATA = {
     watch:["Rushing past the fairness checks without pausing","Skipping the agenda after they agree to the objective"],
   },
   "orient": {
-    rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
+    rule:"Lay out the three problems, then let them pick the one that hurts most. Their pick steers current state and how we solve it.",
+    script:[
+      { kind:"say", title:"Three outcomes", slide:"Slide 2 · Three outcomes", beats:[
+        { cue:"Bridge", text:"And through speaking with HR and TA leaders, it usually shows up in **one of three places**:" },
+        { cue:"Three outcomes", text:"", list:[
+          { tag:"Pipeline", text:"So first, **pipeline**. Some partners tell us they **aren't able to build a bigger, more sustainable pipeline** of soon-to-graduate talent for critical clinical and allied health roles — and by the time those grads **hit the open market**, they're **competing with every system in town** for the same small pool." },
+          { tag:"Labor cost", text:"Second, **the spend**. Others tell us they're **spending too much**, whether it be on sign-on bonuses that **aren't showing ROI**, on contract labor that's **eating into their operating margin**, or on recruiting just to keep roles filled." },
+          { tag:"Retention", text:"And last but not least, **retention**. Some partners tell us they do great at building pipeline, but **still struggle to keep people**. Often their benefits and programs **reward joining, not staying** — so they're **losing good people** to the system across the street." },
+        ]},
+        { cue:"Hand it to them", check:"answer", text:"So **help me understand where you fit here** — which of these three is **the biggest challenge for you today**?" },
+      ]},
+    ],
+    tips:["Mark the area they pick in the capture pane. Current state and How We Solve It follow it."],
+    watch:["Picking the area for them — let them choose"],
+  },
+  "about-clasp": {
+    rule:"Find out what they already know, then give the short version of who we are. End on the common theme.",
     script:[
       { kind:"say", title:"Context", slide:"Slide 1 · Title", beats:[
         { cue:"Set up the slides", text:"Great, so like I mentioned, to set **a strong foundation** for the call, I've prepared **a few short slides** to give you some context on **the problems we solve**." },
@@ -117,40 +135,26 @@ export const STAGE_DATA = {
         { cue:"Who we work with", text:"Those partners range from **large health systems** like **Novant Health** and **Northwestern Medicine**, **smaller** like **Saint Alphonsus**, and even **specialty clinics** like **Confluent Health**." },
         { cue:"The common theme", text:"But no matter the size or structure, there's **a common theme** we've seen — and it's **why our founder built Clasp**." },
       ]},
-      { kind:"say", title:"Three outcomes", slide:"Slide 2 · Three outcomes", beats:[
-        { cue:"Three outcomes", text:"", list:[
-          { tag:"Pipeline", text:"So first, **pipeline**. Some partners tell us they **aren't able to build a bigger, more sustainable pipeline** of soon-to-graduate talent for critical clinical and allied health roles — and by the time those grads **hit the open market**, they're **competing with every system in town** for the same small pool." },
-          { tag:"Labor cost", text:"Second, **the spend**. Others tell us they're **spending too much**, whether it be on sign-on bonuses that **aren't showing ROI**, on contract labor that's **eating into their operating margin**, or on recruiting just to keep roles filled." },
-          { tag:"Retention", text:"And last but not least, **retention**. Some partners tell us they do great at building pipeline, but **still struggle to keep people**. Often their benefits and programs **reward joining, not staying** — so they're **losing good people** to the system across the street." },
-        ]},
-        { cue:"Hand it to them", check:"answer", text:"But enough about our partners and the types of problems we solve for them… **help me understand where you fit here**, and **where would be the most relevant place for us to spend our time today?**" },
-      ]},
     ],
-    tips:["Mark the area they pick in the capture pane. Discovery and the Value Drop follow it."],
-    watch:["Picking the area for them — let them choose"],
+    tips:["Keep it short. The point is to set up the pain narrative, not to pitch."],
+    watch:["Turning it into a full pitch"],
   },
   "pain-narrative": {
-    rule:"Teach the pain before you ask about it. Their pick sets the stat slide; the role fills the numbers.",
+    rule:"Teach the pain before you ask about it. Covers all three problems so the pick lands. Tap a role if they named one.",
     script:[
       { kind:"picker", key:"role", label:"Which role? (fills the numbers · none = RN)", options:[
         { value:"RN", sub:"" }, { value:"LPN", sub:"" }, { value:"PT", sub:"" }, { value:"OT", sub:"" }, { value:"SLP", sub:"" },
         { value:"CRNA", sub:"" }, { value:"RT", sub:"" }, { value:"Rad Tech", sub:"" }, { value:"Surg Tech", sub:"" },
         { value:"NP / PA", sub:"" }, { value:"Therapist", sub:"" }, { value:"Social Worker", sub:"" }, { value:"Optometrist", sub:"" }, { value:"DVM", sub:"" },
       ]},
-      { kind:"say", title:"You're not alone", beats:[
-        { cue:"Open", text:"So you've just shared with me that **[their focus]** is your main focus… and let me just tell you, **you're not alone** — you're in the right spot." },
+      { kind:"say", title:"The common theme", beats:[
         { cue:"Set it up", text:"Here's what **we're** seeing out there." },
       ]},
-      { kind:"say", title:"What we're seeing", slide:"Stat slide · their pick", proof:["Role numbers come from the battle cards","Sign-on ROI: every $10K creates about $2,800 of value (Laudio)"], beats:[
-        { cue:"The stat", when:"funnel", text:"**[role loans] of [role] grads have student loans**, right? New grad hiring has become **a zero-sum fight**. Every system in town is recruiting from the **same small class**, and by the time they hit the open market, you're **competing with everyone**." },
-        { cue:"Now it turns out", when:"funnel", text:"Now it turns out the average [role] graduates with **[role debt] in debt** — and it's **top of mind** when they pick where to work." },
-        { cue:"We don't appreciate", when:"funnel", text:"So everybody understands new grads are hard to recruit. What we don't always appreciate is **how many we're losing to whoever helps with that debt first**." },
-        { cue:"The stat", when:"spendArea", text:"The typical [role] sign-on is **[role sign-on]**, right? Sign-ons have become **an arms race**. Everyone offers one because everyone else does, and they **keep going up** every year." },
-        { cue:"Now it turns out", when:"spendArea", text:"Now it turns out every **$10K in sign-ons creates about $2,800 of value** — a **−72% return**." },
-        { cue:"We don't appreciate", when:"spendArea", text:"So everybody understands you have to offer something to compete. What we don't always appreciate is **how much of that money walks out the door**." },
-        { cue:"The stat", when:"retentionArea", text:"About **[role turnover] of [role] new grads leave in their first year**, right? New grad retention has become **a revolving door**. They take the sign-on, work a year, and **walk across the street** for the next one." },
-        { cue:"Now it turns out", when:"retentionArea", text:"Now it turns out every one who leaves means paying **[role sign-on] again** just to backfill — and that's before the cost of **covering the gap**." },
-        { cue:"We don't appreciate", when:"retentionArea", text:"So everybody understands turnover is part of healthcare. What we don't always appreciate is **how much we're paying to hire the same role twice**." },
+      { kind:"say", title:"What we're seeing", slide:"Stat slide", proof:["Role numbers come from the battle cards","Sign-on ROI: every $10K creates about $2,800 of value (Laudio)"], beats:[
+        { cue:"The debt", text:"**[role loans] of [role] grads have student loans**, averaging **[role debt]** — and it's **top of mind** when they pick where to work. So every system in town is fighting over the **same small class**." },
+        { cue:"The arms race", text:"Systems answer with sign-ons — typically **[role sign-on]** for a [role]. It's become **an arms race**. And it turns out every **$10K in sign-ons creates about $2,800 of value** — a **−72% return**." },
+        { cue:"The revolving door", text:"And still, about **[role turnover] of [role] new grads leave in their first year**. They take the sign-on, work a year, and **walk across the street** for the next one." },
+        { cue:"We don't appreciate", text:"So everybody understands new grads are hard to hire and keep. What we don't always appreciate is **how much it's costing us**." },
       ]},
       { kind:"say", title:"One hire", slide:"Chart · stays vs. leaves", proof:["Stays: $10K sign-on = $10K","Leaves: $10K sign-on + 4 months of traveler coverage at ~$2,200/week (~$38K) + another $10K sign-on = ~$58K"], beats:[
         { cue:"One example", text:"So here's an example just to illustrate how expensive it is when **even one new grad leaves**." },
@@ -170,13 +174,10 @@ export const STAGE_DATA = {
           { tag:"Hold", text:"Or do you hold the line on spend? But that means roles sit open, your current staff **burns out** — and that **drives even more turnover**." },
         ]},
         { cue:"The question", text:"So **which expensive problem do you want to pay the price on?**" },
-      ]},
-      { kind:"say", title:"What if", slide:"What if", beats:[
-        { cue:"What if", text:"What I'm about to show you is something that **helps you answer this question**. **What if you could fill your hardest roles and keep them — without spending more?**" },
-        { cue:"Marry them", text:"Those 2 goals are often **at odds** with each other. What I'm going to show you **marries them together**, so that you get **the best of both worlds**." },
+        { cue:"Hold that thought", text:"Hold that thought — we'll come back to it." },
       ]},
     ],
-    tips:["Tap the role first so the numbers are theirs.","Keep it to about 3 minutes. It's a story, not a lecture."],
+    tips:["If they named a role in intros, tap it so the numbers are theirs.","Keep it to about 3 minutes. It's a story, not a lecture."],
     watch:["Turning it into a lecture — if they jump in, let them","Using \"millions\" for a small system"],
   },
   "value-drop": {
@@ -187,6 +188,9 @@ export const STAGE_DATA = {
         { cue:"Acknowledge + start", when:"funnel", text:"Okay, let's talk about what we do to help you **build that pipeline**. And I'd love to understand **what you're currently doing**, so we can explore any opportunities to **amplify that** and be **additive to your team**." },
         { cue:"Acknowledge + start", when:"notFunnel", text:"Okay, let's start with how we help our partners [the area they chose]. And feel free to **stop me if any of this doesn't feel relevant**." },
         { cue:"Check the picture", check:"answer", text:"Before I show you anything — **what am I missing from this picture?**" },
+        { cue:"Back to the question", text:"So — remember that question: **which expensive problem do you want to pay the price on?** What I'm about to show you **helps you answer it**." },
+        { cue:"What if", text:"**What if you could fill your hardest roles and keep them — without spending more?**" },
+        { cue:"Marry them", text:"Those 2 goals are often **at odds** with each other. What I'm going to show you **marries them together**, so that you get **the best of both worlds**." },
       ]},
       { kind:"say", group:"Pipeline", title:"The outcome", slide:"Slide 3 · 4 channels", proof:["Channels: school penetration, social + influencers, associations + conferences, campus ambassadors + virtual career fairs"], beats:[
         { cue:"What if", text:"**What if you could** have more new grads **raising their hand to work for you** — before they even graduate?" },
