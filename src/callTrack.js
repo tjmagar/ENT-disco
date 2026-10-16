@@ -140,35 +140,18 @@ export const STAGE_DATA = {
     watch:["Turning it into a full pitch"],
   },
   "pain-narrative": {
-    rule:"Teach the pain before you ask about it. Covers all three problems so the pick lands. Tap a role if they named one.",
+    rule:"Teach the pain before you ask about it: the shortage, then the debt crisis making it worse.",
     script:[
-      { kind:"picker", key:"role", label:"Which role? (fills the numbers · skip = broad healthcare version)", options:[
-        { value:"RN", sub:"" }, { value:"LPN", sub:"" }, { value:"PT", sub:"" }, { value:"OT", sub:"" }, { value:"SLP", sub:"" },
-        { value:"CRNA", sub:"" }, { value:"RT", sub:"" }, { value:"Rad Tech", sub:"" }, { value:"Surg Tech", sub:"" },
-        { value:"NP / PA", sub:"" }, { value:"Therapist", sub:"" }, { value:"Social Worker", sub:"" }, { value:"Optometrist", sub:"" }, { value:"DVM", sub:"" },
-      ]},
       { kind:"say", title:"The common theme", beats:[
         { cue:"Set it up", text:"Here's what **we're** seeing out there." },
       ]},
-      { kind:"say", title:"What we're seeing", slide:"Stat slide", proof:["Turnover + $60,090 per RN + $4.2–6.2M per hospital: NSI 2025 · Half leave within two years: Clasp Series B release · Allied vacancy 2x nursing + 100K short by 2028: Clasp School Deserts · 30% of counties + 40–85% unfunded: Clasp 2026 Talent Outlook · 78 days to fill: playbook · Imaging 18.1% vacancy: ASRT","Loan caps: Grad PLUS ends July 1, 2026; nursing, PT, PA capped at $100K (check the lawsuit status) · 1 in 3 cutting back or switching: U.S. News survey","Betting: Clasp survey of 1,000 healthcare students (say \"a survey we ran\") · 89% rewards: 2026 healthcare workforce survey (Motivosity — don't name it) · −72%: Laudio"], beats:[
+      { kind:"say", title:"What we're seeing", slide:"Stat slide", proof:["100,000+ short by 2028 + allied vacancy 2x nursing + 30% of counties: Clasp School Deserts / Talent Outlook · Imaging 18%: ASRT · 78 days to fill: playbook","80,000+ qualified nursing applications turned away (2024): AACN — barriers are faculty, clinical sites, preceptors, space","Six-figure debt for PT, OT, CRNA, PA: battle cards · $100K cap: Grad PLUS ends July 1, 2026 (check the lawsuit status) · Up to 85% unfunded: Clasp 2026 Talent Outlook"], beats:[
         { cue:"Not pretty", text:"And honestly — **it's not pretty**." },
-        { cue:"The shortage", when:"noRole", text:"Healthcare is **short on people** — and it's getting worse. Clinical demand is projected to outpace supply by **more than 100,000 workers by 2028**. **Allied health vacancies often run more than double nursing's** — in imaging, vacancy hit **18%**, **triple** what it was three years ago. Even an experienced nurse takes **78 days** to fill." },
-        { cue:"The shortage", when:"isRN", text:"Healthcare is **short on people** — and it's getting worse. Clinical demand is projected to outpace supply by **more than 100,000 workers by 2028**, and an experienced RN role takes **78 days to fill**." },
-        { cue:"The shortage", when:"isImaging", text:"Healthcare is **short on people** — and it's getting worse. In imaging, vacancy hit **18%** — **triple** what it was three years ago." },
-        { cue:"The shortage", when:"otherAllied", text:"Healthcare is **short on people** — and it's getting worse. **Allied health vacancies often run more than double nursing's**." },
-        { cue:"The shortage", when:"otherNursing", text:"Healthcare is **short on people** — and it's getting worse. Clinical demand is projected to outpace supply by **more than 100,000 workers by 2028**." },
-        { cue:"Can't backfill", text:"And the pipeline can't backfill it — **about 30% of U.S. counties don't have a single allied health training program**." },
-        { cue:"The debt", when:"noRole", text:"**Now layer on the student debt crisis.** A new grad PT walks out with **$142,000** in debt. OTs and CRNAs, **$175,000 or more**." },
-        { cue:"The debt", when:"hasRole", text:"**Now layer on the student debt crisis.** **[role loans] of [role] grads** have student loans — averaging **[role debt]**." },
-        { cue:"Loan caps", text:"And as of July 1st, nursing, PT and PA students are **capped at $100,000 in federal loans** — leaving **40 to 85% of program costs unfunded**. **1 in 3 students** say they're considering **cutting back on school or switching degrees** because of it. So the debt crisis is **making the shortage worse**." },
-        { cue:"Desperate", text:"**And they're getting desperate.** We surveyed 1,000 healthcare students — **more than 1 in 4 are betting on DraftKings and Kalshi**, and **two-thirds of them see it as a way to pay for school**." },
-        { cue:"Even when you win", when:"noRole", text:"And even when you win them — **nearly 1 in 3 new hires leave in their first year**, and **nearly half of new clinicians leave within two years**." },
-        { cue:"Even when you win", when:"hasRole", text:"And even when you win them — about **[role turnover] of new [role]s leave in their first year**, and across healthcare, **nearly half of new clinicians leave within two years**." },
-        { cue:"The cost", when:"noRole", text:"Replacing **just one nurse** costs about **$60,000** — and nurse turnover **alone** runs the average hospital **$4 to $6 million a year**." },
-        { cue:"The cost", when:"isRN", text:"**Every RN who leaves costs about $60,000** to replace. For the average hospital, that's **$4 to $6 million a year**." },
-        { cue:"The cost", when:"otherRole", text:"Every one who leaves means **another [role sign-on] sign-on** to backfill — before you've paid to **cover the gap**." },
-        { cue:"The kicker", text:"**Here's the kicker:** **89% of healthcare employees say rewards are what keep them**. Yet most systems put that money into **sign-ons** — which have a **−72% return**." },
-        { cue:"We don't appreciate", text:"So everybody understands healthcare hiring is hard. What we don't always appreciate is **how much it's costing us**." },
+        { cue:"The shortage", text:"Healthcare is **short on people** — and it's getting worse. Clinical demand is projected to outpace supply by **more than 100,000 workers by 2028**. **Allied health vacancies often run more than double nursing's** — in imaging, vacancy hit **18%**, **triple** what it was three years ago. Even an experienced nurse takes **78 days** to fill." },
+        { cue:"Can't backfill", text:"And the pipeline can't backfill it. For example, nursing schools turned away **more than 80,000 qualified applications** in a single year — they don't have the faculty or clinical spots to train them. And **about 30% of U.S. counties don't have a single allied health training program**." },
+        { cue:"The debt", text:"**Now layer on the student debt crisis.** Clinicians are graduating with **six figures** in student debt — for PTs, OTs, CRNAs and PAs, it's **$100,000 or more**." },
+        { cue:"It just got worse", text:"And it just got worse. As of July 1st, federal loans **cap at $100,000**, which leaves **up to 85% of a clinical degree's cost unfunded**. So **fewer students can afford to train** for the roles you need most." },
+        { cue:"We don't appreciate", text:"So everybody understands healthcare hiring is hard. What we don't always appreciate is **how much the debt crisis is making the shortage worse**." },
       ]},
       { kind:"say", title:"One hire", slide:"Chart · stays vs. leaves", proof:["Stays: the sign-on, and that's it","Leaves: the sign-on + ~$60,090 to replace (NSI 2025: recruiting, onboarding, overtime and premium coverage)"], beats:[
         { cue:"One example", text:"So here's an example just to illustrate how expensive it is when **even one new grad leaves**." },
@@ -191,7 +174,7 @@ export const STAGE_DATA = {
         { cue:"Hold that thought", text:"Hold that thought — we'll come back to it." },
       ]},
     ],
-    tips:["If they named a role in intros, tap it so the numbers are theirs.","Keep it to about 3 minutes. It's a story, not a lecture."],
+    tips:["Keep it to about 3 minutes. It's a story, not a lecture."],
     watch:["Turning it into a lecture — if they jump in, let them","Using \"millions\" for a small system — say \"hundreds of thousands, every year\"","Saying the $60K or $295K numbers are for every role — they're nurse numbers"],
   },
   "value-drop": {
