@@ -110,7 +110,7 @@ export const STAGE_DATA = {
     rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
     script:[
       { kind:"say", title:"Who we are", slide:"Slide 1 · Title", beats:[
-        { cue:"Set up the slides", text:"To give you some context, I've got **a few short slides** — feel free to **interrupt me**." },
+        { cue:"Set up the slides", text:"To give you some context on **the problems we solve**, I've prepared **a few short slides**." },
         { cue:"Who we are", text:"Clasp works **only in healthcare**. We help HR and TA teams hit **three outcomes** through a **student loan repayment and recruitment program**." },
       ]},
       { kind:"say", title:"Three outcomes", slide:"Slide 2 · Three outcomes", beats:[
