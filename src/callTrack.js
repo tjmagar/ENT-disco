@@ -109,9 +109,8 @@ export const STAGE_DATA = {
   "orient": {
     rule:"Lay out the three outcomes, then let them choose where to focus. Their pick steers discovery.",
     script:[
-      { kind:"say", title:"Who we are", slide:"Slide 1 · Title", beats:[
+      { kind:"say", title:"Context", slide:"Slide 1 · Title", beats:[
         { cue:"Set up the slides", text:"To give you some context on **the problems we solve**, I've prepared **a few short slides**." },
-        { cue:"Who we are", text:"Clasp works **only in healthcare**. We help HR and TA teams hit **three outcomes** through a **student loan repayment and recruitment program**." },
       ]},
       { kind:"say", title:"Three outcomes", slide:"Slide 2 · Three outcomes", beats:[
         { cue:"Next slide", text:"And through speaking with HR and TA leaders, **the three areas where we tend to drive the most value**, and where a partnership often makes sense, are here on your screen:" },
