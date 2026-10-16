@@ -155,18 +155,18 @@ export const STAGE_DATA = {
       ]},
       { kind:"say", title:"The gap", slide:"Chart · the gap", proof:["Grads vs. needed per year: CRNA ~2,400 vs 4,000–5,000 · PT ~14,000 vs 15,000–18,000 · Rad Tech ~15,000 vs 16,000–18,000 · RT ~5,500 vs 7,000–8,800 (Clasp research)","Backup: 40% of RT program classes unfilled; RT enrollment down 27% while 92K RTs retire by 2030"], beats:[
         { cue:"Show it", text:"So here's what that looks like." },
-        { cue:"Walk the chart", text:"Every year we graduate about **5,500 respiratory therapists** — and we need up to **8,800**. About **2,400 CRNAs** — and we need up to **5,000**. PTs and rad techs? **Same story.**" },
+        { cue:"Walk the chart", text:"Across nursing and allied health, we're **not graduating enough people to fill the seats**. For example, about **5,500 respiratory therapists** graduate each year — and we need up to **8,800**. About **14,000 PTs** — and we need up to **18,000**. **2,400 CRNAs** — and we need up to **5,000**." },
         { cue:"The gap", text:"That space in between? **That's the gap.** And you pay for every inch of it — **sign-ons, travelers, overtime**." },
         { cue:"Wider", text:"And it's **only getting wider**." },
       ]},
-      { kind:"say", title:"Multiply it", slide:"Chart · across your system", proof:["Travel RN ~$91.23/hr vs staff RN ~$59.46/hr incl. benefits (playbook) → ~$32/hr × 2,080 hrs ≈ $66K more per role per year","10 roles ≈ $660K · 50 roles ≈ $3.3M — nurse rates; say \"for a nurse\" if pressed"], beats:[
-        { cue:"Multiply it", text:"Now, of course, when you multiply that across your system — every role in that gap you cover with a traveler costs about **$66,000 more a year** than a staff hire." },
-        { cue:"Scale it", text:"So **10 open roles** isn't a rounding error — it's **over $650,000**. **Fifty** is **more than $3 million**. And that's **every year** the gap stays open." },
+      { kind:"say", title:"Multiply it", slide:"Chart · across your system", proof:["Replacement cost: nurse $60,090 (NSI 2026) · PT ~$70K · rad tech ~$75K · RT ~$80K (Clasp research)","10 × ~$70K ≈ $700K · 50 ≈ $3.5M"], beats:[
+        { cue:"Multiply it", text:"Now, of course, when you multiply that across your system — **every seat you have to fill or refill costs tens of thousands**. For example, about **$60,000** for a nurse, **$70,000** for a PT, **$80,000** for an RT." },
+        { cue:"Scale it", text:"So **10 open roles** isn't a rounding error — it's **about $700,000**. **Fifty** is **more than $3 million**. And that's **every year** the gap stays open." },
       ]},
-      { kind:"say", title:"Two bad choices", slide:"The gap gets even WORSE when you're short-staffed…", proof:["Slide: two questions, each with a \"But…\" underneath","CRNA: 12,500 shortfall by 2033, demand up 10–38% (Clasp research)","Backup if they push on spend: contract labor went from 2% to 11% of hospital labor costs, 2019–2022 (Kaufman Hall)"], beats:[
-        { cue:"It gets worse", text:"Now, the last piece of this before we dig into your situation — **it gets even worse**, because **demand isn't slowing down**. An aging population, more surgeries, more chronic disease. CRNA demand alone is projected to grow **up to 38%** — while we're already headed for a **12,500 CRNA shortfall** by 2033." },
+      { kind:"say", title:"Two bad choices", slide:"The gap gets even WORSE when you're short-staffed…", proof:["Slide: two questions, each with a \"But…\" underneath","RT demand +14% by 2031, 92K RTs retire by 2030 · CRNA demand +10–38%, 12,500 shortfall by 2033 (Clasp research)","Backup if they push on spend: contract labor went from 2% to 11% of hospital labor costs, 2019–2022 (Kaufman Hall)"], beats:[
+        { cue:"It gets worse", text:"Now, the last piece of this before we dig into your situation — **it gets even worse**, because **demand isn't slowing down** across nursing and allied health. An aging population, more surgeries, more chronic disease. For example, RT demand is projected to grow **14%** — while **92,000 RTs retire** by 2030. And CRNA demand could grow **up to 38%**." },
         { cue:"Two choices", text:"And you've got a choice, right? You've got **two bad choices**.", list:[
-          { tag:"1", text:"Number one, **do you fill every seat?** But because the pipeline is so thin, you have to **pay whatever it takes** — sign-ons, travelers, overtime." },
+          { tag:"1", text:"Number one, **do you fill every seat?** But because the pipeline is so thin, you **overpay for every hire you make**." },
           { tag:"2", text:"Or number two, **do you hold the line on spend?** But that leaves roles open and **burns out the team you have**. Burnout drives turnover, turnover **deepens the shortage** — and **patient care and revenue** take the hit." },
         ]},
         { cue:"The question", text:"So **which expensive problem do you want to pay the price on?**" },
