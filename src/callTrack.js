@@ -157,7 +157,7 @@ export const STAGE_DATA = {
       { kind:"say", title:"One open seat", slide:"Chart · one vacant FTE: staff RN vs premium labor", proof:["Staff RN $59.46/hr all-in × 2,080 hrs ≈ $124K · traveler $91.23/hr ≈ $190K · ~$66K more/yr (NSI 2026) · SIA/NATHO 2025 avg travel bill rate $90.54","Burnout: each extra patient per nurse → 23% higher odds of burnout (Aiken, JAMA 2002)","78 days to hire an experienced RN (NSI 2026)","Mortality: each extra patient per nurse → ~7% higher 30-day mortality (Aiken, JAMA 2002)","Two years, two seats ≈ nearly $200K premium over staff"], beats:[
         { cue:"One example", text:"Here's an example to illustrate how costly it can be for **just one seat you can't fill**." },
         { cue:"Walk the chart", text:"Okay, we've got this red line, which is **a staff RN in that seat**, the teal line, which is **that same seat covered by premium labor**, and this is **what each one costs you** over a year, right?" },
-        { cue:"Staff RN", text:"A **staff RN** is probably **costing you about $124 grand** a year, all in." },
+        { cue:"Staff RN", text:"According to **NSI**, a **staff RN** is probably **costing you about $124 grand** a year, all in — **benefits and everything**." },
         { cue:"Not always a traveler", text:"And realistically, an open seat **isn't always a traveler**. It's **overtime, agency, incentive shifts** — or some days it just **sits open**." },
         { cue:"Traveler rate", text:"But when you do bring in a traveler, the industry average is about **$91 an hour**, versus **$59 for staff**." },
         { cue:"150%", text:"So a traveler is probably **costing you around 150% of a staff RN** — and they're gonna **cost you $66,000 more** over the span of the year." },
