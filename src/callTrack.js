@@ -153,21 +153,21 @@ export const STAGE_DATA = {
         { cue:"It just got worse", text:"And on July 1st, the government **eliminated Grad PLUS** — the loan that covered the full cost of school. It even tried to say nursing **isn't a professional degree**. That's in court, but students hear the message loud and clear: **the barrier to a healthcare career is getting higher**." },
         { cue:"We don't appreciate", text:"So everybody understands clinical hiring is **getting harder**. What we don't always appreciate is **how much it's costing us**. And with **43% of hospitals operating at a loss** — **up from a third before COVID** — there's **no budget left to throw at the problem**." },
       ]},
-      { kind:"say", title:"The gap", slide:"Chart · the gap", proof:["Concept chart — two lines, not plotted data","Labor expenses up 16% in three years: Kaufman Hall Flash Report (Aug 2026)"], beats:[
+      { kind:"say", title:"The gap", slide:"Chart · the gap", proof:["Grads vs. needed per year: CRNA ~2,400 vs 4,000–5,000 · PT ~14,000 vs 15,000–18,000 · Rad Tech ~15,000 vs 16,000–18,000 · RT ~5,500 vs 7,000–8,800 (Clasp research)","Backup: 40% of RT program classes unfilled; RT enrollment down 27% while 92K RTs retire by 2030"], beats:[
         { cue:"Show it", text:"So here's what that looks like." },
-        { cue:"Walk the chart", text:"The top line is **the people you need** — and it keeps going up. The bottom line is **the grads available to hire**. It was already flat — and now the debt crisis is **pushing it down**." },
-        { cue:"The gap", text:"That shaded space in between? **That's the gap.** And you pay for every inch of it — **sign-ons, travelers, overtime**." },
+        { cue:"Walk the chart", text:"Every year we graduate about **5,500 respiratory therapists** — and we need up to **8,800**. About **2,400 CRNAs** — and we need up to **5,000**. PTs and rad techs? **Same story.**" },
+        { cue:"The gap", text:"That space in between? **That's the gap.** And you pay for every inch of it — **sign-ons, travelers, overtime**." },
         { cue:"Wider", text:"And it's **only getting wider**." },
       ]},
       { kind:"say", title:"Multiply it", slide:"Chart · across your system", proof:["Travel RN ~$91.23/hr vs staff RN ~$59.46/hr incl. benefits (playbook) → ~$32/hr × 2,080 hrs ≈ $66K more per role per year","10 roles ≈ $660K · 50 roles ≈ $3.3M — nurse rates; say \"for a nurse\" if pressed"], beats:[
         { cue:"Multiply it", text:"Now, of course, when you multiply that across your system — every role in that gap you cover with a traveler costs about **$66,000 more a year** than a staff hire." },
         { cue:"Scale it", text:"So **10 open roles** isn't a rounding error — it's **over $650,000**. **Fifty** is **more than $3 million**. And that's **every year** the gap stays open." },
       ]},
-      { kind:"say", title:"Two bad choices", slide:"The gap gets even WORSE when you're short-staffed…", proof:["Slide: two questions, each with a \"But…\" underneath","Backup if they push on spend: contract labor went from 2% to 11% of hospital labor costs, 2019–2022 (Kaufman Hall)"], beats:[
-        { cue:"It gets worse", text:"Now, the last piece of this before we dig into your situation — **it gets even worse** when you're short-staffed, just like a lot of systems are right now. Because you've still got **units to staff** and **hiring targets to hit**." },
+      { kind:"say", title:"Two bad choices", slide:"The gap gets even WORSE when you're short-staffed…", proof:["Slide: two questions, each with a \"But…\" underneath","CRNA: 12,500 shortfall by 2033, demand up 10–38% (Clasp research)","Backup if they push on spend: contract labor went from 2% to 11% of hospital labor costs, 2019–2022 (Kaufman Hall)"], beats:[
+        { cue:"It gets worse", text:"Now, the last piece of this before we dig into your situation — **it gets even worse**, because **demand isn't slowing down**. An aging population, more surgeries, more chronic disease. CRNA demand alone is projected to grow **up to 38%** — while we're already headed for a **12,500 CRNA shortfall** by 2033." },
         { cue:"Two choices", text:"And you've got a choice, right? You've got **two bad choices**.", list:[
           { tag:"1", text:"Number one, **do you fill every seat?** But because the pipeline is so thin, you have to **pay whatever it takes** — sign-ons, travelers, overtime." },
-          { tag:"2", text:"Or number two, **do you hold the line on spend?** But that leaves roles open and **burns out the team you have** — and now you miss your staffing targets, and therefore **patient care and revenue** take the hit." },
+          { tag:"2", text:"Or number two, **do you hold the line on spend?** But that leaves roles open and **burns out the team you have**. Burnout drives turnover, turnover **deepens the shortage** — and **patient care and revenue** take the hit." },
         ]},
         { cue:"The question", text:"So **which expensive problem do you want to pay the price on?**" },
         { cue:"Help you answer it", text:"What I want to do today is **help you answer that question**." },
@@ -347,13 +347,13 @@ export const STAGE_DATA = {
       { kind:"ask", label:"What they've tried", text:"What have you **tried so far** to keep them?" },
       { kind:"ask", label:"Internal conversations", text:"It sounds like that might already be on the radar. How much has **bringing that number down** come up in conversations internally?" },
       { kind:"ask", label:"Who feels it", text:"And who would you say **feels that number the most**?" },
-      { kind:"say", title:"If it lands: the cost of one departure", slide:"Chart · stays vs. leaves", proof:["Stays: the sign-on, and that's it","Leaves: the sign-on + ~$60,090 to replace a nurse (NSI 2026) · up to ~80% of salary for skilled technical roles (Gallup benchmark)","Therapists + techs 60+ days to hire: Florida Hospital Association (state data)"], beats:[
+      { kind:"say", title:"If it lands: the cost of one departure", slide:"Chart · stays vs. leaves", proof:["Stays: the sign-on, and that's it","Replacement cost: nurse ~$77K · PT ~$70K · rad tech ~$75K · RT ~$80K (Clasp research) — NSI's nurse-only figure is ~$60K","Therapists + techs 60+ days to hire: Florida Hospital Association (state data)"], beats:[
         { cue:"Set it up", text:"Let me show you what **one departure** actually costs." },
         { cue:"One example", text:"So here's an example just to illustrate how expensive it is when **even one new grad leaves**." },
         { cue:"Walk the chart", text:"The red line is a new grad who **stays**, the teal line is one who **leaves** — and this is what you spend on each over their first two years. Both get the **same sign-on** on day one, right? For the one who stays, that's it. That's your cost." },
         { cue:"It gets worse", text:"Okay. That's only one hire. Now it actually gets worse. The one who leaves at month 12 doesn't just walk out with the sign-on. **The role sits open.** Backfilling with an experienced nurse takes about **78 days**, and therapists and techs often take **two months or more** — or you wait for **next year's graduating class**. Meanwhile you're paying for recruiting, onboarding, overtime, and **travelers** — for a nurse, that's **$91 an hour** versus $59 for staff." },
         { cue:"Backfill", text:"Then you pay **another sign-on** to backfill." },
-        { cue:"Two years", text:"So when we extend the timeline to 2 years — assuming your second hire even stays — that one departure cost you **tens of thousands** more than the hire who stayed. Replacing a skilled clinician can cost **up to 80% of their salary** — for a nurse, that's about **$60,000**." },
+        { cue:"Two years", text:"So when we extend the timeline to 2 years — assuming your second hire even stays — that one departure cost you **tens of thousands** more than the hire who stayed. Replacing a nurse runs about **$77,000**. A PT, about **$70,000**. A rad tech, **$75,000**. An RT, **$80,000**." },
         { cue:"Why I share it", text:"And the reason I share this isn't because you need to be taught that turnover is hard. It's to make clear just **how expensive even one new grad leaving is**." },
       ]},
     ],
