@@ -173,7 +173,7 @@ export const STAGE_DATA = {
         { cue:"Multiply it", text:"Now, of course, when you multiply that across your system, **the average hospital is carrying about 43 open RN positions**. At $66,000 each, that's **nearly $3 million a year, in premium labor alone**. And that's money that **doesn't build anything**. When the contract ends, the seat's still empty." },
       ]},
       { kind:"say", title:"Quality of care", slide:"Quality of care", proof:["Mortality: each extra patient per nurse → ~7% higher 30-day mortality (Aiken, JAMA 2002)","Each understaffed shift → ~2% higher mortality risk, cumulative (Needleman, NEJM 2011)","Allied health line has no stat yet"], beats:[
-        { cue:"Transition", text:"But those are just **the dollars and cents**. Nobody gets into healthcare to get rich. They get into it to **help people get better**. So here's what this crisis is doing to **quality of care**." },
+        { cue:"Transition", text:"But the dollars are only half of it. Nobody gets into healthcare to get rich. They get into it to **help people get better**. And this is hitting **quality of care**." },
         { cue:"Patients don't go away", text:"When a seat sits open, **the patients don't go away**. They just get **spread across fewer people**." },
         { cue:"Mortality", text:"Research shows every extra patient per nurse is tied to about a **7% increase in mortality risk**." },
         { cue:"Every short shift", text:"Another study found that **every shift a unit runs understaffed** raises patients' mortality risk — and it **compounds**, shift after shift." },
