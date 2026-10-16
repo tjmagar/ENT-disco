@@ -177,7 +177,7 @@ export const STAGE_DATA = {
         ]},
         { cue:"The question", text:"So **which costly problem are you willing to pay the price on?**" },
         { cue:"Help you answer it", text:"What I want to show you today is something that **answers this question**." },
-        { cue:"New slide · What if", text:"**What if you could fill your hardest-to-fill roles with permanent staff AND save money?** Those two goals are usually **at odds** with each other. What we do **marries them together**, so you get the best of both worlds: **your CFO is happy, your team is happy, and your community is happy.**" },
+        { cue:"New slide · What if", text:"**What if you could protect your margins and stabilize your permanent workforce — and those two goals weren't at odds?** What we do **marries them together**, so you get the best of both worlds: **your CFO is happy, your team is happy, and your community is happy.**" },
       ]},
     ],
     tips:["Keep it to about 3 minutes. It's a story, not a lecture."],
