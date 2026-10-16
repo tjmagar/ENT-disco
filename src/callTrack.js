@@ -160,7 +160,7 @@ export const STAGE_DATA = {
         { cue:"Staff RN", text:"According to **NSI**, a **staff RN** is probably **costing you about $124 grand** a year, all in — **benefits and everything**." },
         { cue:"Not always a traveler", text:"And realistically, an open seat **isn't always a traveler**. It's **overtime, agency, incentive shifts** — or some days it just **sits open**." },
         { cue:"Traveler rate", text:"But when you do bring in a traveler, the industry average is about **$91 an hour**, versus **$59 for staff**." },
-        { cue:"150%", text:"So a traveler is probably **costing you around 150% of a staff RN** — and they're gonna **cost you $66,000 more** over the span of the year." },
+        { cue:"150%", text:"So a traveler runs you **around 150% of a staff RN** — **$66K more** than a staff RN over the course of the year." },
         { cue:"It gets worse", text:"Okay, that's expensive. Now it actually **gets worse**, because that's **only one seat**." },
         { cue:"Only one FTE", text:"That's only telling you the **premium labor cost** of **one vacant FTE**." },
         { cue:"Burnout", text:"What happens with a vacant FTE is that, at some point, the staff picking up those shifts **start to burn out**. Research shows every extra patient per nurse raises burnout risk by **about 23%** — and **they leave too**." },
