@@ -160,6 +160,10 @@ export const STAGE_DATA = {
         { cue:"The gap", text:"That shaded space in between? **That's the gap.** And you pay for every inch of it — **sign-ons, travelers, overtime**. It's a big part of why labor costs are **up 16% in three years**." },
         { cue:"Wider", text:"And it's **only getting wider**." },
       ]},
+      { kind:"say", title:"Multiply it", slide:"Chart · across your system", proof:["Travel RN ~$91.23/hr vs staff RN ~$59.46/hr incl. benefits (playbook) → ~$32/hr × 2,080 hrs ≈ $66K more per role per year","10 roles ≈ $660K · 50 roles ≈ $3.3M — nurse rates; say \"for a nurse\" if pressed"], beats:[
+        { cue:"Multiply it", text:"Now, of course, when you multiply that across your system — every role in that gap you cover with a traveler costs about **$66,000 more a year** than a staff hire." },
+        { cue:"Scale it", text:"So **10 open roles** isn't a rounding error — it's **over $650,000**. **Fifty** is **more than $3 million**. And that's **every year** the gap stays open." },
+      ]},
       { kind:"say", title:"Two bad choices", slide:"Two bad choices", beats:[
         { cue:"It gets worse", text:"Now, the last piece of this before I show you how we help — **it gets even worse** when you're short-staffed, just like a lot of systems are right now. You've got units to staff and services to keep open." },
         { cue:"Two choices", text:"So you've got a choice, right? **Two bad choices.**", list:[
